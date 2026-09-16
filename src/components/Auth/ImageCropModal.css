@@ -1,0 +1,323 @@
+/* Dedicated Self-Contained Styles for ImageCropModal */
+
+.crop-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(12, 24, 36, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: 16px;
+  box-sizing: border-box;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: cropFadeIn 0.16s ease-out;
+}
+
+.crop-modal-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #ded9cc;
+  box-shadow: 0 24px 48px rgba(15, 29, 47, 0.35);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  animation: cropSlideUp 0.18s ease-out;
+  position: relative;
+}
+
+.crop-modal-top-accent {
+  height: 4px;
+  width: 100%;
+  background-color: #b3881e;
+  flex-shrink: 0;
+}
+
+.crop-modal-header {
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid #ede8de;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  background-color: #ffffff;
+}
+
+.crop-modal-header .modal-role-pill {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b3881e;
+  background-color: #faf7f0;
+  border: 1px solid #ded9cc;
+  padding: 2.5px 8px;
+  border-radius: 3px;
+  margin-bottom: 4px;
+}
+
+.crop-modal-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f1d2f;
+  margin: 4px 0 2px;
+  letter-spacing: -0.01em;
+}
+
+.crop-modal-subtitle {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+}
+
+.crop-modal-header .modal-close-btn {
+  width: 28px;
+  height: 28px;
+  font-size: 13px;
+  border: 1px solid #ded8cb;
+  border-radius: 4px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.crop-modal-header .modal-close-btn:hover {
+  background-color: #f8f6f0;
+  color: #0f1d2f;
+  border-color: #cbd5e1;
+}
+
+.crop-modal-body {
+  padding: 20px 22px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  background-color: #fcfbf9;
+  box-sizing: border-box;
+}
+
+/* Crop Viewport Area (Strictly bounded 280x280) */
+.crop-viewport {
+  width: 280px;
+  height: 280px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: #0f1d2f;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+}
+
+.crop-viewport:active {
+  cursor: grabbing;
+}
+
+.crop-target-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+  transform-origin: center center;
+  will-change: transform;
+  user-select: none;
+  max-width: none;
+  max-height: none;
+  display: block;
+}
+
+.crop-circle-mask {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 9999px rgba(15, 29, 47, 0.72);
+  border: 2px solid #d4af37;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.crop-grid-lines {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.crop-grid-h {
+  position: absolute;
+  top: 33.33%;
+  left: 0;
+  right: 0;
+  height: 33.33%;
+  border-top: 1px dashed rgba(212, 175, 55, 0.35);
+  border-bottom: 1px dashed rgba(212, 175, 55, 0.35);
+  pointer-events: none;
+}
+
+.crop-grid-v {
+  position: absolute;
+  left: 33.33%;
+  top: 0;
+  bottom: 0;
+  width: 33.33%;
+  border-left: 1px dashed rgba(212, 175, 55, 0.35);
+  border-right: 1px dashed rgba(212, 175, 55, 0.35);
+  pointer-events: none;
+}
+
+/* Zoom and Pan Controls */
+.crop-controls-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+  box-sizing: border-box;
+}
+
+.crop-zoom-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: 1px solid #d4cdc0;
+  background: #ffffff;
+  color: #0f1d2f;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+.crop-zoom-btn:hover {
+  background-color: #112233;
+  color: #ffffff;
+  border-color: #112233;
+}
+
+.crop-zoom-slider {
+  flex-grow: 1;
+  accent-color: #1b525c;
+  cursor: pointer;
+  height: 5px;
+}
+
+.crop-zoom-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #556977;
+  min-width: 36px;
+  text-align: right;
+}
+
+.crop-reset-btn {
+  background: transparent;
+  border: 1px solid #ded9cc;
+  border-radius: 3px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #556977;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.crop-reset-btn:hover {
+  color: #0f1d2f;
+  border-color: #112233;
+  background-color: #f5f2ea;
+}
+
+/* Modal Footer Actions */
+.crop-modal-footer {
+  padding: 14px 22px 18px;
+  border-top: 1px solid #ede8de;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.crop-btn-cancel {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1.5px solid #ded9cc;
+  background: #ffffff;
+  color: #556977;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.crop-btn-cancel:hover {
+  background-color: #f5f2ea;
+  color: #0f1d2f;
+  border-color: #b3881e;
+}
+
+.crop-btn-apply {
+  padding: 8px 20px;
+  border-radius: 4px;
+  border: 1.5px solid #112233;
+  background: #112233;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.crop-btn-apply:hover {
+  background: #1b525c;
+  border-color: #1b525c;
+}
+
+@keyframes cropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cropSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

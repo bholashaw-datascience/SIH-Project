@@ -1,0 +1,152 @@
+:root {
+  --text: #0f1d2f;
+  --bg: #f5f2ea;
+  color-scheme: light;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Global 100% solid, fully opaque application-controlled cursors */
+  /* Solid arrow with opaque white fill and dark navy outline: no transparency, no blend mode, no inversion */
+  --cursor-default: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M0 0 L0 18 L4.5 14 L8.5 21.5 L11 20.5 L7 13 L14 13 Z' fill='%23ffffff' stroke='%230f1d2f' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") 0 0, default;
+
+  /* Solid pointer with opaque white fill and dark navy outline: no transparency, no blend mode, no inversion */
+  --cursor-pointer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M7 2a1.5 1.5 0 0 0-1.5 1.5v7.8l-1.4-.9a1.6 1.6 0 0 0-2.2.4 1.6 1.6 0 0 0 .3 2.2l4.8 4.2c1.3 1.2 3 1.8 4.8 1.8h3c3.3 0 6-2.7 6-6V9.5a1.5 1.5 0 0 0-3 0v1h-1v-2a1.5 1.5 0 0 0-3 0v2h-1v-3a1.5 1.5 0 0 0-3 0v3h-1V3.5A1.5 1.5 0 0 0 7 2z' fill='%23ffffff' stroke='%230f1d2f' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") 7 2, pointer;
+
+  /* Solid text I-beam with opaque white backing and dark navy core: no inversion, no transparency */
+  --cursor-text: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M8 3h8M12 3v18M8 21h8' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M8 3h8M12 3v18M8 21h8' stroke='%230f1d2f' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") 12 12, text;
+
+  /* Solid not-allowed cursor */
+  --cursor-not-allowed: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='9' fill='%23ffffff' stroke='%230f1d2f' stroke-width='1.5'/%3E%3Ccircle cx='12' cy='12' r='7.5' fill='none' stroke='%23c93b2b' stroke-width='1.5'/%3E%3Cline x1='6.7' y1='6.7' x2='17.3' y2='17.3' stroke='%23c93b2b' stroke-width='1.5'/%3E%3C/svg%3E") 12 12, not-allowed;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Ensure pseudo-elements never intercept pointer events or obstruct interactive elements */
+*::before,
+*::after {
+  pointer-events: none;
+}
+
+/* Ensure all normal non-interactive text content uses the solid arrow cursor and never the I-beam cursor */
+h1, h2, h3, h4, h5, h6,
+p,
+span,
+label,
+strong,
+b,
+em,
+i,
+small,
+dt,
+dd,
+li,
+td,
+th,
+figcaption,
+.form-label,
+.form-feedback,
+.badge,
+.tag {
+  cursor: var(--cursor-default);
+}
+
+/* Ensure interactive controls preserve their clean, solid pointer cursor */
+button,
+a,
+select,
+summary,
+[role="button"],
+[role="link"],
+[role="tab"],
+.clickable,
+.stakeholder-tile,
+.tile-action-button,
+.btn,
+.nav-link,
+.card-clickable,
+[onclick] {
+  cursor: var(--cursor-pointer) !important;
+}
+
+/* Ensure child text and elements inside interactive containers inherit the solid interactive pointer */
+button *,
+a *,
+select *,
+summary *,
+[role="button"] *,
+[role="link"] *,
+[role="tab"] *,
+.clickable *,
+.stakeholder-tile *,
+.tile-action-button *,
+.btn *,
+.nav-link *,
+.card-clickable *,
+[onclick] * {
+  cursor: inherit !important;
+}
+
+/* Real editable text input fields retain clean, solid text cursor for typing */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="search"],
+textarea {
+  cursor: var(--cursor-text, text) !important;
+}
+
+/* Checkbox, radio, and button inputs use pointer cursor */
+input[type="checkbox"],
+input[type="radio"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  cursor: var(--cursor-pointer) !important;
+}
+
+/* Disabled elements retain not-allowed cursor */
+:disabled,
+[aria-disabled="true"],
+.disabled,
+.btn-disabled {
+  cursor: var(--cursor-not-allowed, not-allowed) !important;
+}
+
+/* Ensure interactive overlays (modals, dropdowns, backdrops) have explicit stacking control */
+.modal-backdrop,
+.crop-modal-overlay {
+  pointer-events: auto;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f5f2ea;
+  box-sizing: border-box;
+  cursor: var(--cursor-default);
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f2ea;
+  box-sizing: border-box;
+  cursor: var(--cursor-default);
+}
