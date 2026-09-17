@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const SKILL_CATEGORIES = [
   'Engineering & Technology',
@@ -92,9 +92,73 @@ export default function StudentAchievementsExperience({
   const [issueDate, setIssueDate] = useState('')
   const [credentialUrl, setCredentialUrl] = useState('')
   const [certificateFile, setCertificateFile] = useState(null)
-  const [fileInputKey, setFileInputKey] = useState(0)
+  const [certificatePreviewUrl, setCertificatePreviewUrl] = useState('')
+  const [isDragOver, setIsDragOver] = useState(false)
   const [formError, setFormError] = useState('')
   const [successBanner, setSuccessBanner] = useState('')
+  const fileInputRef = useRef(null)
+
+  const handleFileSelect = (file) => {
+    if (!file) return
+    const maxBytes = 5 * 1024 * 1024 // 5 MB
+    if (file.size > maxBytes) {
+      setFormError('Certificate file exceeds 5 MB limit. Please select a smaller file.')
+      return
+    }
+    const allowed = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
+    const ext = (file.name.split('.').pop() || '').toLowerCase()
+    if (!allowed.includes(file.type) && !['pdf', 'jpg', 'jpeg', 'png'].includes(ext)) {
+      setFormError('Please upload a valid PDF, JPG, or PNG certificate file.')
+      return
+    }
+
+    if (certificatePreviewUrl) {
+      try { URL.revokeObjectURL(certificatePreviewUrl) } catch {}
+    }
+
+    try {
+      const objUrl = URL.createObjectURL(file)
+      setCertificatePreviewUrl(objUrl)
+    } catch {}
+
+    setCertificateFile(file)
+    setFormError('')
+  }
+
+  const handleViewCertificate = () => {
+    if (certificatePreviewUrl) {
+      window.open(certificatePreviewUrl, '_blank')
+    } else if (certificateFile) {
+      try {
+        const url = URL.createObjectURL(certificateFile)
+        setCertificatePreviewUrl(url)
+        window.open(url, '_blank')
+      } catch {}
+    }
+  }
+
+  const handleReplaceCertificate = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleDeleteCertificate = () => {
+    if (certificatePreviewUrl) {
+      try { URL.revokeObjectURL(certificatePreviewUrl) } catch {}
+    }
+    setCertificateFile(null)
+    setCertificatePreviewUrl('')
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (certificatePreviewUrl) {
+        try { URL.revokeObjectURL(certificatePreviewUrl) } catch {}
+      }
+    }
+  }, [certificatePreviewUrl])
 
   // Save skills to localStorage whenever updated
   useEffect(() => {
@@ -240,8 +304,14 @@ export default function StudentAchievementsExperience({
     setIssuingOrg('')
     setIssueDate('')
     setCredentialUrl('')
+    if (certificatePreviewUrl) {
+      try { URL.revokeObjectURL(certificatePreviewUrl) } catch {}
+    }
     setCertificateFile(null)
-    setFileInputKey((k) => k + 1)
+    setCertificatePreviewUrl('')
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
     setFormError('')
     setIsAddFormOpen(false)
 
@@ -808,6 +878,181 @@ export default function StudentAchievementsExperience({
           border-color: #1e3a5f;
           background: #ffffff;
           box-shadow: 0 0 0 2px rgba(30, 58, 95, 0.08);
+        }
+
+        /* Custom Certificate Upload Box */
+        .sae-upload-box {
+          border: 2px dashed #cbd5e1;
+          background: #fafbfc;
+          border-radius: 8px;
+          padding: 20px 18px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          user-select: none;
+        }
+
+        .sae-upload-box:hover,
+        .sae-upload-box.dragover {
+          border-color: #1e3a5f;
+          background: #ffffff;
+          box-shadow: 0 4px 14px rgba(30, 58, 95, 0.08);
+          transform: translateY(-1px);
+        }
+
+        .sae-upload-icon-circle {
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          background: #e2e8f0;
+          color: #1e3a5f;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 6px;
+          transition: background 0.2s ease;
+        }
+
+        .sae-upload-box:hover .sae-upload-icon-circle,
+        .sae-upload-box.dragover .sae-upload-icon-circle {
+          background: #dbeafe;
+          color: #1d4ed8;
+        }
+
+        .sae-upload-title {
+          font-size: 0.92rem;
+          font-weight: 700;
+          color: #0f1f2e;
+        }
+
+        .sae-upload-hint {
+          font-size: 0.78rem;
+          color: #64748b;
+          margin-top: 3px;
+        }
+
+        /* Uploaded File Presentation Card */
+        .sae-file-card {
+          background: #ffffff;
+          border: 1px solid #cbd5e1;
+          border-left: 4px solid #16a34a;
+          border-radius: 8px;
+          padding: 10px 14px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          box-shadow: 0 2px 8px rgba(15, 31, 46, 0.04);
+        }
+
+        .sae-file-info {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          min-width: 0;
+          flex: 1;
+        }
+
+        .sae-file-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 6px;
+          background: #ecfdf5;
+          color: #16a34a;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .sae-file-text {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          min-width: 0;
+        }
+
+        .sae-file-name {
+          font-size: 0.86rem;
+          font-weight: 700;
+          color: #0f172a;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .sae-file-meta {
+          font-size: 0.74rem;
+          color: #64748b;
+        }
+
+        .sae-file-actions {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex-shrink: 0;
+        }
+
+        .sae-file-btn {
+          border-radius: 5px;
+          padding: 6px 11px;
+          font-size: 0.78rem;
+          font-weight: 600;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          transition: all 0.15s ease;
+          line-height: 1;
+        }
+
+        .sae-file-btn-view {
+          background: #f1f5f9;
+          color: #1e3a5f;
+          border: 1px solid #cbd5e1;
+        }
+
+        .sae-file-btn-view:hover {
+          background: #e2e8f0;
+          color: #0f1f2e;
+        }
+
+        .sae-file-btn-replace {
+          background: #f1f5f9;
+          color: #1e3a5f;
+          border: 1px solid #cbd5e1;
+        }
+
+        .sae-file-btn-replace:hover {
+          background: #e2e8f0;
+          color: #0f1f2e;
+        }
+
+        .sae-file-btn-delete {
+          background: #fef2f2;
+          color: #b91c1c;
+          border: 1px solid #fecaca;
+        }
+
+        .sae-file-btn-delete:hover {
+          background: #dc2626;
+          color: #ffffff;
+          border-color: #dc2626;
+        }
+
+        @media (max-width: 600px) {
+          .sae-file-card {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+          }
+          .sae-file-actions {
+            justify-content: flex-end;
+          }
         }
 
         .sae-form-actions {
@@ -1558,19 +1803,115 @@ export default function StudentAchievementsExperience({
                   <div className="sae-form-field sae-form-field-full">
                     <label>Upload Certificate *</label>
                     <input
-                      key={fileInputKey}
+                      ref={fileInputRef}
                       type="file"
-                      required
                       accept=".pdf,.jpg,.jpeg,.png"
+                      style={{ display: 'none' }}
                       onChange={(e) => {
                         const file = e.target.files?.[0] || null
-                        setCertificateFile(file)
+                        handleFileSelect(file)
                       }}
                     />
-                    {certificateFile && (
-                      <span style={{ fontSize: '0.78rem', color: '#16a34a', fontWeight: 600 }}>
-                        Attached: {certificateFile.name} ({(certificateFile.size / 1024).toFixed(1)} KB)
-                      </span>
+
+                    {!certificateFile ? (
+                      <div
+                        className={`sae-upload-box ${isDragOver ? 'dragover' : ''}`}
+                        onClick={() => fileInputRef.current?.click()}
+                        onDragOver={(e) => {
+                          e.preventDefault()
+                          setIsDragOver(true)
+                        }}
+                        onDragLeave={(e) => {
+                          e.preventDefault()
+                          setIsDragOver(false)
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault()
+                          setIsDragOver(false)
+                          const file = e.dataTransfer.files?.[0] || null
+                          handleFileSelect(file)
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            fileInputRef.current?.click()
+                          }
+                        }}
+                        aria-label="Upload Certificate"
+                      >
+                        <div className="sae-upload-icon-circle">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                          </svg>
+                        </div>
+                        <div className="sae-upload-title">Upload Certificate</div>
+                        <div className="sae-upload-hint">PDF, JPG or PNG • Max 5 MB</div>
+                      </div>
+                    ) : (
+                      <div className="sae-file-card">
+                        <div className="sae-file-info">
+                          <div className="sae-file-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                              <polyline points="14 2 14 8 20 8" />
+                              <line x1="16" y1="13" x2="8" y2="13" />
+                              <line x1="16" y1="17" x2="8" y2="17" />
+                              <polyline points="10 9 9 9 8 9" />
+                            </svg>
+                          </div>
+                          <div className="sae-file-text">
+                            <span className="sae-file-name" title={certificateFile.name}>
+                              {certificateFile.name}
+                            </span>
+                            <span className="sae-file-meta">
+                              {(certificateFile.size / (1024 * 1024) >= 1)
+                                ? `${(certificateFile.size / (1024 * 1024)).toFixed(2)} MB`
+                                : `${(certificateFile.size / 1024).toFixed(1)} KB`} • Ready for Verification
+                            </span>
+                          </div>
+                        </div>
+                        <div className="sae-file-actions">
+                          <button
+                            type="button"
+                            className="sae-file-btn sae-file-btn-view"
+                            onClick={handleViewCertificate}
+                            title="View Certificate"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            View
+                          </button>
+                          <button
+                            type="button"
+                            className="sae-file-btn sae-file-btn-replace"
+                            onClick={handleReplaceCertificate}
+                            title="Replace Certificate"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                            </svg>
+                            Replace
+                          </button>
+                          <button
+                            type="button"
+                            className="sae-file-btn sae-file-btn-delete"
+                            onClick={handleDeleteCertificate}
+                            title="Delete Certificate"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                            Delete
+                          </button>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
