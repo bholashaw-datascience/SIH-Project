@@ -1023,10 +1023,10 @@ function StudentPortal({
       `}</style>
 
       {/* Top Gold Accent Bar */}
-      {(!showDashboard && (!isDemoActive || demoStep === 1 || demoStep === 4)) && <div className="sp-gold-accent-bar" />}
+      {(!showDashboard && !showAchievementsExperience && (!isDemoActive || demoStep === 1 || demoStep === 4)) && <div className="sp-gold-accent-bar" />}
 
       {/* Top Navigation Navbar */}
-      {(!showDashboard && (!isDemoActive || demoStep === 1 || demoStep === 4)) && (
+      {(!showDashboard && !showAchievementsExperience && (!isDemoActive || demoStep === 1 || demoStep === 4)) && (
         <header className="sp-top-navbar">
           <div className="sp-brand-block">
             <h1 className="sp-brand-title">IAS Collaboration Portal</h1>
@@ -1300,7 +1300,7 @@ function StudentPortal({
 
           {/* STEP 5: Student Dashboard */}
           {demoStep === 5 && (
-            <div style={{ paddingBottom: '100px' }}>
+            <div style={{ paddingBottom: activeView === 'achievements_experience' ? 0 : '100px', display: 'flex', flexDirection: 'column', flex: 1 }}>
               {activeView === 'achievements_experience' ? (
                 <StudentAchievementsExperience
                   student={currentLive}

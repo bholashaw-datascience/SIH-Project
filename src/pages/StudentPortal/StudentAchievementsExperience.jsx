@@ -967,7 +967,8 @@ export default function StudentAchievementsExperience({
     <div className="sae-page-wrap">
       <style>{`
         .sae-page-wrap {
-          min-height: 100vh;
+          flex: 1;
+          min-height: 100%;
           background-color: #f7f5ef;
           color: #112233;
           display: flex;
@@ -981,7 +982,7 @@ export default function StudentAchievementsExperience({
           background-color: #0f1f2e;
           color: #ffffff;
           border-bottom: 3px solid #b38e44;
-          padding: 14px 28px;
+          padding: 8px 24px;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -1095,11 +1096,11 @@ export default function StudentAchievementsExperience({
           max-width: 1240px;
           width: 100%;
           margin: 0 auto;
-          padding: 16px 20px 60px;
+          padding: 8px 20px 14px;
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          gap: 14px;
+          gap: 8px;
         }
 
         /* Page Title & Inline Verification Notice */
@@ -1241,7 +1242,7 @@ export default function StudentAchievementsExperience({
         .sae-metrics-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 10px;
+          gap: 8px;
         }
 
         @media (max-width: 960px) {
@@ -1260,11 +1261,11 @@ export default function StudentAchievementsExperience({
           background: #ffffff;
           border: 1px solid #ded9cc;
           border-radius: 6px;
-          padding: 8px 12px;
+          padding: 6px 10px;
           box-shadow: 0 1px 3px rgba(15, 31, 46, 0.03);
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
           min-width: 0;
           transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
@@ -1290,8 +1291,8 @@ export default function StudentAchievementsExperience({
         }
 
         .sae-metric-icon {
-          width: 32px;
-          height: 32px;
+          width: 28px;
+          height: 28px;
           border-radius: 6px;
           display: flex;
           align-items: center;
@@ -1314,7 +1315,7 @@ export default function StudentAchievementsExperience({
         }
 
         .sae-metric-val {
-          font-size: 1.25rem;
+          font-size: 1.15rem;
           font-weight: 800;
           line-height: 1;
           color: #0f1f2e;
@@ -1331,12 +1332,12 @@ export default function StudentAchievementsExperience({
         }
 
         .sae-metric-sub {
-          font-size: 0.69rem;
+          font-size: 0.68rem;
           color: #64748b;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          margin-top: 2px;
+          margin-top: 1px;
           line-height: 1.2;
         }
 
@@ -1346,8 +1347,8 @@ export default function StudentAchievementsExperience({
           background: #ffffff;
           border: 1px solid #ded9cc;
           border-radius: 8px;
-          padding: 6px;
-          gap: 6px;
+          padding: 3px;
+          gap: 3px;
           box-shadow: 0 2px 6px rgba(15, 31, 46, 0.04);
         }
 
@@ -1355,16 +1356,16 @@ export default function StudentAchievementsExperience({
           flex: 1;
           background: transparent;
           border: none;
-          padding: 12px 18px;
+          padding: 6px 12px;
           border-radius: 6px;
-          font-size: 0.9rem;
+          font-size: 0.86rem;
           font-weight: 600;
           color: #475569;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 10px;
+          gap: 6px;
           transition: all 0.15s ease;
         }
 
@@ -1416,7 +1417,7 @@ export default function StudentAchievementsExperience({
           align-items: center;
           justify-content: space-between;
           flex-wrap: wrap;
-          gap: 14px;
+          gap: 8px;
         }
 
         .sae-filter-chips {
@@ -2442,17 +2443,17 @@ export default function StudentAchievementsExperience({
           background: #ffffff;
           border: 1px dashed #cbd5e1;
           border-radius: 8px;
-          padding: 48px 24px;
+          padding: 16px 16px;
           text-align: center;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 12px;
+          gap: 6px;
         }
 
         .sae-empty-icon {
-          width: 54px;
-          height: 54px;
+          width: 38px;
+          height: 38px;
           border-radius: 50%;
           background: #f1f5f9;
           color: #64748b;
@@ -2563,7 +2564,7 @@ export default function StudentAchievementsExperience({
             <div className="sae-verify-badge-wrap">
               <span className="sae-verify-badge">
                 <span className="sae-verify-shield">🛡</span>
-                Admin-verified items are included in your official profile.
+                Only verified achievements appear on your official profile.
               </span>
               <div className="sae-info-tooltip-wrap">
                 <button
@@ -2772,7 +2773,7 @@ export default function StudentAchievementsExperience({
 
         {/* TAB 1: SKILLS (FULLY IMPLEMENTED WITH DEPARTMENT-NEUTRAL FIELDS) */}
         {activeTab === 'skills' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {/* Toolbar: Filter & Add */}
             <div className="sae-toolbar">
               <div className="sae-filter-chips">
@@ -3143,7 +3144,7 @@ export default function StudentAchievementsExperience({
                   <button
                     type="button"
                     className="sae-btn-add"
-                    style={{ marginTop: 8 }}
+                    style={{ marginTop: 4 }}
                     onClick={() => {
                       setIsAddFormOpen(true)
                       setTimeout(() => {
@@ -3174,7 +3175,7 @@ export default function StudentAchievementsExperience({
                     <button
                       type="button"
                       className="sae-btn-cancel"
-                      style={{ marginTop: 8 }}
+                      style={{ marginTop: 4 }}
                       onClick={() => {
                         setSkillFilter('all')
                         setSearchQuery('')
@@ -3363,7 +3364,7 @@ export default function StudentAchievementsExperience({
 
         {/* TAB 2: PROJECTS (FULL IMPLEMENTATION) */}
         {activeTab === 'projects' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {/* Toolbar: Filter & Add */}
             <div className="sae-toolbar">
               <div className="sae-filter-chips">
@@ -3899,7 +3900,7 @@ export default function StudentAchievementsExperience({
                   <button
                     type="button"
                     className="sae-btn-add"
-                    style={{ marginTop: 8 }}
+                    style={{ marginTop: 4 }}
                     onClick={() => {
                       setIsAddProjectFormOpen(true)
                       setTimeout(() => {
@@ -3930,7 +3931,7 @@ export default function StudentAchievementsExperience({
                     <button
                       type="button"
                       className="sae-btn-cancel"
-                      style={{ marginTop: 8 }}
+                      style={{ marginTop: 4 }}
                       onClick={() => {
                         setProjectFilter('all')
                         setProjectSearchQuery('')
@@ -4125,7 +4126,7 @@ export default function StudentAchievementsExperience({
 
         {/* TAB 3: INTERNSHIPS & EXPERIENCE */}
         {activeTab === 'experience' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {/* Toolbar: Filter & Add */}
             <div className="sae-toolbar">
               <div className="sae-filter-chips">
@@ -4549,7 +4550,7 @@ export default function StudentAchievementsExperience({
                   <button
                     type="button"
                     className="sae-btn-add"
-                    style={{ marginTop: 8 }}
+                    style={{ marginTop: 4 }}
                     onClick={() => {
                       setIsAddInternshipFormOpen(true)
                       setTimeout(() => {
@@ -4580,7 +4581,7 @@ export default function StudentAchievementsExperience({
                     <button
                       type="button"
                       className="sae-btn-cancel"
-                      style={{ marginTop: 8 }}
+                      style={{ marginTop: 4 }}
                       onClick={() => {
                         setInternshipFilter('all')
                         setInternshipSearchQuery('')
