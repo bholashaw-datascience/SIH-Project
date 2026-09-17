@@ -80,6 +80,7 @@ export default function StudentAchievementsExperience({
   const [replacingImageId, setReplacingImageId] = useState(null)
   const [viewingModalImage, setViewingModalImage] = useState(null)
   const [projectDocFile, setProjectDocFile] = useState(null)
+  const [projectDocPreviewUrl, setProjectDocPreviewUrl] = useState('')
   const [isProjectImageDragOver, setIsProjectImageDragOver] = useState(false)
   const [isProjectDocDragOver, setIsProjectDocDragOver] = useState(false)
   const [projectFormError, setProjectFormError] = useState('')
@@ -175,14 +176,15 @@ export default function StudentAchievementsExperience({
   }
 
   const handleViewCertificate = () => {
-    if (certificatePreviewUrl) {
-      window.open(certificatePreviewUrl, '_blank')
-    } else if (certificateFile) {
+    let url = certificatePreviewUrl
+    if (!url && certificateFile) {
       try {
-        const url = URL.createObjectURL(certificateFile)
+        url = URL.createObjectURL(certificateFile)
         setCertificatePreviewUrl(url)
-        window.open(url, '_blank')
       } catch {}
+    }
+    if (url) {
+      handleOpenImageModal(url, certificateFile?.name || 'Certificate Document')
     }
   }
 
@@ -348,6 +350,7 @@ export default function StudentAchievementsExperience({
       issueDate: issueDate,
       credentialUrl: credentialUrl.trim(),
       certificateFile: certificateFile.name,
+      certificateUrl: certificatePreviewUrl || '',
       verified: false,
       status: 'pending',
       submittedAt: new Date().toISOString(),
@@ -504,10 +507,10 @@ export default function StudentAchievementsExperience({
     })
   }
 
-  // Image Modal Handlers (clean in-page preview)
+  // Universal Modal Handlers (clean in-page preview for images & documents across Skills, Projects, and Internships)
   const handleOpenImageModal = (url, name) => {
-    if (!url) return
-    setViewingModalImage({ url, name: name || 'Project Preview Image' })
+    if (!url && !name) return
+    setViewingModalImage({ url: url || '', name: name || 'Document Preview' })
   }
 
   const handleCloseImageModal = () => {
@@ -538,16 +541,49 @@ export default function StudentAchievementsExperience({
       setProjectFormError('Please upload a valid documentation file (.pdf, .doc, .docx, .txt, .zip).')
       return
     }
+    if (projectDocPreviewUrl) {
+      try { URL.revokeObjectURL(projectDocPreviewUrl) } catch {}
+    }
+    try {
+      const objUrl = URL.createObjectURL(file)
+      setProjectDocPreviewUrl(objUrl)
+    } catch {}
     setProjectDocFile(file)
     setProjectFormError('')
   }
 
+  const handleViewProjectDoc = () => {
+    if (!projectDocFile) return
+    let url = projectDocPreviewUrl
+    if (!url) {
+      try {
+        url = URL.createObjectURL(projectDocFile)
+        setProjectDocPreviewUrl(url)
+      } catch {}
+    }
+    if (url) {
+      handleOpenImageModal(url, projectDocFile.name)
+    }
+  }
+
   const handleDeleteProjectDoc = () => {
+    if (projectDocPreviewUrl) {
+      try { URL.revokeObjectURL(projectDocPreviewUrl) } catch {}
+    }
     setProjectDocFile(null)
+    setProjectDocPreviewUrl('')
     if (projectDocInputRef.current) {
       projectDocInputRef.current.value = ''
     }
   }
+
+  useEffect(() => {
+    return () => {
+      if (projectDocPreviewUrl) {
+        try { URL.revokeObjectURL(projectDocPreviewUrl) } catch {}
+      }
+    }
+  }, [projectDocPreviewUrl])
 
   // Handle Project Creation & Submission
   const handleCreateProject = (e) => {
@@ -620,6 +656,7 @@ export default function StudentAchievementsExperience({
         size: img.size,
       })),
       documentationFile: projectDocFile.name,
+      documentationUrl: projectDocPreviewUrl || '',
       verified: false,
       status: 'pending',
       submittedAt: new Date().toISOString(),
@@ -656,7 +693,11 @@ export default function StudentAchievementsExperience({
     })
     setProjectImageFiles([])
     setReplacingImageId(null)
+    if (projectDocPreviewUrl) {
+      try { URL.revokeObjectURL(projectDocPreviewUrl) } catch {}
+    }
     setProjectDocFile(null)
+    setProjectDocPreviewUrl('')
     if (projectImageInputRef.current) projectImageInputRef.current.value = ''
     if (replaceImageInputRef.current) replaceImageInputRef.current.value = ''
     if (projectDocInputRef.current) projectDocInputRef.current.value = ''
@@ -846,6 +887,7 @@ export default function StudentAchievementsExperience({
       duration: calculatedDur || 'Completed',
       role: internshipRole.trim(),
       certificateFile: internshipCertFile.name,
+      certificateUrl: internshipCertPreviewUrl || '',
       certificateLink: cleanCertLink,
       verified: false,
       status: 'pending',
@@ -3049,7 +3091,16 @@ export default function StudentAchievementsExperience({
                           {/* Certificate & Credential Details (Department-Neutral) */}
                           {(item.credentialName || item.issuingOrg || item.credentialUrl || item.certificateFile) ? (
                             <div className="sae-cred-box">
-                              <div className="sae-cred-header">
+                              <div
+                                className="sae-cred-header"
+                                style={item.certificateFile ? { cursor: 'pointer' } : {}}
+                                onClick={() => {
+                                  if (item.certificateFile) {
+                                    handleOpenImageModal(item.certificateUrl || '', item.certificateFile)
+                                  }
+                                }}
+                                title={item.certificateFile ? 'Click to view certificate' : ''}
+                              >
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b38e44" strokeWidth="2">
                                   <circle cx="12" cy="8" r="6" />
                                   <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
@@ -3064,7 +3115,15 @@ export default function StudentAchievementsExperience({
                                 {item.issuingOrg && item.issueDate && <span>•</span>}
                                 {item.issueDate && <span><strong>Issued:</strong> {item.issueDate}</span>}
                                 {item.certificateFile && <span>•</span>}
-                                {item.certificateFile && <span><strong>File:</strong> {item.certificateFile}</span>}
+                                {item.certificateFile && (
+                                  <span
+                                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                    onClick={() => handleOpenImageModal(item.certificateUrl || '', item.certificateFile)}
+                                    title="Click to view certificate"
+                                  >
+                                    <strong>File:</strong> {item.certificateFile}
+                                  </span>
+                                )}
                               </div>
 
                               {item.credentialUrl && (
@@ -3577,7 +3636,12 @@ export default function StudentAchievementsExperience({
                       </div>
                     ) : (
                       <div className="sae-file-card">
-                        <div className="sae-file-info">
+                        <div
+                          className="sae-file-info"
+                          onClick={handleViewProjectDoc}
+                          style={{ cursor: 'pointer' }}
+                          title="Click to view project documentation"
+                        >
                           <div className="sae-file-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -3596,6 +3660,18 @@ export default function StudentAchievementsExperience({
                           </div>
                         </div>
                         <div className="sae-file-actions">
+                          <button
+                            type="button"
+                            className="sae-file-btn sae-file-btn-view"
+                            onClick={handleViewProjectDoc}
+                            title="View Document"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            View
+                          </button>
                           <button
                             type="button"
                             className="sae-file-btn sae-file-btn-replace"
@@ -3804,7 +3880,12 @@ export default function StudentAchievementsExperience({
                           )}
 
                           {/* Project Documentation */}
-                          <div className="sae-project-doc-box">
+                          <div
+                            className="sae-project-doc-box"
+                            onClick={() => handleOpenImageModal(item.documentationUrl || '', item.documentationFile || item.documentFile || 'Project Documentation')}
+                            style={{ cursor: 'pointer' }}
+                            title="Click to view project documentation"
+                          >
                             <div className="sae-project-doc-header">
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0284c7" strokeWidth="2.2">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -3814,7 +3895,7 @@ export default function StudentAchievementsExperience({
                                 {item.documentationFile || item.documentFile || 'Project Documentation'}
                               </span>
                             </div>
-                            <span className="sae-project-doc-badge">Official Report Attached</span>
+                            <span className="sae-project-doc-badge">View Document ↗</span>
                           </div>
 
                           {/* Project Link if available */}
@@ -3883,10 +3964,10 @@ export default function StudentAchievementsExperience({
 
         {/* TAB 3: INTERNSHIPS & EXPERIENCE */}
         {activeTab === 'experience' && (
-          <div className="sae-tab-content">
-            {/* TOOLBAR */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Toolbar: Filter & Add */}
             <div className="sae-toolbar">
-              <div className="sae-chips">
+              <div className="sae-filter-chips">
                 <button
                   type="button"
                   className={`sae-chip ${internshipFilter === 'all' ? 'active' : ''}`}
@@ -4396,7 +4477,12 @@ export default function StudentAchievementsExperience({
                           </div>
 
                           {/* Certificate Document */}
-                          <div className="sae-project-doc-box">
+                          <div
+                            className="sae-project-doc-box"
+                            onClick={() => handleOpenImageModal(item.certificateUrl || '', item.certificateFile || item.documentFile || 'Internship Certificate')}
+                            style={{ cursor: 'pointer' }}
+                            title="Click to view internship certificate"
+                          >
                             <div className="sae-project-doc-header">
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0284c7" strokeWidth="2.2">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -4406,7 +4492,7 @@ export default function StudentAchievementsExperience({
                                 {item.certificateFile || item.documentFile || 'Internship Certificate'}
                               </span>
                             </div>
-                            <span className="sae-project-doc-badge">Certificate Attached</span>
+                            <span className="sae-project-doc-badge">View Certificate ↗</span>
                           </div>
 
                           {/* Certificate Link */}
@@ -4474,7 +4560,7 @@ export default function StudentAchievementsExperience({
         )}
       </main>
 
-      {/* In-Page Project Preview Image Modal */}
+      {/* Reusable In-Page Preview Modal for Skills, Projects, and Internships */}
       {viewingModalImage && (
         <div
           className="sae-img-modal-backdrop"
@@ -4490,7 +4576,7 @@ export default function StudentAchievementsExperience({
               <div className="sae-img-modal-title">
                 {(() => {
                   const name = (viewingModalImage.name || '').toLowerCase()
-                  const isDoc = name.endsWith('.pdf') || name.endsWith('.doc') || name.endsWith('.docx')
+                  const isDoc = name.endsWith('.pdf') || name.endsWith('.doc') || name.endsWith('.docx') || name.endsWith('.txt') || name.endsWith('.zip') || !viewingModalImage.url
                   if (isDoc) {
                     return (
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -4528,9 +4614,9 @@ export default function StudentAchievementsExperience({
               {(() => {
                 const name = (viewingModalImage.name || '').toLowerCase()
                 const isPdf = name.endsWith('.pdf')
-                const isDoc = name.endsWith('.doc') || name.endsWith('.docx')
+                const isDoc = name.endsWith('.doc') || name.endsWith('.docx') || name.endsWith('.txt') || name.endsWith('.zip') || !viewingModalImage.url
 
-                if (isPdf) {
+                if (isPdf && viewingModalImage.url) {
                   return (
                     <iframe
                       src={viewingModalImage.url}
