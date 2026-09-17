@@ -76,8 +76,8 @@ export default function StudentAchievementsExperience({
   const [projectDuration, setProjectDuration] = useState('')
   const [customProjectDuration, setCustomProjectDuration] = useState('')
   const [projectLink, setProjectLink] = useState('')
-  const [projectImageFile, setProjectImageFile] = useState(null)
-  const [projectImagePreviewUrl, setProjectImagePreviewUrl] = useState('')
+  const [projectImageFiles, setProjectImageFiles] = useState([])
+  const [replacingImageId, setReplacingImageId] = useState(null)
   const [projectDocFile, setProjectDocFile] = useState(null)
   const [isProjectImageDragOver, setIsProjectImageDragOver] = useState(false)
   const [isProjectDocDragOver, setIsProjectDocDragOver] = useState(false)
@@ -85,6 +85,7 @@ export default function StudentAchievementsExperience({
 
   const addProjectFormRef = useRef(null)
   const projectImageInputRef = useRef(null)
+  const replaceImageInputRef = useRef(null)
   const projectDocInputRef = useRef(null)
 
   // Internships State (from localStorage for counts/tabs)
@@ -399,49 +400,102 @@ export default function StudentAchievementsExperience({
 
   useEffect(() => {
     return () => {
-      if (projectImagePreviewUrl) {
-        try { URL.revokeObjectURL(projectImagePreviewUrl) } catch {}
-      }
+      projectImageFiles.forEach((img) => {
+        if (img.previewUrl) {
+          try { URL.revokeObjectURL(img.previewUrl) } catch {}
+        }
+      })
     }
-  }, [projectImagePreviewUrl])
+  }, [projectImageFiles])
 
-  // Project Image Handlers
-  const handleProjectImageSelect = (file) => {
-    if (!file) return
-    const maxBytes = 5 * 1024 * 1024 // 5 MB
-    if (file.size > maxBytes) {
-      setProjectFormError('Project preview image exceeds 5 MB limit. Please select a smaller file.')
+  // Project Image Handlers (Supports Multiple Images, Add-More, Replace, and Delete)
+  const handleProjectImageSelect = (fileList) => {
+    if (!fileList) return
+    const files = Array.isArray(fileList) ? fileList : Array.from(fileList)
+    if (files.length === 0) return
+
+    const maxBytes = 5 * 1024 * 1024 // 5 MB per image
+    const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    const newItems = []
+
+    for (const file of files) {
+      if (file.size > maxBytes) {
+        setProjectFormError(`Project preview image "${file.name}" exceeds 5 MB limit. Please select a smaller file.`)
+        return
+      }
+      const ext = (file.name.split('.').pop() || '').toLowerCase()
+      if (!allowed.includes(file.type) && !['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
+        setProjectFormError(`File "${file.name}" is not a valid image. Please upload PNG, JPG, JPEG, or WEBP.`)
+        return
+      }
+
+      let objUrl = ''
+      try {
+        objUrl = URL.createObjectURL(file)
+      } catch {}
+
+      newItems.push({
+        id: `pimg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        file,
+        previewUrl: objUrl,
+        name: file.name,
+        size: file.size,
+      })
+    }
+
+    if (newItems.length > 0) {
+      setProjectImageFiles((prev) => [...prev, ...newItems])
+      setProjectFormError('')
+    }
+  }
+
+  const handleReplaceProjectImage = (id, newFile) => {
+    if (!newFile) return
+    const maxBytes = 5 * 1024 * 1024
+    if (newFile.size > maxBytes) {
+      setProjectFormError(`Replacement image "${newFile.name}" exceeds 5 MB limit.`)
       return
     }
     const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
-    const ext = (file.name.split('.').pop() || '').toLowerCase()
-    if (!allowed.includes(file.type) && !['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
-      setProjectFormError('Please upload a valid image file (PNG, JPG, JPEG, or WEBP) for Project Preview.')
+    const ext = (newFile.name.split('.').pop() || '').toLowerCase()
+    if (!allowed.includes(newFile.type) && !['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
+      setProjectFormError(`File "${newFile.name}" is not a valid image. Allowed formats: PNG, JPG, JPEG, WEBP.`)
       return
     }
 
-    if (projectImagePreviewUrl) {
-      try { URL.revokeObjectURL(projectImagePreviewUrl) } catch {}
-    }
-
+    let newUrl = ''
     try {
-      const objUrl = URL.createObjectURL(file)
-      setProjectImagePreviewUrl(objUrl)
+      newUrl = URL.createObjectURL(newFile)
     } catch {}
 
-    setProjectImageFile(file)
+    setProjectImageFiles((prev) =>
+      prev.map((img) => {
+        if (img.id === id) {
+          if (img.previewUrl) {
+            try { URL.revokeObjectURL(img.previewUrl) } catch {}
+          }
+          return {
+            ...img,
+            file: newFile,
+            previewUrl: newUrl,
+            name: newFile.name,
+            size: newFile.size,
+          }
+        }
+        return img
+      })
+    )
     setProjectFormError('')
   }
 
-  const handleDeleteProjectImage = () => {
-    if (projectImagePreviewUrl) {
-      try { URL.revokeObjectURL(projectImagePreviewUrl) } catch {}
-    }
-    setProjectImageFile(null)
-    setProjectImagePreviewUrl('')
-    if (projectImageInputRef.current) {
-      projectImageInputRef.current.value = ''
-    }
+  const handleDeleteProjectImage = (id) => {
+    setProjectImageFiles((prev) => {
+      const target = prev.find((img) => img.id === id)
+      if (target?.previewUrl) {
+        try { URL.revokeObjectURL(target.previewUrl) } catch {}
+      }
+      return prev.filter((img) => img.id !== id)
+    })
   }
 
   // Project Documentation Handlers
@@ -509,9 +563,9 @@ export default function StudentAchievementsExperience({
       }
     }
 
-    // Validation: Project Preview Image and Project Documentation are mandatory for both types
-    if (!projectImageFile) {
-      setProjectFormError('Please upload a Project Preview Image (screenshot or photo).')
+    // Validation: At least one Project Preview Image is mandatory
+    if (projectImageFiles.length === 0) {
+      setProjectFormError('Please upload at least one Project Preview Image (screenshot or photo).')
       return
     }
 
@@ -532,8 +586,13 @@ export default function StudentAchievementsExperience({
       duration: finalDuration,
       url: isSoftware ? projectLink.trim() : '',
       link: isSoftware ? projectLink.trim() : '',
-      previewImage: projectImageFile.name,
-      previewImageUrl: projectImagePreviewUrl,
+      previewImage: projectImageFiles[0]?.name || '',
+      previewImageUrl: projectImageFiles[0]?.previewUrl || '',
+      previewImages: projectImageFiles.map((img) => ({
+        name: img.name,
+        url: img.previewUrl,
+        size: img.size,
+      })),
       documentationFile: projectDocFile.name,
       verified: false,
       status: 'pending',
@@ -564,10 +623,16 @@ export default function StudentAchievementsExperience({
     setProjectDuration('')
     setCustomProjectDuration('')
     setProjectLink('')
-    setProjectImageFile(null)
-    setProjectImagePreviewUrl('')
+    projectImageFiles.forEach((img) => {
+      if (img.previewUrl) {
+        try { URL.revokeObjectURL(img.previewUrl) } catch {}
+      }
+    })
+    setProjectImageFiles([])
+    setReplacingImageId(null)
     setProjectDocFile(null)
     if (projectImageInputRef.current) projectImageInputRef.current.value = ''
+    if (replaceImageInputRef.current) replaceImageInputRef.current.value = ''
     if (projectDocInputRef.current) projectDocInputRef.current.value = ''
     setProjectFormError('')
     setIsAddProjectFormOpen(false)
@@ -1642,15 +1707,34 @@ export default function StudentAchievementsExperience({
           color: #475569;
         }
 
+        .sae-btn-add-img-more {
+          background: #f0fdf4;
+          color: #15803d;
+          border: 1.5px dashed #86efac;
+          border-radius: 6px;
+          padding: 8px 16px;
+          font-size: 0.82rem;
+          font-weight: 700;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          transition: all 0.18s ease;
+        }
+
+        .sae-btn-add-img-more:hover {
+          background: #dcfce7;
+          border-color: #16a34a;
+          color: #166534;
+        }
+
         .sae-project-preview-wrap {
           border-radius: 6px;
           overflow: hidden;
           border: 1px solid #e2e8f0;
           background: #f8fafc;
-          max-height: 180px;
           display: flex;
-          align-items: center;
-          justify-content: center;
+          flex-direction: column;
         }
 
         .sae-project-preview-img {
@@ -2995,20 +3079,49 @@ export default function StudentAchievementsExperience({
                     </div>
                   )}
 
-                  {/* Field 6: Project Preview Image* (screenshot/photo) */}
+                  {/* Field 6: Project Preview Images (Multiple Allowed, + Add More, View/Replace/Delete) */}
                   <div className="sae-form-field sae-form-field-full">
-                    <label>Project Preview Image * (Screenshot or Photo)</label>
+                    <label>
+                      Project Preview Images * (Screenshots or Photos)
+                      {projectImageFiles.length > 0 && (
+                        <span style={{ marginLeft: 8, fontSize: '0.76rem', color: '#166534', fontWeight: 600 }}>
+                          ({projectImageFiles.length} {projectImageFiles.length === 1 ? 'image' : 'images'} added)
+                        </span>
+                      )}
+                    </label>
+
+                    {/* Hidden main file input for uploading one or multiple images */}
                     <input
                       ref={projectImageInputRef}
+                      type="file"
+                      multiple
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files.length > 0) {
+                          handleProjectImageSelect(e.target.files)
+                          e.target.value = ''
+                        }
+                      }}
+                    />
+
+                    {/* Hidden file input for replacing a specific image */}
+                    <input
+                      ref={replaceImageInputRef}
                       type="file"
                       accept="image/jpeg,image/jpg,image/png,image/webp"
                       style={{ display: 'none' }}
                       onChange={(e) => {
                         const file = e.target.files?.[0] || null
-                        handleProjectImageSelect(file)
+                        if (file && replacingImageId) {
+                          handleReplaceProjectImage(replacingImageId, file)
+                          setReplacingImageId(null)
+                        }
+                        e.target.value = ''
                       }}
                     />
-                    {!projectImageFile ? (
+
+                    {projectImageFiles.length === 0 ? (
                       <div
                         className={`sae-upload-box ${isProjectImageDragOver ? 'dragover' : ''}`}
                         onClick={() => projectImageInputRef.current?.click()}
@@ -3023,8 +3136,9 @@ export default function StudentAchievementsExperience({
                         onDrop={(e) => {
                           e.preventDefault()
                           setIsProjectImageDragOver(false)
-                          const file = e.dataTransfer.files?.[0] || null
-                          handleProjectImageSelect(file)
+                          if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                            handleProjectImageSelect(e.dataTransfer.files)
+                          }
                         }}
                         role="button"
                         tabIndex={0}
@@ -3034,7 +3148,7 @@ export default function StudentAchievementsExperience({
                             projectImageInputRef.current?.click()
                           }
                         }}
-                        aria-label="Upload Project Preview Image"
+                        aria-label="Upload Project Preview Images"
                       >
                         <div className="sae-upload-icon-circle">
                           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -3043,77 +3157,117 @@ export default function StudentAchievementsExperience({
                             <polyline points="21 15 16 10 5 21" />
                           </svg>
                         </div>
-                        <div className="sae-upload-title">Upload Project Preview Image</div>
-                        <div className="sae-upload-hint">PNG, JPG, JPEG or WEBP screenshot/photo • Max 5 MB</div>
+                        <div className="sae-upload-title">Upload Project Preview Images (Multiple Allowed)</div>
+                        <div className="sae-upload-hint">PNG, JPG, JPEG or WEBP screenshots/photos • Up to 5 MB each • Drag & drop multiple files</div>
                       </div>
                     ) : (
-                      <div className="sae-file-card">
-                        <div className="sae-file-info">
-                          {projectImagePreviewUrl ? (
-                            <img
-                              src={projectImagePreviewUrl}
-                              alt="Preview"
-                              style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 4, border: '1px solid #cbd5e1' }}
-                            />
-                          ) : (
-                            <div className="sae-file-icon">
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                <circle cx="8.5" cy="8.5" r="1.5" />
-                                <polyline points="21 15 16 10 5 21" />
-                              </svg>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {projectImageFiles.map((img, idx) => (
+                          <div key={img.id} className="sae-file-card">
+                            <div className="sae-file-info">
+                              {img.previewUrl ? (
+                                <img
+                                  src={img.previewUrl}
+                                  alt={`Preview ${idx + 1}`}
+                                  style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 4, border: '1px solid #cbd5e1', cursor: 'pointer', flexShrink: 0 }}
+                                  onClick={() => window.open(img.previewUrl, '_blank')}
+                                  title="Click to view full preview image"
+                                />
+                              ) : (
+                                <div className="sae-file-icon">
+                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                    <polyline points="21 15 16 10 5 21" />
+                                  </svg>
+                                </div>
+                              )}
+                              <div className="sae-file-text">
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                                  <span className="sae-file-name" title={img.name}>
+                                    {img.name}
+                                  </span>
+                                  <span style={{
+                                    fontSize: '0.68rem',
+                                    fontWeight: 700,
+                                    background: idx === 0 ? '#dbeafe' : '#f1f5f9',
+                                    color: idx === 0 ? '#1d4ed8' : '#475569',
+                                    padding: '1px 6px',
+                                    borderRadius: 3,
+                                  }}>
+                                    {idx === 0 ? 'Primary Cover' : `Image #${idx + 1}`}
+                                  </span>
+                                </div>
+                                <span className="sae-file-meta">
+                                  {img.size / (1024 * 1024) >= 1
+                                    ? `${(img.size / (1024 * 1024)).toFixed(2)} MB`
+                                    : `${(img.size / 1024).toFixed(1)} KB`} • Preview Attached
+                                </span>
+                              </div>
                             </div>
-                          )}
-                          <div className="sae-file-text">
-                            <span className="sae-file-name" title={projectImageFile.name}>
-                              {projectImageFile.name}
-                            </span>
-                            <span className="sae-file-meta">
-                              {(projectImageFile.size / (1024 * 1024) >= 1)
-                                ? `${(projectImageFile.size / (1024 * 1024)).toFixed(2)} MB`
-                                : `${(projectImageFile.size / 1024).toFixed(1)} KB`} • Preview Image Attached
-                            </span>
+                            <div className="sae-file-actions">
+                              {img.previewUrl && (
+                                <button
+                                  type="button"
+                                  className="sae-file-btn sae-file-btn-view"
+                                  onClick={() => window.open(img.previewUrl, '_blank')}
+                                  title="View full-size image"
+                                >
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                  </svg>
+                                  View
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                className="sae-file-btn sae-file-btn-replace"
+                                onClick={() => {
+                                  setReplacingImageId(img.id)
+                                  replaceImageInputRef.current?.click()
+                                }}
+                                title="Replace this image"
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                  <polyline points="1 4 1 10 7 10" />
+                                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                                </svg>
+                                Replace
+                              </button>
+                              <button
+                                type="button"
+                                className="sae-file-btn sae-file-btn-delete"
+                                onClick={() => handleDeleteProjectImage(img.id)}
+                                title="Delete this image"
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                  <polyline points="3 6 5 6 21 6" />
+                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                </svg>
+                                Delete
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                        <div className="sae-file-actions">
-                          {projectImagePreviewUrl && (
-                            <button
-                              type="button"
-                              className="sae-file-btn sae-file-btn-view"
-                              onClick={() => window.open(projectImagePreviewUrl, '_blank')}
-                              title="View Image"
-                            >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                <circle cx="12" cy="12" r="3" />
-                              </svg>
-                              View
-                            </button>
-                          )}
+                        ))}
+
+                        {/* Clear '+ Add More' Option to upload additional images */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4, flexWrap: 'wrap' }}>
                           <button
                             type="button"
-                            className="sae-file-btn sae-file-btn-replace"
+                            className="sae-btn-add-img-more"
                             onClick={() => projectImageInputRef.current?.click()}
-                            title="Replace Image"
+                            title="Add more preview images or screenshots"
                           >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                              <polyline points="1 4 1 10 7 10" />
-                              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                              <line x1="12" y1="5" x2="12" y2="19" />
+                              <line x1="5" y1="12" x2="19" y2="12" />
                             </svg>
-                            Replace
+                            + Add More Images
                           </button>
-                          <button
-                            type="button"
-                            className="sae-file-btn sae-file-btn-delete"
-                            onClick={handleDeleteProjectImage}
-                            title="Delete Image"
-                          >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                              <polyline points="3 6 5 6 21 6" />
-                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                            </svg>
-                            Delete
-                          </button>
+                          <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                            You can add as many relevant preview images as needed.
+                          </span>
                         </div>
                       </div>
                     )}
@@ -3358,15 +3512,15 @@ export default function StudentAchievementsExperience({
                             <span><strong>Duration:</strong> {item.duration || 'Not specified'}</span>
                           </div>
 
-                          {/* Project Preview Image */}
-                          {(item.previewImageUrl || item.previewImage) && (
+                          {/* Project Preview Image(s) */}
+                          {((item.previewImages && item.previewImages.length > 0) || item.previewImageUrl || item.previewImage) && (
                             <div className="sae-project-preview-wrap">
-                              {item.previewImageUrl ? (
+                              {((item.previewImages && item.previewImages[0]?.url) || item.previewImageUrl) ? (
                                 <img
-                                  src={item.previewImageUrl}
+                                  src={(item.previewImages && item.previewImages[0]?.url) || item.previewImageUrl}
                                   alt={item.name || 'Project preview'}
                                   className="sae-project-preview-img"
-                                  onClick={() => window.open(item.previewImageUrl, '_blank')}
+                                  onClick={() => window.open((item.previewImages && item.previewImages[0]?.url) || item.previewImageUrl, '_blank')}
                                   title="Click to view full preview image"
                                 />
                               ) : (
@@ -3377,6 +3531,23 @@ export default function StudentAchievementsExperience({
                                     <polyline points="21 15 16 10 5 21" />
                                   </svg>
                                   <span>{item.previewImage}</span>
+                                </div>
+                              )}
+                              {item.previewImages && item.previewImages.length > 1 && (
+                                <div style={{ display: 'flex', gap: 6, padding: '7px 10px', background: '#f8fafc', borderTop: '1px solid #e2e8f0', alignItems: 'center', overflowX: 'auto' }}>
+                                  <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#475569', whiteSpace: 'nowrap' }}>
+                                    📷 {item.previewImages.length} Images:
+                                  </span>
+                                  {item.previewImages.map((pImg, pIdx) => (
+                                    <img
+                                      key={pIdx}
+                                      src={pImg.url}
+                                      alt={`Thumbnail ${pIdx + 1}`}
+                                      style={{ width: 30, height: 30, objectFit: 'cover', borderRadius: 4, border: '1px solid #cbd5e1', cursor: 'pointer', flexShrink: 0 }}
+                                      onClick={() => window.open(pImg.url, '_blank')}
+                                      title={`View preview image #${pIdx + 1} (${pImg.name})`}
+                                    />
+                                  ))}
                                 </div>
                               )}
                             </div>
