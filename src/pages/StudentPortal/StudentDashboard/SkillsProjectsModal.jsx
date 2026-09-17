@@ -1,12 +1,14 @@
 import { useState } from 'react'
 
+const EMPTY_ARRAY = []
+
 export default function SkillsProjectsModal({
   isOpen,
   onClose,
   initialTab = 'skills',
-  skills = [],
-  projects = [],
-  internships = [],
+  skills = EMPTY_ARRAY,
+  projects = EMPTY_ARRAY,
+  internships = EMPTY_ARRAY,
   onAddSkill,
   onAddProject,
   onAddInternship,

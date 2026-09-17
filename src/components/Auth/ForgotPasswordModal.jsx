@@ -258,7 +258,7 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
           acc.username.toLowerCase() === foundAccount.username.toLowerCase() &&
           (acc.role === normalizedRole || (normalizedRole === 'industry' && acc.role === 'industries'))
         ) {
-          return { ...acc, password: newPassword }
+          return Object.assign({}, acc, { password: newPassword })
         }
         return acc
       })

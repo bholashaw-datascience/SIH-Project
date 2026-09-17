@@ -450,7 +450,7 @@ export default function AcademicDetailsModal({ isOpen, onClose, student }) {
                   </thead>
                   <tbody>
                     {semHistory.map((row, idx) => (
-                      <tr key={idx}>
+                      <tr key={row.sem || idx}>
                         <td>
                           <strong>{row.sem}</strong>
                           <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{row.year}</div>

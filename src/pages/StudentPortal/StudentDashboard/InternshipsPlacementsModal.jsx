@@ -393,7 +393,7 @@ export default function InternshipsPlacementsModal({ isOpen, onClose, student })
                       <div className="ip-role-title">{op.role}</div>
                       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                         {op.tags.map((t, idx) => (
-                          <span key={idx} style={{ fontSize: '0.72rem', background: '#f1f5f9', color: '#475569', padding: '2px 8px', borderRadius: 4, fontWeight: 600 }}>
+                          <span key={`${op.id || op.company}-${t}-${idx}`} style={{ fontSize: '0.72rem', background: '#f1f5f9', color: '#475569', padding: '2px 8px', borderRadius: 4, fontWeight: 600 }}>
                             {t}
                           </span>
                         ))}

@@ -8,9 +8,11 @@ import InternshipsPlacementsModal from './InternshipsPlacementsModal'
 import SkillAssessmentsModal from './SkillAssessmentsModal'
 import ChangePasswordModal from './ChangePasswordModal'
 
+const EMPTY_OBJ = {}
+
 export default function StudentDashboard({
-  student = {},
-  verifiedProfile = {},
+  student = EMPTY_OBJ,
+  verifiedProfile = EMPTY_OBJ,
   hasPendingChanges = false,
   onEditProfile,
   onViewPendingDiff,
@@ -1529,7 +1531,7 @@ export default function StudentDashboard({
             <div className="sd-contacts-grid">
               {(student?.institutionContacts && Array.isArray(student.institutionContacts) && student.institutionContacts.length > 0) ? (
                 student.institutionContacts.map((c, i) => (
-                  <div key={i} className="sd-contact-card">
+                  <div key={c.id || c.role || i} className="sd-contact-card">
                     <span className="sd-contact-role">{c.role}</span>
                     <span className="sd-contact-name">{c.name}</span>
                     <span className="sd-contact-detail">
@@ -1547,8 +1549,8 @@ export default function StudentDashboard({
                   { role: 'Head of Department (HOD)', dept: s.course ? `Dept of ${s.course}` : 'Department Office' },
                   { role: 'Academic Advisor', dept: 'Batch Mentor & Faculty' },
                   { role: 'Placement Cell Head', dept: 'Training & Placements Cell' },
-                ].map((slot, i) => (
-                  <div key={i} className="sd-contact-card" style={{ background: '#fafbfc' }}>
+                ].map((slot) => (
+                  <div key={slot.role} className="sd-contact-card" style={{ background: '#fafbfc' }}>
                     <span className="sd-contact-role">{slot.role}</span>
                     <span className="sd-contact-name" style={{ color: '#64748b', fontSize: '0.88rem', fontWeight: 500 }}>
                       Not available yet

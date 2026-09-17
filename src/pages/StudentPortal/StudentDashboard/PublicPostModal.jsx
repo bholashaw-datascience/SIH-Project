@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 
+const EMPTY_POSTS = []
+
 export default function PublicPostModal({
   isOpen,
   onClose,
-  posts = [],
+  posts = EMPTY_POSTS,
   onCreatePost,
   onSubmitDraft,
 }) {
@@ -1150,6 +1152,7 @@ export default function PublicPostModal({
                       src={activePreviewDoc.url}
                       title={activePreviewDoc.name}
                       className="post-preview-pdf-iframe"
+                      sandbox="allow-same-origin allow-popups"
                     >
                       <div className="post-preview-pdf-fallback">
                         <p>Your browser could not render the PDF directly inside this frame.</p>

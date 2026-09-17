@@ -2253,6 +2253,7 @@ export default function StudentProfileOnboarding({
                         src={previewDoc.dataUrl}
                         title={previewDoc.fileName}
                         className="onb-preview-pdf-iframe"
+                        sandbox="allow-same-origin allow-popups"
                       >
                         <div className="onb-preview-fallback">
                           <p>Your browser could not render the PDF directly inside this preview window.</p>

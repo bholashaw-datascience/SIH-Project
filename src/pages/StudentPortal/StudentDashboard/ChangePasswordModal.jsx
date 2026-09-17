@@ -103,8 +103,8 @@ export default function ChangePasswordModal({ isOpen, onClose, student, onPasswo
 
   const formatTimer = (seconds) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0')
-    const s = (seconds % 60).toString().padStart(2, '0')
-    return `${m}:${s}`
+    const secs = (seconds % 60).toString().padStart(2, '0')
+    return `${m}:${secs}`
   }
 
   // --- STEP 1: NORMAL PASSWORD CHANGE SUBMISSION ---
@@ -1195,7 +1195,7 @@ export default function ChangePasswordModal({ isOpen, onClose, student, onPasswo
                 <div className="cp-otp-box-row">
                   {otpDigits.map((digit, idx) => (
                     <input
-                      key={idx}
+                      key={`otp-slot-${idx}`}
                       ref={(el) => (otpInputRefs.current[idx] = el)}
                       type="text"
                       inputMode="numeric"
