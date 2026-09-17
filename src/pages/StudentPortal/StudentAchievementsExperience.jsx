@@ -105,19 +105,22 @@ export default function StudentAchievementsExperience({
 
   // Add Internship Form state (All fields start unselected/empty)
   const [isAddInternshipFormOpen, setIsAddInternshipFormOpen] = useState(false)
+  const [internshipTitle, setInternshipTitle] = useState('')
   const [internshipOrg, setInternshipOrg] = useState('')
-  const [internshipRole, setInternshipRole] = useState('')
+  const [internshipDomain, setInternshipDomain] = useState('')
+  const [customInternshipDomain, setCustomInternshipDomain] = useState('')
   const [internshipType, setInternshipType] = useState('')
-  const [internshipDuration, setInternshipDuration] = useState('')
-  const [customInternshipDuration, setCustomInternshipDuration] = useState('')
-  const [internshipLocation, setInternshipLocation] = useState('')
-  const [internshipDescription, setInternshipDescription] = useState('')
-  const [internshipDocFile, setInternshipDocFile] = useState(null)
-  const [isInternshipDocDragOver, setIsInternshipDocDragOver] = useState(false)
+  const [internshipStartDate, setInternshipStartDate] = useState('')
+  const [internshipEndDate, setInternshipEndDate] = useState('')
+  const [internshipRole, setInternshipRole] = useState('')
+  const [internshipCertFile, setInternshipCertFile] = useState(null)
+  const [internshipCertPreviewUrl, setInternshipCertPreviewUrl] = useState('')
+  const [internshipCertLink, setInternshipCertLink] = useState('')
+  const [isInternshipCertDragOver, setIsInternshipCertDragOver] = useState(false)
   const [internshipFormError, setInternshipFormError] = useState('')
 
   const addInternshipFormRef = useRef(null)
-  const internshipDocInputRef = useRef(null)
+  const internshipCertInputRef = useRef(null)
 
   // Filter state for Skills: 'all' | 'verified' | 'pending' | 'unverified'
   const [skillFilter, setSkillFilter] = useState('all')
@@ -237,10 +240,12 @@ export default function StudentAchievementsExperience({
 
     if (internshipSearchQuery.trim()) {
       const q = internshipSearchQuery.toLowerCase()
-      const matchOrg = item.organization?.toLowerCase().includes(q) || item.company?.toLowerCase().includes(q)
-      const matchRole = item.role?.toLowerCase().includes(q)
-      const matchType = item.type?.toLowerCase().includes(q)
-      if (!matchOrg && !matchRole && !matchType) return false
+      const matchTitle = (item.title || '').toLowerCase().includes(q)
+      const matchOrg = (item.organization || item.company || '').toLowerCase().includes(q)
+      const matchDomain = (item.domain || '').toLowerCase().includes(q)
+      const matchRole = (item.role || '').toLowerCase().includes(q)
+      const matchType = (item.type || '').toLowerCase().includes(q)
+      if (!matchTitle && !matchOrg && !matchDomain && !matchRole && !matchType) return false
     }
 
     return true
@@ -671,72 +676,177 @@ export default function StudentAchievementsExperience({
     } catch {}
   }, [internships])
 
-  // Internship Document Handlers
-  const handleInternshipDocSelect = (file) => {
+  // Internship Certificate Handlers
+  const handleInternshipCertSelect = (file) => {
     if (!file) return
     const maxBytes = 10 * 1024 * 1024 // 10 MB
     if (file.size > maxBytes) {
-      setInternshipFormError('Document file exceeds 10 MB limit.')
+      setInternshipFormError('Certificate file exceeds 10 MB limit.')
       return
     }
     const ext = (file.name.split('.').pop() || '').toLowerCase()
-    const allowed = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png']
+    const allowed = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'webp']
     if (!allowed.includes(ext)) {
-      setInternshipFormError('Please upload a valid document (.pdf, .doc, .docx, .jpg, .png).')
+      setInternshipFormError('Please upload a valid certificate file (.pdf, .doc, .docx, .jpg, .png, .webp).')
       return
     }
-    setInternshipDocFile(file)
+    if (internshipCertPreviewUrl) {
+      try { URL.revokeObjectURL(internshipCertPreviewUrl) } catch {}
+    }
+    try {
+      const objUrl = URL.createObjectURL(file)
+      setInternshipCertPreviewUrl(objUrl)
+    } catch {}
+    setInternshipCertFile(file)
     setInternshipFormError('')
   }
 
-  const handleDeleteInternshipDoc = () => {
-    setInternshipDocFile(null)
-    if (internshipDocInputRef.current) {
-      internshipDocInputRef.current.value = ''
+  const handleViewInternshipCert = () => {
+    if (!internshipCertFile) return
+    let url = internshipCertPreviewUrl
+    if (!url) {
+      try {
+        url = URL.createObjectURL(internshipCertFile)
+        setInternshipCertPreviewUrl(url)
+      } catch {}
     }
+    if (url) {
+      handleOpenImageModal(url, internshipCertFile.name)
+    }
+  }
+
+  const handleDeleteInternshipCert = () => {
+    if (internshipCertPreviewUrl) {
+      try { URL.revokeObjectURL(internshipCertPreviewUrl) } catch {}
+    }
+    setInternshipCertFile(null)
+    setInternshipCertPreviewUrl('')
+    if (internshipCertInputRef.current) {
+      internshipCertInputRef.current.value = ''
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (internshipCertPreviewUrl) {
+        try { URL.revokeObjectURL(internshipCertPreviewUrl) } catch {}
+      }
+    }
+  }, [internshipCertPreviewUrl])
+
+  // Calculate internship duration in human-readable format
+  const calculateInternshipDuration = (startStr, endStr) => {
+    if (!startStr || !endStr) return ''
+    const start = new Date(startStr)
+    const end = new Date(endStr)
+    if (isNaN(start.getTime()) || isNaN(end.getTime()) || end < start) return ''
+    const diffTime = Math.abs(end - start)
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    const months = Math.round(diffDays / 30.44)
+    if (months >= 1) {
+      return `${months} ${months === 1 ? 'Month' : 'Months'}`
+    }
+    const weeks = Math.round(diffDays / 7)
+    if (weeks >= 1) {
+      return `${weeks} ${weeks === 1 ? 'Week' : 'Weeks'}`
+    }
+    return `${diffDays} ${diffDays === 1 ? 'Day' : 'Days'}`
+  }
+
+  // Reset Internship Form
+  const resetInternshipForm = () => {
+    setInternshipTitle('')
+    setInternshipOrg('')
+    setInternshipDomain('')
+    setCustomInternshipDomain('')
+    setInternshipType('')
+    setInternshipStartDate('')
+    setInternshipEndDate('')
+    setInternshipRole('')
+    if (internshipCertPreviewUrl) {
+      try { URL.revokeObjectURL(internshipCertPreviewUrl) } catch {}
+    }
+    setInternshipCertFile(null)
+    setInternshipCertPreviewUrl('')
+    setInternshipCertLink('')
+    if (internshipCertInputRef.current) {
+      internshipCertInputRef.current.value = ''
+    }
+    setInternshipFormError('')
+    setIsAddInternshipFormOpen(false)
   }
 
   // Handle Internship Creation & Submission
   const handleCreateInternship = (e) => {
     e.preventDefault()
+    if (!internshipTitle.trim()) {
+      setInternshipFormError('Please enter the Internship Title.')
+      return
+    }
     if (!internshipOrg.trim()) {
       setInternshipFormError('Please enter the Organization / Company Name.')
       return
     }
-    if (!internshipRole.trim()) {
-      setInternshipFormError('Please enter the Role / Designation.')
+    const finalDomain = internshipDomain === 'Other' ? customInternshipDomain.trim() : internshipDomain.trim()
+    if (!finalDomain) {
+      setInternshipFormError('Please select or specify the Domain / Field.')
       return
     }
     if (!internshipType) {
-      setInternshipFormError('Please select the Internship / Experience Type.')
+      setInternshipFormError('Please select the Internship Type (On-site, Remote, or Hybrid).')
       return
     }
-    if (!internshipDuration) {
-      setInternshipFormError('Please select the Duration.')
+    if (!internshipStartDate) {
+      setInternshipFormError('Please select the Start Date.')
       return
     }
-    if (internshipDuration === 'Other' && !customInternshipDuration.trim()) {
-      setInternshipFormError('Please enter your custom internship duration.')
+    if (!internshipEndDate) {
+      setInternshipFormError('Please select the End Date.')
       return
     }
-    if (!internshipDocFile) {
-      setInternshipFormError('Please upload an Internship Certificate or Completion Document.')
+    if (new Date(internshipEndDate) < new Date(internshipStartDate)) {
+      setInternshipFormError('End Date cannot be earlier than Start Date.')
+      return
+    }
+    if (!internshipRole.trim()) {
+      setInternshipFormError('Please enter the Internship Role.')
+      return
+    }
+    if (!internshipCertFile) {
+      setInternshipFormError('Please upload an Internship Certificate document.')
+      return
+    }
+    const cleanCertLink = internshipCertLink.trim()
+    if (!cleanCertLink) {
+      setInternshipFormError('Please enter the Certificate Link.')
+      return
+    }
+    try {
+      const parsedUrl = new URL(cleanCertLink)
+      if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+        setInternshipFormError('Certificate Link must start with http:// or https://')
+        return
+      }
+    } catch {
+      setInternshipFormError('Please enter a valid Certificate Link URL (e.g. https://...).')
       return
     }
 
-    const finalDuration = internshipDuration === 'Other' ? customInternshipDuration.trim() : internshipDuration
+    const calculatedDur = calculateInternshipDuration(internshipStartDate, internshipEndDate)
 
     const newIntern = {
-      id: `i_${Date.now()}`,
+      id: `intern_${Date.now()}`,
+      title: internshipTitle.trim(),
       organization: internshipOrg.trim(),
       company: internshipOrg.trim(),
-      role: internshipRole.trim(),
+      domain: finalDomain,
       type: internshipType,
-      duration: finalDuration,
-      location: internshipLocation.trim(),
-      description: internshipDescription.trim(),
-      certificateFile: internshipDocFile.name,
-      documentFile: internshipDocFile.name,
+      startDate: internshipStartDate,
+      endDate: internshipEndDate,
+      duration: calculatedDur || 'Completed',
+      role: internshipRole.trim(),
+      certificateFile: internshipCertFile.name,
+      certificateLink: cleanCertLink,
       verified: false,
       status: 'pending',
       submittedAt: new Date().toISOString(),
@@ -750,32 +860,19 @@ export default function StudentAchievementsExperience({
       const newNotif = {
         id: `n_${Date.now()}`,
         type: 'info',
-        title: `Internship Submitted: ${newIntern.organization}`,
-        message: 'Your industrial experience credential has been submitted to Portal Admin for verification.',
+        title: `Internship Submitted: ${newIntern.title}`,
+        message: `${newIntern.role} at ${newIntern.organization} has been submitted to Portal Admin for verification.`,
         timestamp: 'Just now',
         read: false,
       }
       localStorage.setItem('udaan_student_notifications', JSON.stringify([newNotif, ...savedNotifs]))
     } catch {}
 
-    // Reset Form
-    setInternshipOrg('')
-    setInternshipRole('')
-    setInternshipType('')
-    setInternshipDuration('')
-    setCustomInternshipDuration('')
-    setInternshipLocation('')
-    setInternshipDescription('')
-    setInternshipDocFile(null)
-    if (internshipDocInputRef.current) {
-      internshipDocInputRef.current.value = ''
-    }
-    setInternshipFormError('')
-    setIsAddInternshipFormOpen(false)
+    resetInternshipForm()
     setInternshipFilter('all')
     setInternshipSearchQuery('')
 
-    setSuccessBanner(`Internship at "${newIntern.organization}" successfully submitted for Portal Admin verification.`)
+    setSuccessBanner(`Internship "${newIntern.title}" at ${newIntern.organization} successfully submitted for Portal Admin verification.`)
     setTimeout(() => setSuccessBanner(''), 5000)
   }
 
@@ -3832,7 +3929,16 @@ export default function StudentAchievementsExperience({
                 <button
                   type="button"
                   className="sae-btn-add"
-                  onClick={() => setIsAddInternshipFormOpen(!isAddInternshipFormOpen)}
+                  onClick={() => {
+                    if (isAddInternshipFormOpen) {
+                      resetInternshipForm()
+                    } else {
+                      setIsAddInternshipFormOpen(true)
+                      setTimeout(() => {
+                        addInternshipFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                      }, 50)
+                    }
+                  }}
                 >
                   {isAddInternshipFormOpen ? (
                     'Cancel'
@@ -3874,145 +3980,201 @@ export default function StudentAchievementsExperience({
                 )}
 
                 <div className="sae-form-grid">
-                  {/* Field 1: Organization / Company Name */}
+                  {/* Field 1: Internship Title* */}
                   <div className="sae-form-field">
-                    <label>Company / Organization Name *</label>
+                    <label>Internship Title *</label>
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Google, Microsoft, ISRO, AIIMS, Tata Consultancy"
+                      placeholder="e.g. Summer Research Internship, Frontend Engineering Intern"
+                      value={internshipTitle}
+                      onChange={(e) => {
+                        setInternshipTitle(e.target.value)
+                        setInternshipFormError('')
+                      }}
+                    />
+                  </div>
+
+                  {/* Field 2: Organization / Company Name* */}
+                  <div className="sae-form-field">
+                    <label>Organization / Company Name *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Google, Tata Consultancy, ISRO, Siemens, Hospital / Lab"
                       value={internshipOrg}
-                      onChange={(e) => setInternshipOrg(e.target.value)}
+                      onChange={(e) => {
+                        setInternshipOrg(e.target.value)
+                        setInternshipFormError('')
+                      }}
                     />
                   </div>
 
-                  {/* Field 2: Role / Designation */}
+                  {/* Field 3: Domain / Field* */}
                   <div className="sae-form-field">
-                    <label>Role / Designation *</label>
-                    <input
-                      type="text"
+                    <label>Domain / Field *</label>
+                    <select
                       required
-                      placeholder="e.g. Software Engineering Intern, Research Fellow"
-                      value={internshipRole}
-                      onChange={(e) => setInternshipRole(e.target.value)}
-                    />
+                      value={internshipDomain}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        setInternshipDomain(val)
+                        if (val !== 'Other') setCustomInternshipDomain('')
+                        setInternshipFormError('')
+                      }}
+                    >
+                      <option value="">Select Domain / Field</option>
+                      <option value="Computer Science & IT">Computer Science & IT</option>
+                      <option value="Electronics & Communication">Electronics & Communication</option>
+                      <option value="Mechanical & Manufacturing">Mechanical & Manufacturing</option>
+                      <option value="Civil & Infrastructure">Civil & Infrastructure</option>
+                      <option value="Electrical & Power Systems">Electrical & Power Systems</option>
+                      <option value="Chemical & Materials Science">Chemical & Materials Science</option>
+                      <option value="Biotechnology & Healthcare">Biotechnology & Healthcare</option>
+                      <option value="Data Science & AI / ML">Data Science & AI / ML</option>
+                      <option value="Business, Finance & Commerce">Business, Finance & Commerce</option>
+                      <option value="Design, Architecture & Media">Design, Architecture & Media</option>
+                      <option value="Operations & Supply Chain">Operations & Supply Chain</option>
+                      <option value="Scientific Research & Lab Tenure">Scientific Research & Lab Tenure</option>
+                      <option value="Law, Governance & Social Impact">Law, Governance & Social Impact</option>
+                      <option value="Other">Other Domain (Specify below)</option>
+                    </select>
                   </div>
 
-                  {/* Field 3: Internship Type */}
+                  {/* Field 4: Internship Type* — On-site / Remote / Hybrid */}
                   <div className="sae-form-field">
-                    <label>Internship / Experience Type *</label>
+                    <label>Internship Type *</label>
                     <select
                       required
                       value={internshipType}
-                      onChange={(e) => setInternshipType(e.target.value)}
-                    >
-                      <option value="">-- Select Type --</option>
-                      <option value="Corporate / Industry">Corporate / Industry Internship</option>
-                      <option value="Research & Lab">Academic Research / Lab Tenure</option>
-                      <option value="Government & PSU">Government Agency / PSU Fellowship</option>
-                      <option value="Hospital & Clinic">Clinical / Hospital Residency</option>
-                      <option value="Startup / Tech">Tech Startup / Incubator Role</option>
-                      <option value="NGO / Non-Profit">Social Impact / NGO Internship</option>
-                    </select>
-                  </div>
-
-                  {/* Field 4: Duration */}
-                  <div className="sae-form-field">
-                    <label>Duration *</label>
-                    <select
-                      required
-                      value={internshipDuration}
                       onChange={(e) => {
-                        setInternshipDuration(e.target.value)
-                        if (e.target.value !== 'Other') setCustomInternshipDuration('')
+                        setInternshipType(e.target.value)
+                        setInternshipFormError('')
                       }}
                     >
-                      <option value="">-- Select Duration --</option>
-                      <option value="1 Month">1 Month</option>
-                      <option value="2 Months">2 Months</option>
-                      <option value="3 Months">3 Months</option>
-                      <option value="6 Months">6 Months</option>
-                      <option value="1 Year">1 Year</option>
-                      <option value="Other">Other</option>
+                      <option value="">Select Internship Type</option>
+                      <option value="On-site">On-site</option>
+                      <option value="Remote">Remote</option>
+                      <option value="Hybrid">Hybrid</option>
                     </select>
                   </div>
 
-                  {/* Custom Duration if Other */}
-                  {internshipDuration === 'Other' && (
-                    <div className="sae-form-field">
-                      <label>Custom Duration *</label>
+                  {/* Custom Domain input if 'Other' selected */}
+                  {internshipDomain === 'Other' && (
+                    <div className="sae-form-field sae-form-field-full">
+                      <label>Specify Domain / Field *</label>
                       <input
                         type="text"
                         required
-                        placeholder="e.g. 4 Months, 8 Weeks, 45 Days"
-                        value={customInternshipDuration}
-                        onChange={(e) => setCustomInternshipDuration(e.target.value)}
+                        placeholder="e.g. Aerospace Engineering, Environmental Sciences, Robotics"
+                        value={customInternshipDomain}
+                        onChange={(e) => {
+                          setCustomInternshipDomain(e.target.value)
+                          setInternshipFormError('')
+                        }}
                       />
                     </div>
                   )}
 
-                  {/* Field 5: Location / Mode */}
+                  {/* Field 5: Start Date* */}
                   <div className="sae-form-field">
-                    <label>Location / Mode</label>
+                    <label>Start Date *</label>
+                    <input
+                      type="date"
+                      required
+                      value={internshipStartDate}
+                      onChange={(e) => {
+                        setInternshipStartDate(e.target.value)
+                        setInternshipFormError('')
+                      }}
+                    />
+                  </div>
+
+                  {/* Field 6: End Date* */}
+                  <div className="sae-form-field">
+                    <label>End Date *</label>
+                    <input
+                      type="date"
+                      required
+                      min={internshipStartDate || undefined}
+                      value={internshipEndDate}
+                      onChange={(e) => {
+                        setInternshipEndDate(e.target.value)
+                        setInternshipFormError('')
+                      }}
+                    />
+                  </div>
+
+                  {/* Field 7: Internship Role* */}
+                  <div className="sae-form-field">
+                    <label>Internship Role *</label>
                     <input
                       type="text"
-                      placeholder="e.g. Bengaluru, Remote, Hybrid"
-                      value={internshipLocation}
-                      onChange={(e) => setInternshipLocation(e.target.value)}
+                      required
+                      placeholder="e.g. Software Engineer Intern, Research Assistant, Trainee"
+                      value={internshipRole}
+                      onChange={(e) => {
+                        setInternshipRole(e.target.value)
+                        setInternshipFormError('')
+                      }}
                     />
                   </div>
 
-                  {/* Field 6: Experience Description */}
-                  <div className="sae-form-field sae-form-field-full">
-                    <label>Key Responsibilities & Contributions</label>
-                    <textarea
-                      rows={2}
-                      placeholder="Briefly describe key tasks, tech stack used, deliverables, or research contributions..."
-                      value={internshipDescription}
-                      onChange={(e) => setInternshipDescription(e.target.value)}
-                    />
-                  </div>
-
-                  {/* Field 7: Certificate / Offer Letter / Completion Doc */}
-                  <div className="sae-form-field sae-form-field-full">
-                    <label>Completion Certificate or Official Offer / Letter *</label>
+                  {/* Field 8: Certificate Link* */}
+                  <div className="sae-form-field">
+                    <label>Certificate Link *</label>
                     <input
-                      ref={internshipDocInputRef}
+                      type="url"
+                      required
+                      placeholder="https://... (e.g. verification portal URL or drive link)"
+                      value={internshipCertLink}
+                      onChange={(e) => {
+                        setInternshipCertLink(e.target.value)
+                        setInternshipFormError('')
+                      }}
+                    />
+                  </div>
+
+                  {/* Field 9: Internship Certificate* — required upload */}
+                  <div className="sae-form-field sae-form-field-full">
+                    <label>Internship Certificate * (Official Certificate / Completion Document)</label>
+                    <input
+                      ref={internshipCertInputRef}
                       type="file"
-                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp"
                       style={{ display: 'none' }}
                       onChange={(e) => {
                         const file = e.target.files?.[0] || null
-                        handleInternshipDocSelect(file)
+                        handleInternshipCertSelect(file)
                       }}
                     />
-                    {!internshipDocFile ? (
+                    {!internshipCertFile ? (
                       <div
-                        className={`sae-upload-box ${isInternshipDocDragOver ? 'dragover' : ''}`}
-                        onClick={() => internshipDocInputRef.current?.click()}
+                        className={`sae-upload-box ${isInternshipCertDragOver ? 'dragover' : ''}`}
+                        onClick={() => internshipCertInputRef.current?.click()}
                         onDragOver={(e) => {
                           e.preventDefault()
-                          setIsInternshipDocDragOver(true)
+                          setIsInternshipCertDragOver(true)
                         }}
                         onDragLeave={(e) => {
                           e.preventDefault()
-                          setIsInternshipDocDragOver(false)
+                          setIsInternshipCertDragOver(false)
                         }}
                         onDrop={(e) => {
                           e.preventDefault()
-                          setIsInternshipDocDragOver(false)
+                          setIsInternshipCertDragOver(false)
                           const file = e.dataTransfer.files?.[0] || null
-                          handleInternshipDocSelect(file)
+                          handleInternshipCertSelect(file)
                         }}
                         role="button"
                         tabIndex={0}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault()
-                            internshipDocInputRef.current?.click()
+                            internshipCertInputRef.current?.click()
                           }
                         }}
-                        aria-label="Upload Internship Document"
+                        aria-label="Upload Internship Certificate"
                       >
                         <div className="sae-upload-icon-circle">
                           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -4022,35 +4184,67 @@ export default function StudentAchievementsExperience({
                             <line x1="16" y1="17" x2="8" y2="17" />
                           </svg>
                         </div>
-                        <div className="sae-upload-title">Upload Internship Certificate or Document</div>
-                        <div className="sae-upload-hint">PDF, DOC, DOCX, JPG or PNG • Max 10 MB</div>
+                        <div className="sae-upload-title">Upload Internship Certificate</div>
+                        <div className="sae-upload-hint">PDF, DOC, DOCX, JPG, PNG or WEBP • Max 10 MB</div>
                       </div>
                     ) : (
                       <div className="sae-file-card">
                         <div className="sae-file-info">
-                          <div className="sae-file-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                              <polyline points="14 2 14 8 20 8" />
-                            </svg>
-                          </div>
+                          {internshipCertPreviewUrl && (internshipCertFile.type?.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(internshipCertFile.name)) ? (
+                            <img
+                              src={internshipCertPreviewUrl}
+                              alt="Certificate preview"
+                              style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 4, border: '1px solid #cbd5e1', cursor: 'pointer', flexShrink: 0 }}
+                              onClick={handleViewInternshipCert}
+                              title="Click to view certificate"
+                            />
+                          ) : (
+                            <div
+                              className="sae-file-icon"
+                              style={{ cursor: 'pointer' }}
+                              onClick={handleViewInternshipCert}
+                              title="Click to view certificate"
+                            >
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                              </svg>
+                            </div>
+                          )}
                           <div className="sae-file-text">
-                            <span className="sae-file-name" title={internshipDocFile.name}>
-                              {internshipDocFile.name}
+                            <span
+                              className="sae-file-name"
+                              title={internshipCertFile.name}
+                              style={{ cursor: 'pointer' }}
+                              onClick={handleViewInternshipCert}
+                            >
+                              {internshipCertFile.name}
                             </span>
                             <span className="sae-file-meta">
-                              {internshipDocFile.size > 1024 * 1024
-                                ? `${(internshipDocFile.size / (1024 * 1024)).toFixed(2)} MB`
-                                : `${(internshipDocFile.size / 1024).toFixed(1)} KB`} • Document Attached
+                              {internshipCertFile.size > 1024 * 1024
+                                ? `${(internshipCertFile.size / (1024 * 1024)).toFixed(2)} MB`
+                                : `${(internshipCertFile.size / 1024).toFixed(1)} KB`} • Certificate Attached
                             </span>
                           </div>
                         </div>
                         <div className="sae-file-actions">
                           <button
                             type="button"
+                            className="sae-file-btn sae-file-btn-view"
+                            onClick={handleViewInternshipCert}
+                            title="View Certificate"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            View
+                          </button>
+                          <button
+                            type="button"
                             className="sae-file-btn sae-file-btn-replace"
-                            onClick={() => internshipDocInputRef.current?.click()}
-                            title="Replace Document"
+                            onClick={() => internshipCertInputRef.current?.click()}
+                            title="Replace Certificate"
                           >
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                               <polyline points="1 4 1 10 7 10" />
@@ -4061,8 +4255,8 @@ export default function StudentAchievementsExperience({
                           <button
                             type="button"
                             className="sae-file-btn sae-file-btn-delete"
-                            onClick={handleDeleteInternshipDoc}
-                            title="Delete Document"
+                            onClick={handleDeleteInternshipCert}
+                            title="Delete Certificate"
                           >
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                               <polyline points="3 6 5 6 21 6" />
@@ -4080,10 +4274,7 @@ export default function StudentAchievementsExperience({
                   <button
                     type="button"
                     className="sae-btn-cancel"
-                    onClick={() => {
-                      setIsAddInternshipFormOpen(false)
-                      setInternshipFormError('')
-                    }}
+                    onClick={resetInternshipForm}
                   >
                     Cancel
                   </button>
@@ -4111,7 +4302,7 @@ export default function StudentAchievementsExperience({
                     No internships submitted yet
                   </div>
                   <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: 460, margin: 0 }}>
-                    Log your company, research lab, clinic, or corporate tenures and submit them for Portal Admin verification.
+                    Log your industrial training, company roles, research fellowships, or clinic tenures and submit them for Portal Admin verification.
                   </p>
                   <button
                     type="button"
@@ -4167,10 +4358,16 @@ export default function StudentAchievementsExperience({
                         <article key={item.id} className={`sae-project-card ${cardClass}`}>
                           <div className="sae-project-header">
                             <div>
-                              <h3 className="sae-project-name">{item.organization || item.company}</h3>
-                              <div className="sae-project-badges-row">
+                              <h3 className="sae-project-name">{item.title || item.organization}</h3>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3, fontSize: '0.86rem', color: '#334155', fontWeight: 600 }}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M3 21h18M3 7v14M21 7v14M6 10h2M6 14h2M6 18h2M10 10h2M10 14h2M10 18h2M14 10h2M14 14h2M14 18h2M18 10h2M18 14h2M18 18h2M9 3h6v4H9z" />
+                                </svg>
+                                <span>{item.organization || item.company}</span>
+                              </div>
+                              <div className="sae-project-badges-row" style={{ marginTop: 6 }}>
+                                {item.domain && <span className="sae-badge-type hardware">{item.domain}</span>}
                                 <span className="sae-badge-type software">{item.type || 'Internship'}</span>
-                                {item.location && <span className="sae-badge-part">{item.location}</span>}
                               </div>
                             </div>
                             <span className={`sae-status-badge ${isVerified ? 'verified' : isRejected ? 'unverified' : 'pending'}`}>
@@ -4179,17 +4376,26 @@ export default function StudentAchievementsExperience({
                           </div>
 
                           <div className="sae-project-meta-row">
-                            <span style={{ fontWeight: 600, color: '#0f172a' }}>{item.role}</span>
-                            <span>•</span>
-                            <span>{item.duration}</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                              <circle cx="12" cy="7" r="4" />
+                            </svg>
+                            <span><strong>Role:</strong> {item.role}</span>
                           </div>
 
-                          {item.description && (
-                            <p style={{ fontSize: '0.82rem', color: '#475569', margin: 0, lineHeight: 1.45 }}>
-                              {item.description}
-                            </p>
-                          )}
+                          <div className="sae-project-meta-row">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                              <line x1="16" y1="2" x2="16" y2="6" />
+                              <line x1="8" y1="2" x2="8" y2="6" />
+                              <line x1="3" y1="10" x2="21" y2="10" />
+                            </svg>
+                            <span>
+                              <strong>Duration:</strong> {item.startDate && item.endDate ? `${item.startDate} to ${item.endDate} (${item.duration})` : item.duration || 'Completed'}
+                            </span>
+                          </div>
 
+                          {/* Certificate Document */}
                           <div className="sae-project-doc-box">
                             <div className="sae-project-doc-header">
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0284c7" strokeWidth="2.2">
@@ -4197,20 +4403,39 @@ export default function StudentAchievementsExperience({
                                 <polyline points="14 2 14 8 20 8" />
                               </svg>
                               <span className="sae-project-doc-name" title={item.certificateFile || item.documentFile}>
-                                {item.certificateFile || item.documentFile || 'Certificate Document'}
+                                {item.certificateFile || item.documentFile || 'Internship Certificate'}
                               </span>
                             </div>
                             <span className="sae-project-doc-badge">Certificate Attached</span>
                           </div>
 
-                          <div className={`sae-card-status-note ${isVerified ? 'verified' : isRejected ? 'unverified' : 'pending'}`}>
+                          {/* Certificate Link */}
+                          {item.certificateLink && (
+                            <a
+                              href={item.certificateLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="sae-project-link-btn"
+                              title="Verify certificate credential online"
+                            >
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                <polyline points="15 3 21 3 21 9" />
+                                <line x1="10" y1="14" x2="21" y2="3" />
+                              </svg>
+                              Open Certificate Link ↗
+                            </a>
+                          )}
+
+                          {/* Status Note */}
+                          <div className={`sae-card-status-note ${cardClass}`}>
                             {isVerified ? (
                               <span>
-                                <strong>Officially Verified:</strong> Authenticated by Portal Admin. Counted in official profile.
+                                <strong>Officially Verified:</strong> Authenticated by Portal Admin. Counted in official student academic profile.
                               </span>
                             ) : isRejected ? (
                               <span>
-                                <strong>Admin Review:</strong> {item.rejectionReason || 'Internship documentation could not be verified.'}
+                                <strong>Admin Review:</strong> {item.rejectionReason || 'Internship documentation could not be verified. Please update details.'}
                               </span>
                             ) : (
                               <span>
@@ -4258,18 +4483,32 @@ export default function StudentAchievementsExperience({
           }}
           role="dialog"
           aria-modal="true"
-          aria-label="Project Preview Image View"
+          aria-label="Preview Modal"
         >
           <div className="sae-img-modal-card">
             <div className="sae-img-modal-header">
               <div className="sae-img-modal-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <polyline points="21 15 16 10 5 21" />
-                </svg>
+                {(() => {
+                  const name = (viewingModalImage.name || '').toLowerCase()
+                  const isDoc = name.endsWith('.pdf') || name.endsWith('.doc') || name.endsWith('.docx')
+                  if (isDoc) {
+                    return (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                      </svg>
+                    )
+                  }
+                  return (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <polyline points="21 15 16 10 5 21" />
+                    </svg>
+                  )
+                })()}
                 <span className="sae-img-modal-filename" title={viewingModalImage.name}>
-                  {viewingModalImage.name || 'Project Preview Image'}
+                  {viewingModalImage.name || 'Preview Document'}
                 </span>
               </div>
               <button
@@ -4277,7 +4516,7 @@ export default function StudentAchievementsExperience({
                 className="sae-img-modal-close"
                 onClick={handleCloseImageModal}
                 title="Close preview (Esc)"
-                aria-label="Close image modal"
+                aria-label="Close modal"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18" />
@@ -4286,14 +4525,81 @@ export default function StudentAchievementsExperience({
               </button>
             </div>
             <div className="sae-img-modal-body">
-              <img
-                src={viewingModalImage.url}
-                alt={viewingModalImage.name || 'Full Project Preview'}
-                className="sae-img-modal-image"
-              />
+              {(() => {
+                const name = (viewingModalImage.name || '').toLowerCase()
+                const isPdf = name.endsWith('.pdf')
+                const isDoc = name.endsWith('.doc') || name.endsWith('.docx')
+
+                if (isPdf) {
+                  return (
+                    <iframe
+                      src={viewingModalImage.url}
+                      title={viewingModalImage.name || 'Document PDF Preview'}
+                      sandbox="allow-same-origin"
+                      style={{
+                        width: '100%',
+                        height: 'calc(90vh - 160px)',
+                        minHeight: '440px',
+                        border: 'none',
+                        borderRadius: '6px',
+                        background: '#ffffff'
+                      }}
+                    />
+                  )
+                }
+
+                if (isDoc) {
+                  return (
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '48px 24px',
+                      textAlign: 'center',
+                      color: '#f8fafc',
+                      gap: 16
+                    }}>
+                      <div style={{
+                        width: 72,
+                        height: 72,
+                        borderRadius: '50%',
+                        background: 'rgba(56, 189, 248, 0.15)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#38bdf8'
+                      }}>
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                          <polyline points="14 2 14 8 20 8" />
+                          <line x1="16" y1="13" x2="8" y2="13" />
+                          <line x1="16" y1="17" x2="8" y2="17" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: 6 }}>
+                          {viewingModalImage.name}
+                        </div>
+                        <div style={{ fontSize: '0.84rem', color: '#94a3b8' }}>
+                          Official Document Attached • Ready for Portal Verification
+                        </div>
+                      </div>
+                    </div>
+                  )
+                }
+
+                return (
+                  <img
+                    src={viewingModalImage.url}
+                    alt={viewingModalImage.name || 'Full Preview'}
+                    className="sae-img-modal-image"
+                  />
+                )
+              })()}
             </div>
             <div className="sae-img-modal-footer">
-              <span className="sae-img-modal-hint">Full-Resolution Project Preview</span>
+              <span className="sae-img-modal-hint">In-Page Document & Image Preview</span>
               <button
                 type="button"
                 className="sae-btn-cancel"
