@@ -78,6 +78,7 @@ export default function StudentAchievementsExperience({
   const [projectLink, setProjectLink] = useState('')
   const [projectImageFiles, setProjectImageFiles] = useState([])
   const [replacingImageId, setReplacingImageId] = useState(null)
+  const [viewingModalImage, setViewingModalImage] = useState(null)
   const [projectDocFile, setProjectDocFile] = useState(null)
   const [isProjectImageDragOver, setIsProjectImageDragOver] = useState(false)
   const [isProjectDocDragOver, setIsProjectDocDragOver] = useState(false)
@@ -497,6 +498,26 @@ export default function StudentAchievementsExperience({
       return prev.filter((img) => img.id !== id)
     })
   }
+
+  // Image Modal Handlers (clean in-page preview)
+  const handleOpenImageModal = (url, name) => {
+    if (!url) return
+    setViewingModalImage({ url, name: name || 'Project Preview Image' })
+  }
+
+  const handleCloseImageModal = () => {
+    setViewingModalImage(null)
+  }
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && viewingModalImage) {
+        setViewingModalImage(null)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [viewingModalImage])
 
   // Project Documentation Handlers
   const handleProjectDocSelect = (file) => {
@@ -1759,6 +1780,138 @@ export default function StudentAchievementsExperience({
           color: #64748b;
           font-size: 0.8rem;
           font-weight: 600;
+        }
+
+        /* In-Page Image Preview Modal */
+        .sae-img-modal-backdrop {
+          position: fixed;
+          inset: 0;
+          background: rgba(15, 23, 42, 0.78);
+          backdrop-filter: blur(5px);
+          -webkit-backdrop-filter: blur(5px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 99999;
+          padding: 20px;
+          animation: saeModalFadeIn 0.2s ease-out;
+        }
+
+        @keyframes saeModalFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        .sae-img-modal-card {
+          background: #ffffff;
+          border-radius: 12px;
+          box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.45);
+          width: 100%;
+          max-width: 860px;
+          max-height: 90vh;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          border: 1px solid #cbd5e1;
+          animation: saeModalZoomIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes saeModalZoomIn {
+          from { transform: scale(0.95); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+
+        .sae-img-modal-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 12px 18px;
+          background: #f8fafc;
+          border-bottom: 1px solid #e2e8f0;
+          gap: 12px;
+        }
+
+        .sae-img-modal-title {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.92rem;
+          font-weight: 700;
+          color: #0f2e4d;
+          min-width: 0;
+        }
+
+        .sae-img-modal-filename {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          max-width: 550px;
+        }
+
+        .sae-img-modal-close {
+          background: transparent;
+          border: none;
+          color: #64748b;
+          cursor: pointer;
+          padding: 6px;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.15s ease;
+          flex-shrink: 0;
+        }
+
+        .sae-img-modal-close:hover {
+          background: #fee2e2;
+          color: #dc2626;
+        }
+
+        .sae-img-modal-body {
+          padding: 18px;
+          background: #0b1320;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: auto;
+          min-height: 220px;
+          max-height: calc(90vh - 120px);
+        }
+
+        .sae-img-modal-image {
+          max-width: 100%;
+          max-height: calc(90vh - 160px);
+          object-fit: contain;
+          border-radius: 6px;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .sae-img-modal-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px 18px;
+          background: #f8fafc;
+          border-top: 1px solid #e2e8f0;
+        }
+
+        .sae-img-modal-hint {
+          font-size: 0.76rem;
+          color: #64748b;
+          font-weight: 500;
+        }
+
+        @media (max-width: 640px) {
+          .sae-img-modal-card {
+            max-width: 96vw;
+            max-height: 94vh;
+          }
+          .sae-img-modal-filename {
+            max-width: 220px;
+          }
+          .sae-img-modal-body {
+            padding: 10px;
+          }
         }
 
         .sae-project-doc-box {
@@ -3170,7 +3323,7 @@ export default function StudentAchievementsExperience({
                                   src={img.previewUrl}
                                   alt={`Preview ${idx + 1}`}
                                   style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 4, border: '1px solid #cbd5e1', cursor: 'pointer', flexShrink: 0 }}
-                                  onClick={() => window.open(img.previewUrl, '_blank')}
+                                  onClick={() => handleOpenImageModal(img.previewUrl, img.name)}
                                   title="Click to view full preview image"
                                 />
                               ) : (
@@ -3210,7 +3363,7 @@ export default function StudentAchievementsExperience({
                                 <button
                                   type="button"
                                   className="sae-file-btn sae-file-btn-view"
-                                  onClick={() => window.open(img.previewUrl, '_blank')}
+                                  onClick={() => handleOpenImageModal(img.previewUrl, img.name)}
                                   title="View full-size image"
                                 >
                                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
@@ -3520,7 +3673,7 @@ export default function StudentAchievementsExperience({
                                   src={(item.previewImages && item.previewImages[0]?.url) || item.previewImageUrl}
                                   alt={item.name || 'Project preview'}
                                   className="sae-project-preview-img"
-                                  onClick={() => window.open((item.previewImages && item.previewImages[0]?.url) || item.previewImageUrl, '_blank')}
+                                  onClick={() => handleOpenImageModal((item.previewImages && item.previewImages[0]?.url) || item.previewImageUrl, (item.previewImages && item.previewImages[0]?.name) || item.name || 'Project Preview')}
                                   title="Click to view full preview image"
                                 />
                               ) : (
@@ -3544,7 +3697,7 @@ export default function StudentAchievementsExperience({
                                       src={pImg.url}
                                       alt={`Thumbnail ${pIdx + 1}`}
                                       style={{ width: 30, height: 30, objectFit: 'cover', borderRadius: 4, border: '1px solid #cbd5e1', cursor: 'pointer', flexShrink: 0 }}
-                                      onClick={() => window.open(pImg.url, '_blank')}
+                                      onClick={() => handleOpenImageModal(pImg.url, pImg.name || `${item.name || 'Project'} Preview #${pIdx + 1}`)}
                                       title={`View preview image #${pIdx + 1} (${pImg.name})`}
                                     />
                                   ))}
@@ -4095,6 +4248,64 @@ export default function StudentAchievementsExperience({
           </div>
         )}
       </main>
+
+      {/* In-Page Project Preview Image Modal */}
+      {viewingModalImage && (
+        <div
+          className="sae-img-modal-backdrop"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) handleCloseImageModal()
+          }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Project Preview Image View"
+        >
+          <div className="sae-img-modal-card">
+            <div className="sae-img-modal-header">
+              <div className="sae-img-modal-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+                <span className="sae-img-modal-filename" title={viewingModalImage.name}>
+                  {viewingModalImage.name || 'Project Preview Image'}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="sae-img-modal-close"
+                onClick={handleCloseImageModal}
+                title="Close preview (Esc)"
+                aria-label="Close image modal"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div className="sae-img-modal-body">
+              <img
+                src={viewingModalImage.url}
+                alt={viewingModalImage.name || 'Full Project Preview'}
+                className="sae-img-modal-image"
+              />
+            </div>
+            <div className="sae-img-modal-footer">
+              <span className="sae-img-modal-hint">Full-Resolution Project Preview</span>
+              <button
+                type="button"
+                className="sae-btn-cancel"
+                style={{ padding: '6px 16px', fontSize: '0.82rem' }}
+                onClick={handleCloseImageModal}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
