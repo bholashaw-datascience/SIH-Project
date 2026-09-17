@@ -145,8 +145,20 @@ export default function StudentAchievementsExperience({
   const [isDragOver, setIsDragOver] = useState(false)
   const [formError, setFormError] = useState('')
   const [successBanner, setSuccessBanner] = useState('')
+  const [isPolicyInfoOpen, setIsPolicyInfoOpen] = useState(false)
   const fileInputRef = useRef(null)
   const addSkillFormRef = useRef(null)
+
+  useEffect(() => {
+    if (!isPolicyInfoOpen) return
+    const handlePopClose = (e) => {
+      if (!e.target.closest('.sae-info-tooltip-wrap')) {
+        setIsPolicyInfoOpen(false)
+      }
+    }
+    document.addEventListener('click', handlePopClose)
+    return () => document.removeEventListener('click', handlePopClose)
+  }, [isPolicyInfoOpen])
 
   const handleFileSelect = (file) => {
     if (!file) return
@@ -1083,69 +1095,156 @@ export default function StudentAchievementsExperience({
           max-width: 1240px;
           width: 100%;
           margin: 0 auto;
-          padding: 24px 20px 60px;
+          padding: 16px 20px 60px;
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          gap: 20px;
-        }
-
-        /* Accreditation Policy Notice Banner */
-        .sae-policy-banner {
-          background: #ffffff;
-          border: 1px solid #d9d4c7;
-          border-left: 5px solid #b38e44;
-          border-radius: 8px;
-          padding: 14px 18px;
-          display: flex;
-          align-items: flex-start;
           gap: 14px;
-          box-shadow: 0 2px 8px rgba(15, 31, 46, 0.04);
         }
 
-        .sae-policy-icon {
-          width: 36px;
-          height: 36px;
-          border-radius: 8px;
-          background: #fef3c7;
-          color: #b45309;
+        /* Page Title & Inline Verification Notice */
+        .sae-page-header {
+          margin-bottom: -2px;
+        }
+
+        .sae-page-title-wrap {
           display: flex;
           align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
+        .sae-page-title {
+          font-size: 1.25rem;
+          font-weight: 800;
+          color: #0f1f2e;
+          margin: 0;
+          letter-spacing: -0.015em;
+        }
+
+        .sae-verify-badge-wrap {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          position: relative;
+        }
+
+        .sae-verify-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #f0fdf4;
+          color: #166534;
+          border: 1px solid #bbf7d0;
+          border-radius: 9999px;
+          padding: 3px 10px;
+          font-size: 0.77rem;
+          font-weight: 600;
+          line-height: 1.3;
+        }
+
+        .sae-verify-shield {
+          font-size: 0.82rem;
+          line-height: 1;
+        }
+
+        .sae-info-tooltip-wrap {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+        }
+
+        .sae-info-btn {
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          background: #e2e8f0;
+          color: #475569;
+          border: 1px solid #cbd5e1;
+          display: inline-flex;
+          align-items: center;
           justify-content: center;
-          flex-shrink: 0;
-          margin-top: 2px;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          padding: 0;
         }
 
-        .sae-policy-text {
-          flex: 1;
+        .sae-info-btn:hover,
+        .sae-info-btn:focus-visible {
+          background: #1e3a5f;
+          color: #ffffff;
+          border-color: #1e3a5f;
         }
 
-        .sae-policy-title {
-          font-size: 0.92rem;
+        .sae-policy-popover {
+          position: absolute;
+          top: calc(100% + 8px);
+          right: 0;
+          width: 320px;
+          background: #ffffff;
+          border: 1px solid #cbd5e1;
+          border-radius: 8px;
+          padding: 12px 14px;
+          box-shadow: 0 10px 25px -5px rgba(15, 31, 46, 0.15), 0 4px 6px -2px rgba(15, 31, 46, 0.05);
+          z-index: 1000;
+          animation: saeFadeIn 0.15s ease-out;
+        }
+
+        .sae-popover-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          font-size: 0.8rem;
           font-weight: 700;
           color: #0f1f2e;
-          margin-bottom: 3px;
+          margin-bottom: 6px;
+          padding-bottom: 4px;
+          border-bottom: 1px solid #f1f5f9;
         }
 
-        .sae-policy-desc {
-          font-size: 0.82rem;
+        .sae-popover-close {
+          background: transparent;
+          border: none;
+          font-size: 1.1rem;
+          line-height: 1;
+          color: #94a3b8;
+          cursor: pointer;
+          padding: 0 2px;
+        }
+
+        .sae-popover-close:hover {
+          color: #0f1f2e;
+        }
+
+        .sae-popover-text {
+          font-size: 0.76rem;
           color: #475569;
           line-height: 1.45;
           margin: 0;
         }
 
-        .sae-policy-desc strong {
-          color: #166534;
+        @media (max-width: 640px) {
+          .sae-page-title-wrap {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+          }
+          .sae-policy-popover {
+            right: auto;
+            left: 0;
+            max-width: calc(100vw - 40px);
+          }
         }
 
-        /* Metrics Summary Bar */
+        /* Compact Metrics Summary Bar */
         .sae-metrics-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 16px;
+          gap: 10px;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 960px) {
           .sae-metrics-grid {
             grid-template-columns: repeat(2, 1fr);
           }
@@ -1160,64 +1259,85 @@ export default function StudentAchievementsExperience({
         .sae-metric-card {
           background: #ffffff;
           border: 1px solid #ded9cc;
-          border-radius: 8px;
-          padding: 16px;
-          box-shadow: 0 2px 6px rgba(15, 31, 46, 0.03);
+          border-radius: 6px;
+          padding: 8px 12px;
+          box-shadow: 0 1px 3px rgba(15, 31, 46, 0.03);
           display: flex;
           align-items: center;
-          gap: 14px;
-          transition: transform 0.15s ease;
+          gap: 10px;
+          min-width: 0;
+          transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
         .sae-metric-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(15, 31, 46, 0.06);
+          box-shadow: 0 2px 8px rgba(15, 31, 46, 0.06);
         }
 
         .sae-metric-card.is-verified {
-          border-left: 4px solid #16a34a;
+          border-left: 3px solid #16a34a;
         }
 
         .sae-metric-card.is-pending {
-          border-left: 4px solid #d97706;
+          border-left: 3px solid #d97706;
         }
 
         .sae-metric-card.is-unverified {
-          border-left: 4px solid #64748b;
+          border-left: 3px solid #64748b;
         }
 
         .sae-metric-card.is-projects {
-          border-left: 4px solid #0284c7;
+          border-left: 3px solid #0284c7;
         }
 
         .sae-metric-icon {
-          width: 44px;
-          height: 44px;
-          border-radius: 8px;
+          width: 32px;
+          height: 32px;
+          border-radius: 6px;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
         }
 
+        .sae-metric-info {
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+          flex: 1;
+        }
+
+        .sae-metric-top {
+          display: flex;
+          align-items: baseline;
+          gap: 7px;
+          min-width: 0;
+        }
+
         .sae-metric-val {
-          font-size: 1.65rem;
+          font-size: 1.25rem;
           font-weight: 800;
           line-height: 1;
           color: #0f1f2e;
+          letter-spacing: -0.02em;
         }
 
         .sae-metric-label {
-          font-size: 0.78rem;
+          font-size: 0.77rem;
           font-weight: 700;
-          color: #475569;
-          margin-top: 4px;
+          color: #334155;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .sae-metric-sub {
-          font-size: 0.7rem;
+          font-size: 0.69rem;
           color: #64748b;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
           margin-top: 2px;
+          line-height: 1.2;
         }
 
         /* Tabs Navigation */
@@ -2436,68 +2556,105 @@ export default function StudentAchievementsExperience({
 
       {/* MAIN BODY */}
       <main className="sae-main-container">
-        {/* OFFICIAL ACCREDITATION POLICY DISCLOSURE */}
-        <section className="sae-policy-banner">
-          <div className="sae-policy-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg>
+        {/* PAGE TITLE & COMPACT INLINE VERIFICATION NOTICE */}
+        <div className="sae-page-header">
+          <div className="sae-page-title-wrap">
+            <h1 className="sae-page-title">Achievements & Experience</h1>
+            <div className="sae-verify-badge-wrap">
+              <span className="sae-verify-badge">
+                <span className="sae-verify-shield">🛡</span>
+                Admin-verified items are included in your official profile.
+              </span>
+              <div className="sae-info-tooltip-wrap">
+                <button
+                  type="button"
+                  className="sae-info-btn"
+                  aria-label="Official verification info"
+                  aria-expanded={isPolicyInfoOpen}
+                  onClick={() => setIsPolicyInfoOpen((prev) => !prev)}
+                  title="Click for verification details"
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="16" x2="12" y2="12" />
+                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                  </svg>
+                </button>
+                {isPolicyInfoOpen && (
+                  <div className="sae-policy-popover" role="tooltip">
+                    <div className="sae-popover-header">
+                      <strong>Admin Verification Notice</strong>
+                      <button
+                        type="button"
+                        className="sae-popover-close"
+                        onClick={() => setIsPolicyInfoOpen(false)}
+                        aria-label="Close"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <p className="sae-popover-text">
+                      Submitted skills, projects, and internships are reviewed by the Portal Admin. Only approved and verified items appear in your official institutional profile, placements, and verified credentials.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-          <div className="sae-policy-text">
-            <div className="sae-policy-title">Official Portal Verification & Accreditation Rule</div>
-            <p className="sae-policy-desc">
-              All submissions undergo formal audit by the <strong>IAS Collaboration Portal Admin</strong> and Institutional Oversight Committee.
-              <strong> Only admin-verified items count in your official profile</strong>, institutional credentials, and industry placement transcripts.
-            </p>
-          </div>
-        </section>
+        </div>
 
-        {/* METRICS SUMMARY BAR */}
-        <section className="sae-metrics-grid">
+        {/* COMPACT STATUS SUMMARY BAR */}
+        <section className="sae-metrics-grid" aria-label="Status summary metrics">
           {/* Card 1: Official Verified Items */}
           <div className="sae-metric-card is-verified">
             <div className="sae-metric-icon" style={{ background: '#dcfce7', color: '#166534' }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                 <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
             </div>
-            <div>
-              <div className="sae-metric-val">
-                {activeTab === 'experience'
-                  ? verifiedInternshipsCount
-                  : activeTab === 'projects'
-                  ? verifiedProjectsCount
-                  : verifiedSkillsCount}
+            <div className="sae-metric-info">
+              <div className="sae-metric-top">
+                <span className="sae-metric-val">
+                  {activeTab === 'experience'
+                    ? verifiedInternshipsCount
+                    : activeTab === 'projects'
+                    ? verifiedProjectsCount
+                    : verifiedSkillsCount}
+                </span>
+                <span className="sae-metric-label">
+                  {activeTab === 'experience'
+                    ? 'Verified Internships'
+                    : activeTab === 'projects'
+                    ? 'Verified Projects'
+                    : 'Verified Skills'}
+                </span>
               </div>
-              <div className="sae-metric-label">
-                {activeTab === 'experience'
-                  ? 'Verified Internships'
-                  : activeTab === 'projects'
-                  ? 'Verified Projects'
-                  : 'Verified Skills'}
+              <div className="sae-metric-sub" style={{ color: '#166534', fontWeight: 600 }}>
+                Counted in Official Profile
               </div>
-              <div className="sae-metric-sub" style={{ color: '#166534', fontWeight: 600 }}>Counted in Official Profile</div>
             </div>
           </div>
 
           {/* Card 2: Pending Admin Review */}
           <div className="sae-metric-card is-pending">
             <div className="sae-metric-icon" style={{ background: '#fef3c7', color: '#92400e' }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg>
             </div>
-            <div>
-              <div className="sae-metric-val">
-                {activeTab === 'experience'
-                  ? pendingInternshipsCount
-                  : activeTab === 'projects'
-                  ? pendingProjectsCount
-                  : pendingSkillsCount}
+            <div className="sae-metric-info">
+              <div className="sae-metric-top">
+                <span className="sae-metric-val">
+                  {activeTab === 'experience'
+                    ? pendingInternshipsCount
+                    : activeTab === 'projects'
+                    ? pendingProjectsCount
+                    : pendingSkillsCount}
+                </span>
+                <span className="sae-metric-label">Pending Verification</span>
               </div>
-              <div className="sae-metric-label">Pending Verification</div>
               <div className="sae-metric-sub">Awaiting Admin Audit</div>
             </div>
           </div>
@@ -2505,21 +2662,23 @@ export default function StudentAchievementsExperience({
           {/* Card 3: Not Verified / Action Needed */}
           <div className="sae-metric-card is-unverified">
             <div className="sae-metric-icon" style={{ background: '#f1f5f9', color: '#475569' }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="12" />
                 <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
             </div>
-            <div>
-              <div className="sae-metric-val">
-                {activeTab === 'experience'
-                  ? unverifiedInternshipsCount
-                  : activeTab === 'projects'
-                  ? unverifiedProjectsCount
-                  : unverifiedSkillsCount}
+            <div className="sae-metric-info">
+              <div className="sae-metric-top">
+                <span className="sae-metric-val">
+                  {activeTab === 'experience'
+                    ? unverifiedInternshipsCount
+                    : activeTab === 'projects'
+                    ? unverifiedProjectsCount
+                    : unverifiedSkillsCount}
+                </span>
+                <span className="sae-metric-label">Needs Revision</span>
               </div>
-              <div className="sae-metric-label">Needs Revision</div>
               <div className="sae-metric-sub">Not Counted in Profile</div>
             </div>
           </div>
@@ -2527,25 +2686,27 @@ export default function StudentAchievementsExperience({
           {/* Card 4: Total Portfolio Submissions */}
           <div className="sae-metric-card is-projects">
             <div className="sae-metric-icon" style={{ background: '#e0f2fe', color: '#0369a1' }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
               </svg>
             </div>
-            <div>
-              <div className="sae-metric-val">
-                {activeTab === 'experience'
-                  ? internships.length
-                  : activeTab === 'projects'
-                  ? projects.length
-                  : skills.length}
-              </div>
-              <div className="sae-metric-label">
-                {activeTab === 'experience'
-                  ? 'Total Internships Logged'
-                  : activeTab === 'projects'
-                  ? 'Total Projects Logged'
-                  : 'Total Skills Logged'}
+            <div className="sae-metric-info">
+              <div className="sae-metric-top">
+                <span className="sae-metric-val">
+                  {activeTab === 'experience'
+                    ? internships.length
+                    : activeTab === 'projects'
+                    ? projects.length
+                    : skills.length}
+                </span>
+                <span className="sae-metric-label">
+                  {activeTab === 'experience'
+                    ? 'Total Internships'
+                    : activeTab === 'projects'
+                    ? 'Total Projects'
+                    : 'Total Skills Logged'}
+                </span>
               </div>
               <div className="sae-metric-sub">
                 {activeTab === 'experience'
