@@ -1,0 +1,57 @@
+
+@import "tailwindcss";
+
+
+
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(14px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes avatarPop {
+          0%   { transform: scale(0.8); opacity: 0; }
+          60%  { transform: scale(1.06); opacity: 1; }
+          100% { transform: scale(1); }
+        }
+        @keyframes stampLand {
+          0%   { transform: scale(1.6) rotate(-14deg); opacity: 0; }
+          55%  { transform: scale(0.94) rotate(-9deg); opacity: 1; }
+          75%  { transform: scale(1.04) rotate(-11deg); }
+          100% { transform: scale(1) rotate(-10deg); opacity: 1; }
+        }
+        @keyframes pulseRing {
+          0%   { box-shadow: 0 0 0 0 rgba(232,163,61,0.45); }
+          70%  { box-shadow: 0 0 0 10px rgba(232,163,61,0); }
+          100% { box-shadow: 0 0 0 0 rgba(232,163,61,0); }
+        }
+        @keyframes shakeX {
+          0%, 100% { transform: translateX(0); }
+          20% { transform: translateX(-4px); }
+          40% { transform: translateX(4px); }
+          60% { transform: translateX(-3px); }
+          80% { transform: translateX(3px); }
+        }
+        @keyframes checkPop {
+          0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+          100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .field-in { animation: fadeUp 0.55s ease both; }
+        .avatar-pop { animation: avatarPop 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+        .stamp-land { animation: stampLand 0.6s cubic-bezier(0.22,1,0.36,1) both; }
+        .pulse-ring { animation: pulseRing 2s ease-out infinite; }
+        .shake-once { animation: shakeX 0.5s ease-in-out both; }
+        .check-pop { animation: checkPop 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+
+        @media (prefers-reduced-motion: reduce) {
+          .field-in, .avatar-pop, .stamp-land, .pulse-ring, .shake-once, .check-pop {
+            animation: none !important;
+          }
+        }
+
+        .font-display { font-family: 'Fraunces', serif; }
+        .font-mono-id { font-family: 'IBM Plex Mono', monospace; }
+        .input-shell:focus-within {
+          border-color: #e8a33d;
+          box-shadow: 0 0 0 3px rgba(232,163,61,0.18);
+        }
