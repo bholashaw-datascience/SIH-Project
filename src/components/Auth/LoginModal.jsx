@@ -96,9 +96,14 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwitchToForgotPassw
         {/* Modal Header */}
         <div className="modal-header">
           <div className="modal-header-info">
-            <span className="modal-role-pill">
-              {isAdmin ? 'System Governance' : isIndustry ? 'Enterprise Gateway' : isAcademic ? 'Academic Institution' : 'STUDENT PORTAL'}
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <span className="modal-portal-badge" style={{ fontSize: '10px', fontWeight: 700, color: '#b3881e', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                IAS Collaboration Portal
+              </span>
+              <span className="modal-role-pill">
+                {isAdmin ? 'System Governance' : isIndustry ? 'Enterprise Gateway' : isAcademic ? 'Academic Institution' : 'STUDENT PORTAL'}
+              </span>
+            </div>
             <h3 className={`modal-title ${isAdmin ? 'admin-login-title' : isIndustry ? 'industry-login-title' : isAcademic ? 'academic-login-title' : 'student-login-title'}`}>
               {isAdmin ? 'Admin Login' : isIndustry ? 'Industry Login' : isAcademic ? 'Academic Login' : 'Student Login'}
             </h3>

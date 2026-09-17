@@ -981,7 +981,7 @@ export default function SkillsProjectsModal({
         {/* Footer */}
         <div className="sp-footer">
           <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
-            Verification authority: <strong>Udaan Central Portal Administration</strong>
+            Verification authority: <strong>IAS Collaboration Portal Administration</strong>
           </div>
           <button className="sp-add-btn" onClick={onClose}>
             Done

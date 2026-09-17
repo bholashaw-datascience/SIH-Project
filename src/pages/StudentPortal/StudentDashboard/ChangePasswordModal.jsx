@@ -1476,7 +1476,7 @@ export default function ChangePasswordModal({ isOpen, onClose, student, onPasswo
 
               <h4 className="cp-success-title">Password Changed Successfully</h4>
               <p className="cp-success-desc">
-                Your student account password has been updated securely. You can now use your new credentials for all future sessions across the Udaan Portal.
+                Your student account password has been updated securely. You can now use your new credentials for all future sessions across the IAS Collaboration Portal.
               </p>
 
               {/* Prepared Architecture Integration Point for Security Email */}

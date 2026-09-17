@@ -1026,7 +1026,7 @@ function StudentPortal({
       {(!showDashboard && (!isDemoActive || demoStep === 1 || demoStep === 4)) && (
         <header className="sp-top-navbar">
           <div className="sp-brand-block">
-            <h1 className="sp-brand-title">Student Portal</h1>
+            <h1 className="sp-brand-title">IAS Collaboration Portal</h1>
           </div>
 
           <div className="sp-header-actions">
@@ -1538,9 +1538,9 @@ function StudentPortal({
         <footer className="sp-footer">
           <div className="sp-footer-inner">
             <div>
-              <span className="sp-footer-brand">Student Portal</span>
+              <span className="sp-footer-brand">IAS Collaboration Portal</span>
             </div>
-            <div>Portal for Academia–Industry Collaboration</div>
+            <div>Built by Team UDAAN</div>
           </div>
         </footer>
       )}

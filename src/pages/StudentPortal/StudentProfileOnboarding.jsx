@@ -1436,13 +1436,45 @@ export default function StudentProfileOnboarding({
             text-align: center;
           }
         }
+
+        /* Official Page Footer */
+        .onb-footer {
+          margin-top: 40px;
+          background: #0f1d2f;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 16px 24px;
+          color: #94a3b8;
+          font-size: 12.5px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .onb-footer-inner {
+          max-width: 900px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
+        .onb-footer-brand {
+          font-weight: 700;
+          color: #ffffff;
+        }
+
+        .onb-footer-attribution {
+          color: #cbd5e1;
+          font-weight: 600;
+        }
       `}</style>
 
       {/* Top Navigation Bar */}
       <header className="onb-top-nav-bar">
         <div className="onb-brand-row">
           <span className="onb-brand-tag">Student Pathway</span>
-          <h1 className="onb-nav-title">Student Portal</h1>
+          <h1 className="onb-nav-title">IAS Collaboration Portal</h1>
         </div>
 
         <div className="onb-nav-actions">
@@ -2124,6 +2156,14 @@ export default function StudentProfileOnboarding({
           </div>
         </div>
       </form>
+
+      {/* Official Page Footer */}
+      <footer className="onb-footer">
+        <div className="onb-footer-inner">
+          <span className="onb-footer-brand">IAS Collaboration Portal</span>
+          <span className="onb-footer-attribution">Built by Team UDAAN</span>
+        </div>
+      </footer>
 
       {/* Image Crop Modal Reused from Project Infrastructure */}
       <ImageCropModal

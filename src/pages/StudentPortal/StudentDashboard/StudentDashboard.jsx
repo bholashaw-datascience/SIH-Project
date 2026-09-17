@@ -268,7 +268,7 @@ export default function StudentDashboard({
         id: `n_${Date.now()}`,
         type: 'info',
         title: `Public Post Submitted: ${newPost.title}`,
-        message: 'Your post is under moderation review by Udaan Portal Admin.',
+        message: 'Your post is under moderation review by IAS Collaboration Portal Admin.',
         timestamp: 'Just now',
         read: false,
       }
@@ -284,7 +284,7 @@ export default function StudentDashboard({
       id: `n_${Date.now()}`,
       type: 'info',
       title: 'Draft Post Submitted',
-      message: 'Your draft post has been submitted for moderation review by Udaan Portal Admin.',
+      message: 'Your draft post has been submitted for moderation review by IAS Collaboration Portal Admin.',
       timestamp: 'Just now',
       read: false,
     }
@@ -1082,14 +1082,45 @@ export default function StudentDashboard({
           background: #a17c35;
         }
 
+        /* Official Dashboard Footer */
+        .sd-footer {
+          margin-top: auto;
+          background: #0f1f2e;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 16px 28px;
+          color: #94a3b8;
+          font-size: 12.5px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .sd-footer-inner {
+          max-width: 1200px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
+        .sd-footer-brand {
+          font-weight: 700;
+          color: #f8fafc;
+        }
+
+        .sd-footer-attribution {
+          color: #cbd5e1;
+          font-weight: 600;
+        }
       `}</style>
 
       {/* 1. TOP HEADER (Requirement 2) */}
       <header className="sd-header">
         <div className="sd-header-brand" onClick={onNavigateHome} title="Return to Portal Home">
-          <div className="sd-brand-logo">U</div>
+          <div className="sd-brand-logo" style={{ fontSize: '0.85rem', letterSpacing: '0.02em' }}>IAS</div>
           <div className="sd-brand-text">
-            <span className="sd-brand-title">UDAAN</span>
+            <span className="sd-brand-title">IAS Collaboration Portal</span>
             <span className="sd-brand-sub">Student Portal & Control Center</span>
           </div>
         </div>
@@ -1647,6 +1678,14 @@ export default function StudentDashboard({
         </section>
 
       </main>
+
+      {/* Official Dashboard Footer */}
+      <footer className="sd-footer">
+        <div className="sd-footer-inner">
+          <span className="sd-footer-brand">IAS Collaboration Portal</span>
+          <span className="sd-footer-attribution">Built by Team UDAAN</span>
+        </div>
+      </footer>
 
       {/* MODALS */}
       {/* View-Only Profile Photo Lightbox (Requirement 3) */}

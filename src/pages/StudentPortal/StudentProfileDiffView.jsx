@@ -456,11 +456,43 @@ export default function StudentProfileDiffView({
             grid-template-columns: 1fr;
           }
         }
+
+        /* Official Page Footer */
+        .diff-footer {
+          margin-top: 48px;
+          background: #0f1d2f;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 16px 24px;
+          color: #94a3b8;
+          font-size: 12.5px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .diff-footer-inner {
+          max-width: 1100px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
+        .diff-footer-brand {
+          font-weight: 700;
+          color: #ffffff;
+        }
+
+        .diff-footer-attribution {
+          color: #cbd5e1;
+          font-weight: 600;
+        }
       `}</style>
 
       {/* Top Navbar */}
       <header className="diff-top-nav-bar">
-        <h1 className="diff-nav-title">Student Portal • Profile Changes</h1>
+        <h1 className="diff-nav-title">IAS Collaboration Portal • Profile Changes</h1>
         <button
           type="button"
           className="diff-btn-back"
@@ -686,6 +718,14 @@ export default function StudentProfileDiffView({
           </div>
         </section>
       </div>
+
+      {/* Official Page Footer */}
+      <footer className="diff-footer">
+        <div className="diff-footer-inner">
+          <span className="diff-footer-brand">IAS Collaboration Portal</span>
+          <span className="diff-footer-attribution">Built by Team UDAAN</span>
+        </div>
+      </footer>
     </div>
   )
 }

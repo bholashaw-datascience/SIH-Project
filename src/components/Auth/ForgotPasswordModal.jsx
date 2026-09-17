@@ -11,7 +11,7 @@ const DEFAULT_PORTAL_ACCOUNTS = {
     { username: 'infosys_hr', email: 'careers@infosys.com' },
   ],
   admin: [
-    { username: 'admin', email: 'system.admin@udaan.gov.in' },
+    { username: 'admin', email: 'system.admin@iasportal.gov.in' },
     { username: 'admin_operations', email: 'admin.ops@portal.gov.in' },
     { username: 'lead_supervisor', email: 'supervisor@portal.gov.in' },
   ],
@@ -277,7 +277,12 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
         {/* Modal Header */}
         <div className="modal-header">
           <div className="modal-header-info">
-            <span className="modal-role-pill">{roleBadge}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <span className="modal-portal-badge" style={{ fontSize: '10px', fontWeight: 700, color: '#b3881e', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                IAS Collaboration Portal
+              </span>
+              <span className="modal-role-pill">{roleBadge}</span>
+            </div>
             <h3 className="modal-title reset-password-title">Reset Password</h3>
             <p className="modal-subtitle">
               {step === 1 && 'Enter your username to look up your account and initiate verification.'}

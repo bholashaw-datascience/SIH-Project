@@ -1061,7 +1061,7 @@ export default function PublicPostModal({
                           </button>
                         ) : (
                           <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
-                            {status === 'approved' ? 'Live on Udaan Public Network' : status === 'pending' ? 'Review queued with Central Portal Admin' : 'Review completed with remarks'}
+                            {status === 'approved' ? 'Live on IAS Collaboration Portal Public Network' : status === 'pending' ? 'Review queued with Central Portal Admin' : 'Review completed with remarks'}
                           </div>
                         )}
                       </div>
@@ -1076,7 +1076,7 @@ export default function PublicPostModal({
         {/* Footer */}
         <div className="post-footer">
           <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
-            Moderation authority: <strong>Udaan Portal Central Editorial Board</strong>
+            Moderation authority: <strong>IAS Collaboration Portal Central Editorial Board</strong>
           </div>
           <button className="post-btn-draft" onClick={onClose}>
             Close

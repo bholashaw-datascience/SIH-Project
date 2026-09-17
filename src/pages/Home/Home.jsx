@@ -2110,6 +2110,38 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
             font-size: 13px;
           }
         }
+
+        /* Official Portal Footer */
+        .portal-footer {
+          margin-top: auto;
+          background: #0f1d2f;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 18px 36px;
+          color: #94a3b8;
+          font-size: 13px;
+        }
+
+        .portal-footer-inner {
+          max-width: 1200px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+
+        .portal-footer-brand {
+          font-weight: 700;
+          color: #ffffff;
+          letter-spacing: 0.02em;
+        }
+
+        .portal-footer-attribution {
+          color: #e2e8f0;
+          font-weight: 600;
+          letter-spacing: 0.01em;
+        }
       `}</style>
 
       <main className="portal-card-frame portal-main-layout">
@@ -2122,7 +2154,7 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
             <span>ACADEMIA – INDUSTRY BRIDGE</span>
           </div>
           <h1 className="hero-portal-title">
-            Portal for Academia–Industry Collaboration
+            IAS Collaboration Portal
           </h1>
           <p className="hero-portal-desc">
             Skill mapping, internships, and placement — one bridge connecting classrooms to careers.
@@ -2184,6 +2216,14 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
             </div>
           </div>
         </section>
+
+        {/* Official Portal Footer */}
+        <footer className="portal-footer">
+          <div className="portal-footer-inner">
+            <span className="portal-footer-brand">IAS Collaboration Portal</span>
+            <span className="portal-footer-attribution">Built by Team UDAAN</span>
+          </div>
+        </footer>
       </main>
 
       {/* Student Login, Registration & Forgot Password Modals */}
