@@ -11,6 +11,8 @@ export default function StudentProfileOnboarding({
   onBackHome,
   isEditMode = false,
   rejectionNotice = null,
+  activeSection = 'all',
+  onProceedToDocuments = null,
 }) {
   // Form State
   const [formData, setFormData] = useState(() => ({
@@ -297,6 +299,12 @@ export default function StudentProfileOnboarding({
   // Submit for Verification Action
   const handleSubmitClick = (e) => {
     e.preventDefault()
+
+    if (activeSection === 'profile') {
+      onProceedToDocuments?.({ formData, documents })
+      return
+    }
+
     setSubmitAttempted(true)
 
     if (!isValid) {
@@ -1459,11 +1467,20 @@ export default function StudentProfileOnboarding({
             <span>Institutional Verification Protocol</span>
           </div>
           <h2 className="onb-hero-title">
-            {isEditMode ? 'Update Your Student Profile' : 'Complete Your Student Profile'}
+            {activeSection === 'profile'
+              ? 'Edit / Complete Student Profile'
+              : activeSection === 'documents'
+              ? 'Required Documents Upload'
+              : isEditMode
+              ? 'Update Your Student Profile'
+              : 'Complete Your Student Profile'}
           </h2>
           <p className="onb-hero-subtitle">
-            Complete your profile and submit the required documents for institutional verification.
-            Your Principal or Institutional Coordinator will review these records to grant full access to accredited internships and academic credentials.
+            {activeSection === 'profile'
+              ? 'Enter and update your personal identity, contact coordinates, permanent address, and official institutional enrollment credentials.'
+              : activeSection === 'documents'
+              ? 'Submit authentic institutional verification documents for review by your Principal or Institutional Coordinator.'
+              : 'Complete your profile and submit the required documents for institutional verification. Your Principal or Institutional Coordinator will review these records to grant full access to accredited internships and academic credentials.'}
           </p>
         </div>
       </section>
@@ -1490,9 +1507,11 @@ export default function StudentProfileOnboarding({
       {/* Main Form Body */}
       <form onSubmit={handleSubmitClick} noValidate>
         <div className="onb-content-container">
-
-          {/* SECTION 1: Personal Information */}
-          <section className="onb-section-card">
+          {/* PERSONAL, ADDRESS & ACADEMIC SECTIONS */}
+          {activeSection !== 'documents' && (
+            <>
+              {/* SECTION 1: Personal Information */}
+              <section className="onb-section-card">
             <div className="onb-section-header">
               <div className="onb-section-title-wrap">
                 <span className="onb-step-num">1</span>
@@ -1924,14 +1943,17 @@ export default function StudentProfileOnboarding({
               </div>
             </div>
           </section>
+            </>
+          )}
 
           {/* SECTION 5: Required Documents Upload Section */}
-          <section className="onb-section-card">
-            <div className="onb-section-header">
-              <div className="onb-section-title-wrap">
-                <span className="onb-step-num">5</span>
-                <div>
-                  <h3 className="onb-section-title">Required Documents</h3>
+          {activeSection !== 'profile' && (
+            <section className="onb-section-card">
+              <div className="onb-section-header">
+                <div className="onb-section-title-wrap">
+                  <span className="onb-step-num">{activeSection === 'documents' ? '1' : '5'}</span>
+                  <div>
+                    <h3 className="onb-section-title">Required Documents</h3>
                   <p className="onb-section-desc">
                     Submit authentic institutional proofs for verification by your Principal / Coordinator. Max 5MB per file (PDF, JPG, PNG). Admission Slip, Aadhaar Card, and Marksheet are mandatory; College ID Card is optional.
                   </p>
@@ -2062,6 +2084,7 @@ export default function StudentProfileOnboarding({
               </div>
             </div>
           </section>
+          )}
 
         </div>
 
@@ -2092,7 +2115,9 @@ export default function StudentProfileOnboarding({
                 type="submit"
                 className="onb-btn-submit"
               >
-                <span>Submit for Verification</span>
+                <span>
+                  {activeSection === 'profile' ? 'Proceed to Document Upload' : 'Submit for Verification'}
+                </span>
                 <span style={{ fontSize: '15px' }}>→</span>
               </button>
             </div>

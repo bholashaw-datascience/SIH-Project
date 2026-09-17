@@ -3,7 +3,7 @@ import LoginModal from '../../components/Auth/LoginModal'
 import RegisterModal from '../../components/Auth/RegisterModal'
 import ForgotPasswordModal from '../../components/Auth/ForgotPasswordModal'
 
-function Home({ onOpenStudentPortal }) {
+function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
   const [selectedRole, setSelectedRole] = useState(null)
   const [activeModal, setActiveModal] = useState(null) // 'academic' | 'industries' | 'students' | 'admin' | null
   const [studentMode, setStudentMode] = useState('login') // 'login' | 'register'
@@ -378,6 +378,54 @@ function Home({ onOpenStudentPortal }) {
 
         .stakeholder-tile:hover .btn-arrow-icon {
           transform: translateX(4px);
+        }
+
+        .tile-demo-button {
+          width: 100%;
+          margin-top: 8px;
+          padding: 7px 12px;
+          font-size: 11.5px;
+          font-weight: 700;
+          border-radius: 6px;
+          border: 1.5px dashed #b3881e;
+          background-color: rgba(179, 136, 30, 0.08);
+          color: #785307;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          transition: all 0.2s ease;
+          box-sizing: border-box;
+          position: relative;
+          z-index: 2;
+          flex-shrink: 0;
+          pointer-events: auto;
+          font-family: inherit;
+        }
+
+        .tile-demo-button:hover {
+          background-color: #112233;
+          border-color: #112233;
+          color: #f1cf7c;
+          transform: translateY(-1px);
+          box-shadow: 0 3px 8px rgba(17, 34, 51, 0.18);
+        }
+
+        .tile-demo-tag {
+          font-size: 9px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          padding: 2px 6px;
+          border-radius: 4px;
+          background-color: #b3881e;
+          color: #ffffff;
+        }
+
+        .tile-demo-button:hover .tile-demo-tag {
+          background-color: #f1cf7c;
+          color: #112233;
         }
 
         /* Modal Overlay & Dialog Styles */
@@ -2113,6 +2161,24 @@ function Home({ onOpenStudentPortal }) {
                     <span>{role.actionLabel}</span>
                     <span className="btn-arrow-icon">→</span>
                   </button>
+                  {role.id === 'students' && (
+                    <button
+                      type="button"
+                      id="students-demo-preview-btn"
+                      className="tile-demo-button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onOpenStudentDemo?.()
+                      }}
+                      title="Launch development-only student flow preview"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                        <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" />
+                      </svg>
+                      <span>Demo Preview</span>
+                      <span className="tile-demo-tag">Dev</span>
+                    </button>
+                  )}
                 </div>
               ))}
             </div>

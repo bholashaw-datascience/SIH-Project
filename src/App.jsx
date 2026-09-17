@@ -3,6 +3,11 @@ import Home from './pages/Home/Home'
 import StudentPortal from './pages/StudentPortal/StudentPortal'
 
 function App() {
+  const [isDemoMode, setIsDemoMode] = useState(() => {
+    const params = new URLSearchParams(window.location.search)
+    return params.get('demo') === 'true' || window.location.hash.includes('demo')
+  })
+
   const [currentPage, setCurrentPage] = useState(() => {
     // Check URL parameters and hash for direct navigation: ?portal=student or #student-portal
     const params = new URLSearchParams(window.location.search)
@@ -16,6 +21,8 @@ function App() {
   useEffect(() => {
     const handleLocationChange = () => {
       const params = new URLSearchParams(window.location.search)
+      const isDemo = params.get('demo') === 'true' || window.location.hash.includes('demo')
+      setIsDemoMode(isDemo)
       const isStudentPortal =
         params.get('portal') === 'student' || window.location.hash.startsWith('#student-portal')
       if (isStudentPortal) {
@@ -32,9 +39,15 @@ function App() {
     }
   }, [])
 
-  const navigateTo = (page) => {
+  const [demoKey, setDemoKey] = useState(0)
+
+  const navigateTo = (page, { demo = false } = {}) => {
+    setIsDemoMode(demo)
+    if (demo) {
+      setDemoKey((k) => k + 1)
+    }
     if (page === 'student-portal') {
-      window.location.hash = '#student-portal'
+      window.location.hash = demo ? '#student-portal-demo' : '#student-portal'
     } else {
       if (window.location.hash.startsWith('#student-portal')) {
         window.history.pushState(null, '', window.location.pathname)
@@ -47,7 +60,9 @@ function App() {
   if (currentPage === 'student-portal') {
     return (
       <StudentPortal
+        key={isDemoMode ? `student-demo-${demoKey}` : 'student-portal'}
         onNavigateHome={() => navigateTo('home')}
+        isDemoMode={isDemoMode}
       />
     )
   }
@@ -55,6 +70,7 @@ function App() {
   return (
     <Home
       onOpenStudentPortal={() => navigateTo('student-portal')}
+      onOpenStudentDemo={() => navigateTo('student-portal', { demo: true })}
     />
   )
 }
