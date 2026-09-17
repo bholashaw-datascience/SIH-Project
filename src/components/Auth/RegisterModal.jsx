@@ -641,50 +641,55 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
                     )}
                   </div>
 
-                  <div className="upload-card-controls">
-                    <label className="btn-upload-photo">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="17 8 12 3 7 8" />
-                        <line x1="12" y1="3" x2="12" y2="15" />
-                      </svg>
-                      <span>
-                        {profilePic
-                          ? isIndustry || isAcademic
-                            ? 'Change Logo'
-                            : 'Change Photo'
-                          : isIndustry || isAcademic
-                          ? 'Upload Logo'
-                          : 'Upload Photo'}
-                      </span>
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        className="file-hidden-input"
-                        onChange={handleProfilePicChange}
-                      />
-                    </label>
+                  <div className="upload-card-action-group">
+                    <div className="upload-card-controls">
+                      <label className="btn-upload-photo">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="17 8 12 3 7 8" />
+                          <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                        <span>
+                          {profilePic
+                            ? isIndustry || isAcademic
+                              ? 'Change Logo'
+                              : 'Change Photo'
+                            : isIndustry || isAcademic
+                            ? 'Upload Logo'
+                            : 'Upload Photo'}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="file-hidden-input"
+                          onChange={handleProfilePicChange}
+                        />
+                      </label>
 
-                    {profilePic && (
-                      <button
-                        type="button"
-                        className="btn-remove-photo"
-                        onClick={handleRemovePhoto}
-                      >
-                        Remove
-                      </button>
+                      {profilePic && (
+                        <button
+                          type="button"
+                          className="btn-remove-photo"
+                          onClick={handleRemovePhoto}
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+
+                    <span
+                      className="profile-format-note"
+                      title={profilePicName ? profilePicName : 'JPG, PNG, WebP (Max 5MB)'}
+                    >
+                      {profilePicName ? profilePicName : 'JPG, PNG, WebP (Max 5MB)'}
+                    </span>
+
+                    {profilePicError && (
+                      <div className="profile-error-text">
+                        {profilePicError}
+                      </div>
                     )}
                   </div>
-
-                  <span className="profile-format-note">
-                    {profilePicName ? profilePicName : 'JPG, PNG, WebP (Max 5MB)'}
-                  </span>
-
-                  {profilePicError && (
-                    <div className="profile-error-text">
-                      {profilePicError}
-                    </div>
-                  )}
                 </div>
               </div>
 

@@ -650,7 +650,7 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
         /* Top Two-Column Split (Details Left, Compact Upload Card Right) */
         .register-top-split {
           display: flex;
-          align-items: stretch;
+          align-items: center;
           gap: 14px;
           width: 100%;
         }
@@ -677,19 +677,20 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
         }
 
         .register-upload-card-right {
-          width: 195px;
+          width: 200px;
           flex-shrink: 0;
           background: #fbfaf7;
           border: 1px solid #ded8cb;
           border-radius: 6px;
-          padding: 8px 10px;
+          padding: 7px 10px;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           text-align: center;
-          gap: 5px;
+          gap: 4px;
           box-shadow: 0 1px 3px rgba(15, 29, 47, 0.04);
+          box-sizing: border-box;
           position: relative;
         }
 
@@ -700,14 +701,15 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
           color: #475569;
           text-transform: uppercase;
           background-color: #eeebe3;
-          padding: 1.5px 6px;
+          padding: 1.5px 7px;
           border-radius: 3px;
           border: 1px solid #ded8cb;
+          line-height: 1.2;
         }
 
         .register-upload-card-right .profile-avatar-wrapper {
-          width: 48px;
-          height: 48px;
+          width: 44px;
+          height: 44px;
           border-radius: 50%;
           background-color: #ffffff;
           border: 1.5px solid #d4cdc0;
@@ -715,8 +717,11 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
           align-items: center;
           justify-content: center;
           overflow: hidden;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
           transition: border-color 0.2s ease;
+          flex-shrink: 0;
+          aspect-ratio: 1 / 1;
+          margin: 0 auto;
         }
 
         .register-upload-card-right .profile-avatar-wrapper:hover {
@@ -728,33 +733,53 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
           display: flex;
           align-items: center;
           justify-content: center;
+          width: 100%;
+          height: 100%;
         }
 
         .register-upload-card-right .avatar-img-preview {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          border-radius: 50%;
+          display: block;
+        }
+
+        .upload-card-action-group {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 3px;
+          width: 100%;
         }
 
         .upload-card-controls {
           display: flex;
           align-items: center;
-          gap: 6px;
+          justify-content: center;
+          gap: 5px;
+          width: 100%;
+          flex-wrap: nowrap;
         }
 
         .register-upload-card-right .btn-upload-photo {
           display: inline-flex;
           align-items: center;
+          justify-content: center;
           gap: 4px;
-          padding: 4px 10px;
-          height: 26px;
+          padding: 3px 8px;
+          height: 25px;
           font-size: 11px;
           font-weight: 600;
+          line-height: 1;
           color: #1e293b;
           background-color: #ffffff;
           border: 1px solid #cbd5e1;
           border-radius: 4px;
           cursor: pointer;
+          white-space: nowrap;
+          flex-shrink: 0;
+          box-sizing: border-box;
           transition: all 0.15s ease;
           box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
         }
@@ -767,27 +792,40 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
         }
 
         .register-upload-card-right .btn-remove-photo {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           background: #ffffff;
           border: 1px solid #fecdd3;
           color: #991b1b;
-          font-size: 10px;
+          font-size: 11px;
           font-weight: 600;
+          line-height: 1;
           padding: 3px 8px;
-          height: 26px;
+          height: 25px;
           border-radius: 4px;
           cursor: pointer;
+          white-space: nowrap;
+          flex-shrink: 0;
+          box-sizing: border-box;
           transition: all 0.15s ease;
         }
 
         .register-upload-card-right .btn-remove-photo:hover {
           background-color: #fee2e2;
           border-color: #fca5a5;
+          color: #7f1d1d;
         }
 
         .register-upload-card-right .profile-format-note {
-          font-size: 9.5px;
+          font-size: 9px;
           color: #64748b;
           line-height: 1.2;
+          max-width: 180px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: block;
         }
 
         .register-upload-card-right .profile-error-text {
@@ -795,6 +833,7 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
           color: #991b1b;
           font-weight: 600;
           line-height: 1.15;
+          margin-top: 1px;
         }
 
         /* Form Logical Section Labels */
@@ -2058,22 +2097,38 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
             padding: 9px 14px 12px;
           }
           .register-top-split {
-            flex-direction: column-reverse;
-            gap: 8px;
+            flex-direction: column;
+            gap: 10px;
           }
           .register-upload-card-right {
             width: 100%;
             flex-direction: row;
+            align-items: center;
             justify-content: flex-start;
-            padding: 6px 10px;
-            gap: 10px;
+            padding: 7px 12px;
+            gap: 12px;
+            text-align: left;
+            box-sizing: border-box;
           }
           .register-upload-card-right .upload-card-badge {
             display: none;
           }
           .register-upload-card-right .profile-avatar-wrapper {
-            width: 38px;
-            height: 38px;
+            width: 42px;
+            height: 42px;
+            margin: 0;
+          }
+          .upload-card-action-group {
+            align-items: flex-start;
+            flex: 1;
+            min-width: 0;
+          }
+          .upload-card-controls {
+            justify-content: flex-start;
+          }
+          .register-upload-card-right .profile-format-note {
+            max-width: 100%;
+            margin: 0;
           }
           .register-details-left {
             grid-template-columns: 1fr;
