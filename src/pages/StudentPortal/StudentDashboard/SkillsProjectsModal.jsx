@@ -328,6 +328,29 @@ export default function SkillsProjectsModal({
           background: #fffafa;
         }
 
+        .sp-btn-add-more {
+          background: #f0fdf4;
+          color: #15803d;
+          border: 1.5px solid #86efac;
+          border-radius: 6px;
+          padding: 9px 20px;
+          font-size: 0.88rem;
+          font-weight: 700;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          transition: all 0.18s ease;
+          box-shadow: 0 1px 4px rgba(22, 163, 74, 0.08);
+        }
+
+        .sp-btn-add-more:hover {
+          background: #16a34a;
+          color: #ffffff;
+          border-color: #16a34a;
+          box-shadow: 0 3px 10px rgba(22, 163, 74, 0.2);
+        }
+
         .sp-item-top {
           display: flex;
           justify-content: space-between;
@@ -802,6 +825,19 @@ export default function SkillsProjectsModal({
                     </div>
                   )
                 })
+              )}
+              {skills.length > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: 14, marginBottom: 4 }}>
+                  <button
+                    type="button"
+                    className="sp-btn-add-more"
+                    onClick={() => {
+                      setShowAddForm(true)
+                    }}
+                  >
+                    + Add More Skills
+                  </button>
+                </div>
               )}
             </div>
           )}

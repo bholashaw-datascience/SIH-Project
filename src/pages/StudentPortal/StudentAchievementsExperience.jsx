@@ -54,8 +54,8 @@ export default function StudentAchievementsExperience({
     }
   })
 
-  // Projects State (from localStorage for counts/tabs)
-  const [projects] = useState(() => {
+  // Projects State (synced with localStorage)
+  const [projects, setProjects] = useState(() => {
     try {
       const saved = localStorage.getItem('udaan_student_projects')
       return saved ? JSON.parse(saved) : []
@@ -64,8 +64,31 @@ export default function StudentAchievementsExperience({
     }
   })
 
+  // Filter state for Projects: 'all' | 'verified' | 'pending' | 'unverified'
+  const [projectFilter, setProjectFilter] = useState('all')
+  const [projectSearchQuery, setProjectSearchQuery] = useState('')
+
+  // Add Project Form state (All fields start unselected/empty - no pre-selection!)
+  const [isAddProjectFormOpen, setIsAddProjectFormOpen] = useState(false)
+  const [projectName, setProjectName] = useState('')
+  const [projectType, setProjectType] = useState('')
+  const [projectParticipation, setProjectParticipation] = useState('')
+  const [projectDuration, setProjectDuration] = useState('')
+  const [customProjectDuration, setCustomProjectDuration] = useState('')
+  const [projectLink, setProjectLink] = useState('')
+  const [projectImageFile, setProjectImageFile] = useState(null)
+  const [projectImagePreviewUrl, setProjectImagePreviewUrl] = useState('')
+  const [projectDocFile, setProjectDocFile] = useState(null)
+  const [isProjectImageDragOver, setIsProjectImageDragOver] = useState(false)
+  const [isProjectDocDragOver, setIsProjectDocDragOver] = useState(false)
+  const [projectFormError, setProjectFormError] = useState('')
+
+  const addProjectFormRef = useRef(null)
+  const projectImageInputRef = useRef(null)
+  const projectDocInputRef = useRef(null)
+
   // Internships State (from localStorage for counts/tabs)
-  const [internships] = useState(() => {
+  const [internships, setInternships] = useState(() => {
     try {
       const saved = localStorage.getItem('udaan_student_internships')
       return saved ? JSON.parse(saved) : []
@@ -73,6 +96,26 @@ export default function StudentAchievementsExperience({
       return []
     }
   })
+
+  // Filter state for Internships: 'all' | 'verified' | 'pending' | 'unverified'
+  const [internshipFilter, setInternshipFilter] = useState('all')
+  const [internshipSearchQuery, setInternshipSearchQuery] = useState('')
+
+  // Add Internship Form state (All fields start unselected/empty)
+  const [isAddInternshipFormOpen, setIsAddInternshipFormOpen] = useState(false)
+  const [internshipOrg, setInternshipOrg] = useState('')
+  const [internshipRole, setInternshipRole] = useState('')
+  const [internshipType, setInternshipType] = useState('')
+  const [internshipDuration, setInternshipDuration] = useState('')
+  const [customInternshipDuration, setCustomInternshipDuration] = useState('')
+  const [internshipLocation, setInternshipLocation] = useState('')
+  const [internshipDescription, setInternshipDescription] = useState('')
+  const [internshipDocFile, setInternshipDocFile] = useState(null)
+  const [isInternshipDocDragOver, setIsInternshipDocDragOver] = useState(false)
+  const [internshipFormError, setInternshipFormError] = useState('')
+
+  const addInternshipFormRef = useRef(null)
+  const internshipDocInputRef = useRef(null)
 
   // Filter state for Skills: 'all' | 'verified' | 'pending' | 'unverified'
   const [skillFilter, setSkillFilter] = useState('all')
@@ -97,6 +140,7 @@ export default function StudentAchievementsExperience({
   const [formError, setFormError] = useState('')
   const [successBanner, setSuccessBanner] = useState('')
   const fileInputRef = useRef(null)
+  const addSkillFormRef = useRef(null)
 
   const handleFileSelect = (file) => {
     if (!file) return
@@ -173,7 +217,32 @@ export default function StudentAchievementsExperience({
   const unverifiedSkillsCount = skills.filter((s) => s.status === 'rejected' || s.status === 'unverified').length
 
   const verifiedProjectsCount = projects.filter((p) => p.verified || p.status === 'verified').length
+  const pendingProjectsCount = projects.filter((p) => !p.verified && (p.status === 'pending' || !p.status)).length
+  const unverifiedProjectsCount = projects.filter((p) => p.status === 'rejected' || p.status === 'unverified').length
   const verifiedInternshipsCount = internships.filter((i) => i.verified || i.status === 'verified').length
+  const pendingInternshipsCount = internships.filter((i) => !i.verified && (i.status === 'pending' || !i.status)).length
+  const unverifiedInternshipsCount = internships.filter((i) => i.status === 'rejected' || i.status === 'unverified').length
+
+  // Filtered internships
+  const filteredInternships = internships.filter((item) => {
+    const isVerified = item.verified || item.status === 'verified'
+    const isPending = !item.verified && (item.status === 'pending' || !item.status)
+    const isUnverified = item.status === 'rejected' || item.status === 'unverified'
+
+    if (internshipFilter === 'verified' && !isVerified) return false
+    if (internshipFilter === 'pending' && !isPending) return false
+    if (internshipFilter === 'unverified' && !isUnverified) return false
+
+    if (internshipSearchQuery.trim()) {
+      const q = internshipSearchQuery.toLowerCase()
+      const matchOrg = item.organization?.toLowerCase().includes(q) || item.company?.toLowerCase().includes(q)
+      const matchRole = item.role?.toLowerCase().includes(q)
+      const matchType = item.type?.toLowerCase().includes(q)
+      if (!matchOrg && !matchRole && !matchType) return false
+    }
+
+    return true
+  })
 
   // Filtered skills
   const filteredSkills = skills.filter((item) => {
@@ -314,10 +383,337 @@ export default function StudentAchievementsExperience({
     }
     setFormError('')
     setIsAddFormOpen(false)
+    setSkillFilter('all')
+    setSearchQuery('')
 
     setSuccessBanner(`Skill "${newSkill.name}" successfully submitted for Portal Admin verification.`)
     setTimeout(() => setSuccessBanner(''), 5000)
   }
+
+  // Save projects to localStorage whenever updated
+  useEffect(() => {
+    try {
+      localStorage.setItem('udaan_student_projects', JSON.stringify(projects))
+    } catch {}
+  }, [projects])
+
+  useEffect(() => {
+    return () => {
+      if (projectImagePreviewUrl) {
+        try { URL.revokeObjectURL(projectImagePreviewUrl) } catch {}
+      }
+    }
+  }, [projectImagePreviewUrl])
+
+  // Project Image Handlers
+  const handleProjectImageSelect = (file) => {
+    if (!file) return
+    const maxBytes = 5 * 1024 * 1024 // 5 MB
+    if (file.size > maxBytes) {
+      setProjectFormError('Project preview image exceeds 5 MB limit. Please select a smaller file.')
+      return
+    }
+    const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    const ext = (file.name.split('.').pop() || '').toLowerCase()
+    if (!allowed.includes(file.type) && !['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
+      setProjectFormError('Please upload a valid image file (PNG, JPG, JPEG, or WEBP) for Project Preview.')
+      return
+    }
+
+    if (projectImagePreviewUrl) {
+      try { URL.revokeObjectURL(projectImagePreviewUrl) } catch {}
+    }
+
+    try {
+      const objUrl = URL.createObjectURL(file)
+      setProjectImagePreviewUrl(objUrl)
+    } catch {}
+
+    setProjectImageFile(file)
+    setProjectFormError('')
+  }
+
+  const handleDeleteProjectImage = () => {
+    if (projectImagePreviewUrl) {
+      try { URL.revokeObjectURL(projectImagePreviewUrl) } catch {}
+    }
+    setProjectImageFile(null)
+    setProjectImagePreviewUrl('')
+    if (projectImageInputRef.current) {
+      projectImageInputRef.current.value = ''
+    }
+  }
+
+  // Project Documentation Handlers
+  const handleProjectDocSelect = (file) => {
+    if (!file) return
+    const maxBytes = 10 * 1024 * 1024 // 10 MB
+    if (file.size > maxBytes) {
+      setProjectFormError('Project documentation file exceeds 10 MB limit.')
+      return
+    }
+    const ext = (file.name.split('.').pop() || '').toLowerCase()
+    const allowed = ['pdf', 'doc', 'docx', 'txt', 'zip']
+    if (!allowed.includes(ext)) {
+      setProjectFormError('Please upload a valid documentation file (.pdf, .doc, .docx, .txt, .zip).')
+      return
+    }
+    setProjectDocFile(file)
+    setProjectFormError('')
+  }
+
+  const handleDeleteProjectDoc = () => {
+    setProjectDocFile(null)
+    if (projectDocInputRef.current) {
+      projectDocInputRef.current.value = ''
+    }
+  }
+
+  // Handle Project Creation & Submission
+  const handleCreateProject = (e) => {
+    e.preventDefault()
+    if (!projectName.trim()) {
+      setProjectFormError('Please enter the Project Name.')
+      return
+    }
+    if (!projectType) {
+      setProjectFormError('Please select a Project Type (Software or Hardware).')
+      return
+    }
+    if (!projectParticipation) {
+      setProjectFormError('Please select Project Participation (Individual or Team).')
+      return
+    }
+    if (!projectDuration) {
+      setProjectFormError('Please select the Project Duration.')
+      return
+    }
+    if (projectDuration === 'Other' && !customProjectDuration.trim()) {
+      setProjectFormError('Please enter your custom project duration.')
+      return
+    }
+
+    // Validation: Software projects cannot be submitted without a Project Link.
+    // Hardware projects completely skip Project Link validation.
+    if (projectType === 'Software') {
+      if (!projectLink.trim()) {
+        setProjectFormError('Project Link is required for Software projects.')
+        return
+      }
+      if (
+        !projectLink.trim().startsWith('http://') &&
+        !projectLink.trim().startsWith('https://')
+      ) {
+        setProjectFormError('Project Link must begin with http:// or https://')
+        return
+      }
+    }
+
+    // Validation: Project Preview Image and Project Documentation are mandatory for both types
+    if (!projectImageFile) {
+      setProjectFormError('Please upload a Project Preview Image (screenshot or photo).')
+      return
+    }
+
+    if (!projectDocFile) {
+      setProjectFormError('Please upload Project Documentation (report or document).')
+      return
+    }
+
+    const finalDuration = projectDuration === 'Other' ? customProjectDuration.trim() : projectDuration
+    const isSoftware = projectType === 'Software'
+
+    const newProj = {
+      id: `p_${Date.now()}`,
+      name: projectName.trim(),
+      title: projectName.trim(),
+      type: projectType,
+      participation: projectParticipation,
+      duration: finalDuration,
+      url: isSoftware ? projectLink.trim() : '',
+      link: isSoftware ? projectLink.trim() : '',
+      previewImage: projectImageFile.name,
+      previewImageUrl: projectImagePreviewUrl,
+      documentationFile: projectDocFile.name,
+      verified: false,
+      status: 'pending',
+      submittedAt: new Date().toISOString(),
+      notes: 'Submitted for Project authenticity and academic evaluation by Portal Admin.',
+    }
+
+    setProjects((prev) => [newProj, ...prev])
+
+    // Save student notification
+    try {
+      const savedNotifs = JSON.parse(localStorage.getItem('udaan_student_notifications') || '[]')
+      const newNotif = {
+        id: `n_${Date.now()}`,
+        type: 'info',
+        title: `Project Submitted: ${newProj.name}`,
+        message: 'Your project submission has been sent to Portal Admin for verification.',
+        timestamp: 'Just now',
+        read: false,
+      }
+      localStorage.setItem('udaan_student_notifications', JSON.stringify([newNotif, ...savedNotifs]))
+    } catch {}
+
+    // Reset project form to initial unselected state
+    setProjectName('')
+    setProjectType('')
+    setProjectParticipation('')
+    setProjectDuration('')
+    setCustomProjectDuration('')
+    setProjectLink('')
+    setProjectImageFile(null)
+    setProjectImagePreviewUrl('')
+    setProjectDocFile(null)
+    if (projectImageInputRef.current) projectImageInputRef.current.value = ''
+    if (projectDocInputRef.current) projectDocInputRef.current.value = ''
+    setProjectFormError('')
+    setIsAddProjectFormOpen(false)
+    setProjectFilter('all')
+    setProjectSearchQuery('')
+
+    setSuccessBanner(`Project "${newProj.name}" successfully submitted for Portal Admin verification.`)
+    setTimeout(() => setSuccessBanner(''), 5000)
+  }
+
+  // Save internships to localStorage whenever updated
+  useEffect(() => {
+    try {
+      localStorage.setItem('udaan_student_internships', JSON.stringify(internships))
+    } catch {}
+  }, [internships])
+
+  // Internship Document Handlers
+  const handleInternshipDocSelect = (file) => {
+    if (!file) return
+    const maxBytes = 10 * 1024 * 1024 // 10 MB
+    if (file.size > maxBytes) {
+      setInternshipFormError('Document file exceeds 10 MB limit.')
+      return
+    }
+    const ext = (file.name.split('.').pop() || '').toLowerCase()
+    const allowed = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png']
+    if (!allowed.includes(ext)) {
+      setInternshipFormError('Please upload a valid document (.pdf, .doc, .docx, .jpg, .png).')
+      return
+    }
+    setInternshipDocFile(file)
+    setInternshipFormError('')
+  }
+
+  const handleDeleteInternshipDoc = () => {
+    setInternshipDocFile(null)
+    if (internshipDocInputRef.current) {
+      internshipDocInputRef.current.value = ''
+    }
+  }
+
+  // Handle Internship Creation & Submission
+  const handleCreateInternship = (e) => {
+    e.preventDefault()
+    if (!internshipOrg.trim()) {
+      setInternshipFormError('Please enter the Organization / Company Name.')
+      return
+    }
+    if (!internshipRole.trim()) {
+      setInternshipFormError('Please enter the Role / Designation.')
+      return
+    }
+    if (!internshipType) {
+      setInternshipFormError('Please select the Internship / Experience Type.')
+      return
+    }
+    if (!internshipDuration) {
+      setInternshipFormError('Please select the Duration.')
+      return
+    }
+    if (internshipDuration === 'Other' && !customInternshipDuration.trim()) {
+      setInternshipFormError('Please enter your custom internship duration.')
+      return
+    }
+    if (!internshipDocFile) {
+      setInternshipFormError('Please upload an Internship Certificate or Completion Document.')
+      return
+    }
+
+    const finalDuration = internshipDuration === 'Other' ? customInternshipDuration.trim() : internshipDuration
+
+    const newIntern = {
+      id: `i_${Date.now()}`,
+      organization: internshipOrg.trim(),
+      company: internshipOrg.trim(),
+      role: internshipRole.trim(),
+      type: internshipType,
+      duration: finalDuration,
+      location: internshipLocation.trim(),
+      description: internshipDescription.trim(),
+      certificateFile: internshipDocFile.name,
+      documentFile: internshipDocFile.name,
+      verified: false,
+      status: 'pending',
+      submittedAt: new Date().toISOString(),
+      notes: 'Submitted for industrial experience verification by Portal Admin.',
+    }
+
+    setInternships((prev) => [newIntern, ...prev])
+
+    try {
+      const savedNotifs = JSON.parse(localStorage.getItem('udaan_student_notifications') || '[]')
+      const newNotif = {
+        id: `n_${Date.now()}`,
+        type: 'info',
+        title: `Internship Submitted: ${newIntern.organization}`,
+        message: 'Your industrial experience credential has been submitted to Portal Admin for verification.',
+        timestamp: 'Just now',
+        read: false,
+      }
+      localStorage.setItem('udaan_student_notifications', JSON.stringify([newNotif, ...savedNotifs]))
+    } catch {}
+
+    // Reset Form
+    setInternshipOrg('')
+    setInternshipRole('')
+    setInternshipType('')
+    setInternshipDuration('')
+    setCustomInternshipDuration('')
+    setInternshipLocation('')
+    setInternshipDescription('')
+    setInternshipDocFile(null)
+    if (internshipDocInputRef.current) {
+      internshipDocInputRef.current.value = ''
+    }
+    setInternshipFormError('')
+    setIsAddInternshipFormOpen(false)
+    setInternshipFilter('all')
+    setInternshipSearchQuery('')
+
+    setSuccessBanner(`Internship at "${newIntern.organization}" successfully submitted for Portal Admin verification.`)
+    setTimeout(() => setSuccessBanner(''), 5000)
+  }
+
+  // Filtered projects
+  const filteredProjects = projects.filter((item) => {
+    const isVerified = item.verified || item.status === 'verified'
+    const isPending = !item.verified && (item.status === 'pending' || !item.status)
+    const isUnverified = item.status === 'rejected' || item.status === 'unverified'
+
+    if (projectFilter === 'verified' && !isVerified) return false
+    if (projectFilter === 'pending' && !isPending) return false
+    if (projectFilter === 'unverified' && !isUnverified) return false
+
+    if (projectSearchQuery.trim()) {
+      const q = projectSearchQuery.toLowerCase()
+      const matchName = (item.name || item.title || '').toLowerCase().includes(q)
+      const matchType = (item.type || '').toLowerCase().includes(q)
+      const matchPart = (item.participation || '').toLowerCase().includes(q)
+      const matchDur = (item.duration || '').toLowerCase().includes(q)
+      if (!matchName && !matchType && !matchPart && !matchDur) return false
+    }
+
+    return true
+  })
 
   // Proficiency level helper
   const getProficiencySteps = (lvl) => {
@@ -1105,6 +1501,222 @@ export default function StudentAchievementsExperience({
           gap: 16px;
         }
 
+        .sae-add-more-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 20px 0 10px 0;
+          margin-top: 4px;
+        }
+
+        .sae-btn-add-more {
+          background: #f0fdf4;
+          color: #15803d;
+          border: 1.5px solid #86efac;
+          border-radius: 8px;
+          padding: 11px 24px;
+          font-size: 0.92rem;
+          font-weight: 700;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 6px rgba(22, 163, 74, 0.08);
+        }
+
+        .sae-btn-add-more:hover {
+          background: #16a34a;
+          border-color: #16a34a;
+          color: #ffffff;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 14px rgba(22, 163, 74, 0.25);
+        }
+
+        .sae-btn-add-more:active {
+          transform: translateY(0);
+        }
+
+        /* Projects Cards Grid */
+        .sae-projects-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+          gap: 16px;
+        }
+
+        @media (max-width: 480px) {
+          .sae-projects-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .sae-project-card {
+          background: #ffffff;
+          border: 1px solid #ded9cc;
+          border-radius: 8px;
+          padding: 18px;
+          box-shadow: 0 2px 6px rgba(15, 31, 46, 0.04);
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          transition: all 0.15s ease;
+          position: relative;
+        }
+
+        .sae-project-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(15, 31, 46, 0.08);
+        }
+
+        .sae-project-card.is-verified {
+          border-left: 4px solid #16a34a;
+        }
+
+        .sae-project-card.is-pending {
+          border-left: 4px solid #d97706;
+        }
+
+        .sae-project-card.is-unverified {
+          border-left: 4px solid #ef4444;
+        }
+
+        .sae-project-header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .sae-project-name {
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: #0f1f2e;
+          margin: 0 0 6px 0;
+        }
+
+        .sae-project-badges-row {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex-wrap: wrap;
+        }
+
+        .sae-badge-type {
+          display: inline-block;
+          font-size: 0.72rem;
+          font-weight: 700;
+          padding: 2px 8px;
+          border-radius: 4px;
+          text-transform: uppercase;
+          letter-spacing: 0.02em;
+        }
+
+        .sae-badge-type.software {
+          background: #eff6ff;
+          color: #1d4ed8;
+          border: 1px solid #bfdbfe;
+        }
+
+        .sae-badge-type.hardware {
+          background: #fef3c7;
+          color: #92400e;
+          border: 1px solid #fde68a;
+        }
+
+        .sae-badge-part {
+          display: inline-block;
+          font-size: 0.72rem;
+          font-weight: 700;
+          padding: 2px 8px;
+          border-radius: 4px;
+          background: #f1f5f9;
+          color: #475569;
+          border: 1px solid #e2e8f0;
+        }
+
+        .sae-project-meta-row {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.82rem;
+          color: #475569;
+        }
+
+        .sae-project-preview-wrap {
+          border-radius: 6px;
+          overflow: hidden;
+          border: 1px solid #e2e8f0;
+          background: #f8fafc;
+          max-height: 180px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .sae-project-preview-img {
+          width: 100%;
+          height: 160px;
+          object-fit: cover;
+          display: block;
+          cursor: pointer;
+          transition: transform 0.2s ease;
+        }
+
+        .sae-project-preview-img:hover {
+          transform: scale(1.02);
+        }
+
+        .sae-project-img-placeholder {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+          padding: 24px;
+          color: #64748b;
+          font-size: 0.8rem;
+          font-weight: 600;
+        }
+
+        .sae-project-doc-box {
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 6px;
+          padding: 10px 12px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+        }
+
+        .sae-project-doc-header {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.84rem;
+          font-weight: 600;
+          color: #1e293b;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .sae-project-doc-name {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          max-width: 200px;
+        }
+
+        .sae-project-doc-badge {
+          font-size: 0.7rem;
+          color: #0369a1;
+          background: #e0f2fe;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-weight: 600;
+          flex-shrink: 0;
+        }
+
         @media (max-width: 480px) {
           .sae-skills-grid {
             grid-template-columns: 1fr;
@@ -1466,7 +2078,7 @@ export default function StudentAchievementsExperience({
 
         {/* METRICS SUMMARY BAR */}
         <section className="sae-metrics-grid">
-          {/* Card 1: Official Verified Skills */}
+          {/* Card 1: Official Verified Items */}
           <div className="sae-metric-card is-verified">
             <div className="sae-metric-icon" style={{ background: '#dcfce7', color: '#166534' }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -1475,8 +2087,20 @@ export default function StudentAchievementsExperience({
               </svg>
             </div>
             <div>
-              <div className="sae-metric-val">{verifiedSkillsCount}</div>
-              <div className="sae-metric-label">Verified Skills</div>
+              <div className="sae-metric-val">
+                {activeTab === 'experience'
+                  ? verifiedInternshipsCount
+                  : activeTab === 'projects'
+                  ? verifiedProjectsCount
+                  : verifiedSkillsCount}
+              </div>
+              <div className="sae-metric-label">
+                {activeTab === 'experience'
+                  ? 'Verified Internships'
+                  : activeTab === 'projects'
+                  ? 'Verified Projects'
+                  : 'Verified Skills'}
+              </div>
               <div className="sae-metric-sub" style={{ color: '#166534', fontWeight: 600 }}>Counted in Official Profile</div>
             </div>
           </div>
@@ -1490,7 +2114,13 @@ export default function StudentAchievementsExperience({
               </svg>
             </div>
             <div>
-              <div className="sae-metric-val">{pendingSkillsCount}</div>
+              <div className="sae-metric-val">
+                {activeTab === 'experience'
+                  ? pendingInternshipsCount
+                  : activeTab === 'projects'
+                  ? pendingProjectsCount
+                  : pendingSkillsCount}
+              </div>
               <div className="sae-metric-label">Pending Verification</div>
               <div className="sae-metric-sub">Awaiting Admin Audit</div>
             </div>
@@ -1506,7 +2136,13 @@ export default function StudentAchievementsExperience({
               </svg>
             </div>
             <div>
-              <div className="sae-metric-val">{unverifiedSkillsCount}</div>
+              <div className="sae-metric-val">
+                {activeTab === 'experience'
+                  ? unverifiedInternshipsCount
+                  : activeTab === 'projects'
+                  ? unverifiedProjectsCount
+                  : unverifiedSkillsCount}
+              </div>
               <div className="sae-metric-label">Needs Revision</div>
               <div className="sae-metric-sub">Not Counted in Profile</div>
             </div>
@@ -1521,9 +2157,27 @@ export default function StudentAchievementsExperience({
               </svg>
             </div>
             <div>
-              <div className="sae-metric-val">{skills.length}</div>
-              <div className="sae-metric-label">Total Skills Logged</div>
-              <div className="sae-metric-sub">{verifiedProjectsCount} Projects • {verifiedInternshipsCount} Internships</div>
+              <div className="sae-metric-val">
+                {activeTab === 'experience'
+                  ? internships.length
+                  : activeTab === 'projects'
+                  ? projects.length
+                  : skills.length}
+              </div>
+              <div className="sae-metric-label">
+                {activeTab === 'experience'
+                  ? 'Total Internships Logged'
+                  : activeTab === 'projects'
+                  ? 'Total Projects Logged'
+                  : 'Total Skills Logged'}
+              </div>
+              <div className="sae-metric-sub">
+                {activeTab === 'experience'
+                  ? `${verifiedSkillsCount} Skills • ${verifiedProjectsCount} Projects`
+                  : activeTab === 'projects'
+                  ? `${verifiedSkillsCount} Skills • ${verifiedInternshipsCount} Internships`
+                  : `${verifiedProjectsCount} Projects • ${verifiedInternshipsCount} Internships`}
+              </div>
             </div>
           </div>
         </section>
@@ -1646,7 +2300,7 @@ export default function StudentAchievementsExperience({
 
             {/* ADD SKILL FORM (CLEAN, UNCLUTTERED, PROFESSIONAL) */}
             {isAddFormOpen && (
-              <form className="sae-form-card" onSubmit={handleCreateSkill}>
+              <form ref={addSkillFormRef} className="sae-form-card" onSubmit={handleCreateSkill}>
                 <div className="sae-form-header">
                   <div className="sae-form-title">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1935,209 +2589,1339 @@ export default function StudentAchievementsExperience({
             )}
 
             {/* SKILLS LISTING */}
-            {filteredSkills.length === 0 ? (
-              <div className="sae-empty-state">
-                <div className="sae-empty-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                  </svg>
-                </div>
-                <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0f1f2e' }}>
-                  {skills.length === 0 ? 'No skills submitted yet' : 'No skills match the selected filter'}
-                </div>
-                <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: 460, margin: 0 }}>
-                  {skills.length === 0
-                    ? 'Add and document your academic, technical, managerial, or professional capabilities to submit them for Portal Admin verification.'
-                    : 'Try clearing your search query or selecting a different status filter.'}
-                </p>
-                {skills.length === 0 && (
+            {skills.length === 0 ? (
+              !isAddFormOpen ? (
+                <div className="sae-empty-state">
+                  <div className="sae-empty-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </div>
+                  <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0f1f2e' }}>
+                    No skills submitted yet
+                  </div>
+                  <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: 460, margin: 0 }}>
+                    Add and document your academic, technical, managerial, or professional capabilities to submit them for Portal Admin verification.
+                  </p>
                   <button
                     type="button"
                     className="sae-btn-add"
                     style={{ marginTop: 8 }}
-                    onClick={() => setIsAddFormOpen(true)}
+                    onClick={() => {
+                      setIsAddFormOpen(true)
+                      setTimeout(() => {
+                        addSkillFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                      }, 50)
+                    }}
                   >
                     + Add Your First Skill
                   </button>
-                )}
-              </div>
+                </div>
+              ) : null
             ) : (
-              <div className="sae-skills-grid">
-                {filteredSkills.map((item) => {
-                  const isVerified = item.verified || item.status === 'verified'
-                  const isRejected = item.status === 'rejected'
-                  const prof = getProficiencySteps(item.level)
+              <>
+                {filteredSkills.length === 0 ? (
+                  <div className="sae-empty-state">
+                    <div className="sae-empty-icon">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                      </svg>
+                    </div>
+                    <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0f1f2e' }}>
+                      No skills match the selected filter
+                    </div>
+                    <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: 460, margin: 0 }}>
+                      Try clearing your search query or selecting a different status filter.
+                    </p>
+                    <button
+                      type="button"
+                      className="sae-btn-cancel"
+                      style={{ marginTop: 8 }}
+                      onClick={() => {
+                        setSkillFilter('all')
+                        setSearchQuery('')
+                      }}
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                ) : (
+                  <div className="sae-skills-grid">
+                    {filteredSkills.map((item) => {
+                      const isVerified = item.verified || item.status === 'verified'
+                      const isRejected = item.status === 'rejected'
+                      const prof = getProficiencySteps(item.level)
 
-                  const cardClass = isVerified ? 'is-verified' : isRejected ? 'is-unverified' : 'is-pending'
+                      const cardClass = isVerified ? 'is-verified' : isRejected ? 'is-unverified' : 'is-pending'
 
-                  return (
-                    <article key={item.id} className={`sae-skill-card ${cardClass}`}>
-                      <div className="sae-skill-header">
-                        <div>
-                          <h3 className="sae-skill-name">{item.name}</h3>
-                          <span className="sae-skill-category-badge">{item.category || 'General'}</span>
+                      return (
+                        <article key={item.id} className={`sae-skill-card ${cardClass}`}>
+                          <div className="sae-skill-header">
+                            <div>
+                              <h3 className="sae-skill-name">{item.name}</h3>
+                              <span className="sae-skill-category-badge">{item.category || 'General'}</span>
+                            </div>
+
+                            {/* Status Chip */}
+                            {isVerified ? (
+                              <span className="sae-status-badge verified" title="Officially accredited and verified by Portal Admin">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                  <polyline points="22 4 12 14.01 9 11.01" />
+                                </svg>
+                                Verified
+                              </span>
+                            ) : isRejected ? (
+                              <span className="sae-status-badge unverified" title="Rejected or needs revision by Portal Admin">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                  <circle cx="12" cy="12" r="10" />
+                                  <line x1="15" y1="9" x2="9" y2="15" />
+                                  <line x1="9" y1="9" x2="15" y2="15" />
+                                </svg>
+                                Not Verified
+                              </span>
+                            ) : (
+                              <span className="sae-status-badge pending" title="Submission received and undergoing audit">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                  <circle cx="12" cy="12" r="10" />
+                                  <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                                Pending Review
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Proficiency Indicator */}
+                          <div className="sae-prof-wrap">
+                            <div className="sae-prof-label-row">
+                              <span style={{ fontWeight: 600 }}>{prof.text}</span>
+                              {item.duration ? (
+                                <span>Duration: {item.duration}</span>
+                              ) : item.experience ? (
+                                <span>{item.experience}</span>
+                              ) : null}
+                            </div>
+                            <div className="sae-prof-bars">
+                              {[1, 2, 3, 4].map((step) => (
+                                <div
+                                  key={`step-${step}`}
+                                  className={`sae-prof-bar-segment ${step <= prof.count ? 'filled' : ''}`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Certificate & Credential Details (Department-Neutral) */}
+                          {(item.credentialName || item.issuingOrg || item.credentialUrl || item.certificateFile) ? (
+                            <div className="sae-cred-box">
+                              <div className="sae-cred-header">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b38e44" strokeWidth="2">
+                                  <circle cx="12" cy="8" r="6" />
+                                  <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+                                </svg>
+                                <span className="sae-cred-name">
+                                  {item.credentialName || item.certificateFile || 'Accredited Skill Credential'}
+                                </span>
+                              </div>
+
+                              <div className="sae-cred-meta">
+                                {item.issuingOrg && <span><strong>Issuer:</strong> {item.issuingOrg}</span>}
+                                {item.issuingOrg && item.issueDate && <span>•</span>}
+                                {item.issueDate && <span><strong>Issued:</strong> {item.issueDate}</span>}
+                                {item.certificateFile && <span>•</span>}
+                                {item.certificateFile && <span><strong>File:</strong> {item.certificateFile}</span>}
+                              </div>
+
+                              {item.credentialUrl && (
+                                <a
+                                  href={item.credentialUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="sae-cred-verify-link"
+                                  title="Verify authenticity with issuing organization in new tab"
+                                >
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                    <polyline points="15 3 21 3 21 9" />
+                                    <line x1="10" y1="14" x2="21" y2="3" />
+                                  </svg>
+                                  Verify Credential Online ↗
+                                </a>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="sae-cred-empty">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="8" x2="12" y2="12" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" />
+                              </svg>
+                              Self-Declared Skill (Awaiting Verification)
+                            </div>
+                          )}
+
+                          {/* Accreditation State Note */}
+                          <div className={`sae-card-status-note ${cardClass}`}>
+                            {isVerified ? (
+                              <span>
+                                <strong>Official Item:</strong> Verified by Portal Admin via issuing authority. Counted in official profile.
+                              </span>
+                            ) : isRejected ? (
+                              <span>
+                                <strong>Admin Review:</strong> {item.rejectionReason || 'Credential could not be verified. Please update the verification link or issuing details.'}
+                              </span>
+                            ) : (
+                              <span>
+                                <strong>Under Audit:</strong> Submitted for Portal Admin verification. Not yet counted in official profile.
+                              </span>
+                            )}
+                          </div>
+                        </article>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {/* Clean '+ Add More Skills' button below the skill list/cards */}
+                <div className="sae-add-more-container">
+                  <button
+                    type="button"
+                    className="sae-btn-add-more"
+                    onClick={() => {
+                      setIsAddFormOpen(true)
+                      setTimeout(() => {
+                        addSkillFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                      }, 50)
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    + Add More Skills
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* TAB 2: PROJECTS (FULL IMPLEMENTATION) */}
+        {activeTab === 'projects' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Toolbar: Filter & Add */}
+            <div className="sae-toolbar">
+              <div className="sae-filter-chips">
+                <button
+                  type="button"
+                  className={`sae-chip ${projectFilter === 'all' ? 'active' : ''}`}
+                  onClick={() => setProjectFilter('all')}
+                >
+                  All Projects <span className="sae-chip-count">{projects.length}</span>
+                </button>
+                <button
+                  type="button"
+                  className={`sae-chip ${projectFilter === 'verified' ? 'active' : ''}`}
+                  onClick={() => setProjectFilter('verified')}
+                >
+                  Verified <span className="sae-chip-count">{verifiedProjectsCount}</span>
+                </button>
+                <button
+                  type="button"
+                  className={`sae-chip ${projectFilter === 'pending' ? 'active' : ''}`}
+                  onClick={() => setProjectFilter('pending')}
+                >
+                  Pending Verification <span className="sae-chip-count">{pendingProjectsCount}</span>
+                </button>
+                <button
+                  type="button"
+                  className={`sae-chip ${projectFilter === 'unverified' ? 'active' : ''}`}
+                  onClick={() => setProjectFilter('unverified')}
+                >
+                  Needs Revision <span className="sae-chip-count">{unverifiedProjectsCount}</span>
+                </button>
+              </div>
+
+              <div className="sae-toolbar-actions">
+                <input
+                  type="text"
+                  className="sae-search-input"
+                  placeholder="Search projects by name, type, duration..."
+                  value={projectSearchQuery}
+                  onChange={(e) => setProjectSearchQuery(e.target.value)}
+                />
+
+                <button
+                  type="button"
+                  className="sae-btn-add"
+                  onClick={() => setIsAddProjectFormOpen(!isAddProjectFormOpen)}
+                >
+                  {isAddProjectFormOpen ? (
+                    'Cancel'
+                  ) : (
+                    <>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                      Add Project
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* ADD PROJECT FORM */}
+            {isAddProjectFormOpen && (
+              <form ref={addProjectFormRef} className="sae-form-card" onSubmit={handleCreateProject}>
+                <div className="sae-form-header">
+                  <div className="sae-form-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                    </svg>
+                    Add Project & Submit for Admin Verification
+                  </div>
+                </div>
+
+                {projectFormError && (
+                  <div className="sae-form-alert" role="alert">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <span>{projectFormError}</span>
+                  </div>
+                )}
+
+                <div className="sae-form-grid">
+                  {/* Field 1: Project Name */}
+                  <div className="sae-form-field sae-form-field-full">
+                    <label>Project Name *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Autonomous Robotic Rover, Deep Learning Medical Imaging, FinTech Ledger"
+                      value={projectName}
+                      onChange={(e) => setProjectName(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Field 2: Project Type (Software / Hardware) */}
+                  <div className="sae-form-field">
+                    <label>Project Type *</label>
+                    <select
+                      required
+                      value={projectType}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        setProjectType(val)
+                        if (val === 'Hardware') {
+                          setProjectLink('')
+                        }
+                        setProjectFormError('')
+                      }}
+                    >
+                      <option value="">Select Project Type</option>
+                      <option value="Software">Software</option>
+                      <option value="Hardware">Hardware</option>
+                    </select>
+                  </div>
+
+                  {/* Field 3: Project Participation (Individual / Team) */}
+                  <div className="sae-form-field">
+                    <label>Project Participation *</label>
+                    <select
+                      required
+                      value={projectParticipation}
+                      onChange={(e) => setProjectParticipation(e.target.value)}
+                    >
+                      <option value="">Select Participation</option>
+                      <option value="Individual">Individual</option>
+                      <option value="Team">Team</option>
+                    </select>
+                  </div>
+
+                  {/* Field 4: Project Duration */}
+                  <div className="sae-form-field">
+                    <label>Project Duration *</label>
+                    <select
+                      required
+                      value={projectDuration}
+                      onChange={(e) => {
+                        setProjectDuration(e.target.value)
+                        if (e.target.value !== 'Other') setCustomProjectDuration('')
+                      }}
+                    >
+                      <option value="">Select Project Duration</option>
+                      <option value="1 Month">1 Month</option>
+                      <option value="2 Months">2 Months</option>
+                      <option value="3 Months">3 Months</option>
+                      <option value="6 Months">6 Months</option>
+                      <option value="1 Year">1 Year</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  {/* Custom Duration if Other */}
+                  {projectDuration === 'Other' && (
+                    <div className="sae-form-field">
+                      <label>Custom Duration *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. 5 Months, 45 Days, 8 Weeks"
+                        value={customProjectDuration}
+                        onChange={(e) => setCustomProjectDuration(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {/* Field 5: Project Link (Shown and required ONLY for Software projects; completely hidden for Hardware) */}
+                  {projectType === 'Software' && (
+                    <div className="sae-form-field sae-form-field-full">
+                      <label>Project Link *</label>
+                      <input
+                        type="url"
+                        required
+                        placeholder="https://github.com/... or https://demo.app/..."
+                        value={projectLink}
+                        onChange={(e) => setProjectLink(e.target.value)}
+                      />
+                      <span style={{ fontSize: '0.74rem', color: '#64748b', marginTop: 4 }}>
+                        Mandatory for Software projects (Repository, Live Demo, or Deployment URL)
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Field 6: Project Preview Image* (screenshot/photo) */}
+                  <div className="sae-form-field sae-form-field-full">
+                    <label>Project Preview Image * (Screenshot or Photo)</label>
+                    <input
+                      ref={projectImageInputRef}
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null
+                        handleProjectImageSelect(file)
+                      }}
+                    />
+                    {!projectImageFile ? (
+                      <div
+                        className={`sae-upload-box ${isProjectImageDragOver ? 'dragover' : ''}`}
+                        onClick={() => projectImageInputRef.current?.click()}
+                        onDragOver={(e) => {
+                          e.preventDefault()
+                          setIsProjectImageDragOver(true)
+                        }}
+                        onDragLeave={(e) => {
+                          e.preventDefault()
+                          setIsProjectImageDragOver(false)
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault()
+                          setIsProjectImageDragOver(false)
+                          const file = e.dataTransfer.files?.[0] || null
+                          handleProjectImageSelect(file)
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            projectImageInputRef.current?.click()
+                          }
+                        }}
+                        aria-label="Upload Project Preview Image"
+                      >
+                        <div className="sae-upload-icon-circle">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                            <circle cx="8.5" cy="8.5" r="1.5" />
+                            <polyline points="21 15 16 10 5 21" />
+                          </svg>
                         </div>
+                        <div className="sae-upload-title">Upload Project Preview Image</div>
+                        <div className="sae-upload-hint">PNG, JPG, JPEG or WEBP screenshot/photo • Max 5 MB</div>
+                      </div>
+                    ) : (
+                      <div className="sae-file-card">
+                        <div className="sae-file-info">
+                          {projectImagePreviewUrl ? (
+                            <img
+                              src={projectImagePreviewUrl}
+                              alt="Preview"
+                              style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 4, border: '1px solid #cbd5e1' }}
+                            />
+                          ) : (
+                            <div className="sae-file-icon">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                <circle cx="8.5" cy="8.5" r="1.5" />
+                                <polyline points="21 15 16 10 5 21" />
+                              </svg>
+                            </div>
+                          )}
+                          <div className="sae-file-text">
+                            <span className="sae-file-name" title={projectImageFile.name}>
+                              {projectImageFile.name}
+                            </span>
+                            <span className="sae-file-meta">
+                              {(projectImageFile.size / (1024 * 1024) >= 1)
+                                ? `${(projectImageFile.size / (1024 * 1024)).toFixed(2)} MB`
+                                : `${(projectImageFile.size / 1024).toFixed(1)} KB`} • Preview Image Attached
+                            </span>
+                          </div>
+                        </div>
+                        <div className="sae-file-actions">
+                          {projectImagePreviewUrl && (
+                            <button
+                              type="button"
+                              className="sae-file-btn sae-file-btn-view"
+                              onClick={() => window.open(projectImagePreviewUrl, '_blank')}
+                              title="View Image"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                              </svg>
+                              View
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            className="sae-file-btn sae-file-btn-replace"
+                            onClick={() => projectImageInputRef.current?.click()}
+                            title="Replace Image"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                              <polyline points="1 4 1 10 7 10" />
+                              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                            </svg>
+                            Replace
+                          </button>
+                          <button
+                            type="button"
+                            className="sae-file-btn sae-file-btn-delete"
+                            onClick={handleDeleteProjectImage}
+                            title="Delete Image"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
-                        {/* Status Chip */}
-                        {isVerified ? (
-                          <span className="sae-status-badge verified" title="Officially accredited and verified by Portal Admin">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                              <polyline points="22 4 12 14.01 9 11.01" />
+                  {/* Field 7: Project Documentation* (report/document) */}
+                  <div className="sae-form-field sae-form-field-full">
+                    <label>Project Documentation * (Project Report or Document)</label>
+                    <input
+                      ref={projectDocInputRef}
+                      type="file"
+                      accept=".pdf,.doc,.docx,.txt,.zip"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null
+                        handleProjectDocSelect(file)
+                      }}
+                    />
+                    {!projectDocFile ? (
+                      <div
+                        className={`sae-upload-box ${isProjectDocDragOver ? 'dragover' : ''}`}
+                        onClick={() => projectDocInputRef.current?.click()}
+                        onDragOver={(e) => {
+                          e.preventDefault()
+                          setIsProjectDocDragOver(true)
+                        }}
+                        onDragLeave={(e) => {
+                          e.preventDefault()
+                          setIsProjectDocDragOver(false)
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault()
+                          setIsProjectDocDragOver(false)
+                          const file = e.dataTransfer.files?.[0] || null
+                          handleProjectDocSelect(file)
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            projectDocInputRef.current?.click()
+                          }
+                        }}
+                        aria-label="Upload Project Documentation"
+                      >
+                        <div className="sae-upload-icon-circle">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                          </svg>
+                        </div>
+                        <div className="sae-upload-title">Upload Project Documentation</div>
+                        <div className="sae-upload-hint">PDF, DOC, DOCX, TXT or ZIP report • Max 10 MB</div>
+                      </div>
+                    ) : (
+                      <div className="sae-file-card">
+                        <div className="sae-file-info">
+                          <div className="sae-file-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                              <polyline points="14 2 14 8 20 8" />
                             </svg>
-                            Verified
-                          </span>
-                        ) : isRejected ? (
-                          <span className="sae-status-badge unverified" title="Rejected or needs revision by Portal Admin">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                              <circle cx="12" cy="12" r="10" />
-                              <line x1="15" y1="9" x2="9" y2="15" />
-                              <line x1="9" y1="9" x2="15" y2="15" />
+                          </div>
+                          <div className="sae-file-text">
+                            <span className="sae-file-name" title={projectDocFile.name}>
+                              {projectDocFile.name}
+                            </span>
+                            <span className="sae-file-meta">
+                              {(projectDocFile.size / (1024 * 1024) >= 1)
+                                ? `${(projectDocFile.size / (1024 * 1024)).toFixed(2)} MB`
+                                : `${(projectDocFile.size / 1024).toFixed(1)} KB`} • Report Attached
+                            </span>
+                          </div>
+                        </div>
+                        <div className="sae-file-actions">
+                          <button
+                            type="button"
+                            className="sae-file-btn sae-file-btn-replace"
+                            onClick={() => projectDocInputRef.current?.click()}
+                            title="Replace Document"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                              <polyline points="1 4 1 10 7 10" />
+                              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
                             </svg>
-                            Not Verified
-                          </span>
-                        ) : (
-                          <span className="sae-status-badge pending" title="Submission received and undergoing audit">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            Replace
+                          </button>
+                          <button
+                            type="button"
+                            className="sae-file-btn sae-file-btn-delete"
+                            onClick={handleDeleteProjectDoc}
+                            title="Delete Document"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="sae-form-actions">
+                  <button
+                    type="button"
+                    className="sae-btn-cancel"
+                    onClick={() => setIsAddProjectFormOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="sae-btn-submit"
+                  >
+                    Submit for Admin Verification
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* PROJECTS LISTING */}
+            {projects.length === 0 ? (
+              !isAddProjectFormOpen ? (
+                <div className="sae-empty-state">
+                  <div className="sae-empty-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                    </svg>
+                  </div>
+                  <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0f1f2e' }}>
+                    No projects submitted yet
+                  </div>
+                  <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: 460, margin: 0 }}>
+                    Document your academic, capstone, innovation, or research projects and submit them for Portal Admin verification.
+                  </p>
+                  <button
+                    type="button"
+                    className="sae-btn-add"
+                    style={{ marginTop: 8 }}
+                    onClick={() => {
+                      setIsAddProjectFormOpen(true)
+                      setTimeout(() => {
+                        addProjectFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                      }, 50)
+                    }}
+                  >
+                    + Add Your First Project
+                  </button>
+                </div>
+              ) : null
+            ) : (
+              <>
+                {filteredProjects.length === 0 ? (
+                  <div className="sae-empty-state">
+                    <div className="sae-empty-icon">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                      </svg>
+                    </div>
+                    <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0f1f2e' }}>
+                      No projects match the selected filter
+                    </div>
+                    <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: 460, margin: 0 }}>
+                      Try clearing your search query or selecting a different status filter.
+                    </p>
+                    <button
+                      type="button"
+                      className="sae-btn-cancel"
+                      style={{ marginTop: 8 }}
+                      onClick={() => {
+                        setProjectFilter('all')
+                        setProjectSearchQuery('')
+                      }}
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                ) : (
+                  <div className="sae-projects-grid">
+                    {filteredProjects.map((item) => {
+                      const isVerified = item.verified || item.status === 'verified'
+                      const isRejected = item.status === 'rejected'
+                      const cardClass = isVerified ? 'is-verified' : isRejected ? 'is-unverified' : 'is-pending'
+
+                      return (
+                        <article key={item.id} className={`sae-project-card ${cardClass}`}>
+                          <div className="sae-project-header">
+                            <div>
+                              <h3 className="sae-project-name">{item.name || item.title}</h3>
+                              <div className="sae-project-badges-row">
+                                <span className={`sae-badge-type ${(item.type || 'software').toLowerCase()}`}>
+                                  {item.type || 'Software'}
+                                </span>
+                                <span className="sae-badge-part">
+                                  {item.participation || 'Individual'}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Status Chip */}
+                            {isVerified ? (
+                              <span className="sae-status-badge verified" title="Officially accredited and verified by Portal Admin">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                  <polyline points="22 4 12 14.01 9 11.01" />
+                                </svg>
+                                Verified
+                              </span>
+                            ) : isRejected ? (
+                              <span className="sae-status-badge unverified" title="Rejected or needs revision by Portal Admin">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                  <circle cx="12" cy="12" r="10" />
+                                  <line x1="15" y1="9" x2="9" y2="15" />
+                                  <line x1="9" y1="9" x2="15" y2="15" />
+                                </svg>
+                                Not Verified
+                              </span>
+                            ) : (
+                              <span className="sae-status-badge pending" title="Submission received and undergoing audit">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                  <circle cx="12" cy="12" r="10" />
+                                  <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                                Pending Review
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Duration Row */}
+                          <div className="sae-project-meta-row">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <circle cx="12" cy="12" r="10" />
                               <polyline points="12 6 12 12 16 14" />
                             </svg>
-                            Pending Review
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Proficiency Indicator */}
-                      <div className="sae-prof-wrap">
-                        <div className="sae-prof-label-row">
-                          <span style={{ fontWeight: 600 }}>{prof.text}</span>
-                          {item.duration ? (
-                            <span>Duration: {item.duration}</span>
-                          ) : item.experience ? (
-                            <span>{item.experience}</span>
-                          ) : null}
-                        </div>
-                        <div className="sae-prof-bars">
-                          {[1, 2, 3, 4].map((step) => (
-                            <div
-                              key={`step-${step}`}
-                              className={`sae-prof-bar-segment ${step <= prof.count ? 'filled' : ''}`}
-                            />
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Certificate & Credential Details (Department-Neutral) */}
-                      {(item.credentialName || item.issuingOrg || item.credentialUrl || item.certificateFile) ? (
-                        <div className="sae-cred-box">
-                          <div className="sae-cred-header">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b38e44" strokeWidth="2">
-                              <circle cx="12" cy="8" r="6" />
-                              <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
-                            </svg>
-                            <span className="sae-cred-name">
-                              {item.credentialName || item.certificateFile || 'Accredited Skill Credential'}
-                            </span>
+                            <span><strong>Duration:</strong> {item.duration || 'Not specified'}</span>
                           </div>
 
-                          <div className="sae-cred-meta">
-                            {item.issuingOrg && <span><strong>Issuer:</strong> {item.issuingOrg}</span>}
-                            {item.issuingOrg && item.issueDate && <span>•</span>}
-                            {item.issueDate && <span><strong>Issued:</strong> {item.issueDate}</span>}
-                            {item.certificateFile && <span>•</span>}
-                            {item.certificateFile && <span><strong>File:</strong> {item.certificateFile}</span>}
+                          {/* Project Preview Image */}
+                          {(item.previewImageUrl || item.previewImage) && (
+                            <div className="sae-project-preview-wrap">
+                              {item.previewImageUrl ? (
+                                <img
+                                  src={item.previewImageUrl}
+                                  alt={item.name || 'Project preview'}
+                                  className="sae-project-preview-img"
+                                  onClick={() => window.open(item.previewImageUrl, '_blank')}
+                                  title="Click to view full preview image"
+                                />
+                              ) : (
+                                <div className="sae-project-img-placeholder">
+                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                    <polyline points="21 15 16 10 5 21" />
+                                  </svg>
+                                  <span>{item.previewImage}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Project Documentation */}
+                          <div className="sae-project-doc-box">
+                            <div className="sae-project-doc-header">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0284c7" strokeWidth="2.2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                              </svg>
+                              <span className="sae-project-doc-name" title={item.documentationFile || item.documentFile}>
+                                {item.documentationFile || item.documentFile || 'Project Documentation'}
+                              </span>
+                            </div>
+                            <span className="sae-project-doc-badge">Official Report Attached</span>
                           </div>
 
-                          {item.credentialUrl && (
+                          {/* Project Link if available */}
+                          {(item.url || item.link) && (
                             <a
-                              href={item.credentialUrl}
+                              href={item.url || item.link}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="sae-cred-verify-link"
-                              title="Verify authenticity with issuing organization in new tab"
+                              title="Open project repository or live site"
                             >
                               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                                 <polyline points="15 3 21 3 21 9" />
                                 <line x1="10" y1="14" x2="21" y2="3" />
                               </svg>
-                              Verify Credential Online ↗
+                              Open Project Online ↗
                             </a>
                           )}
-                        </div>
-                      ) : (
-                        <div className="sae-cred-empty">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <circle cx="12" cy="12" r="10" />
-                            <line x1="12" y1="8" x2="12" y2="12" />
-                            <line x1="12" y1="16" x2="12.01" y2="16" />
-                          </svg>
-                          Self-Declared Skill (Awaiting Verification)
-                        </div>
-                      )}
 
-                      {/* Accreditation State Note */}
-                      <div className={`sae-card-status-note ${cardClass}`}>
-                        {isVerified ? (
-                          <span>
-                            <strong>Official Item:</strong> Verified by Portal Admin via issuing authority. Counted in official profile.
-                          </span>
-                        ) : isRejected ? (
-                          <span>
-                            <strong>Admin Review:</strong> {item.rejectionReason || 'Credential could not be verified. Please update the verification link or issuing details.'}
-                          </span>
-                        ) : (
-                          <span>
-                            <strong>Under Audit:</strong> Submitted for Portal Admin verification. Not yet counted in official profile.
-                          </span>
-                        )}
-                      </div>
-                    </article>
-                  )
-                })}
-              </div>
+                          {/* Status Note */}
+                          <div className={`sae-card-status-note ${cardClass}`}>
+                            {isVerified ? (
+                              <span>
+                                <strong>Official Item:</strong> Verified by Portal Admin. Counted in official academic profile.
+                              </span>
+                            ) : isRejected ? (
+                              <span>
+                                <strong>Admin Review:</strong> {item.rejectionReason || 'Project documentation could not be verified. Please update project details.'}
+                              </span>
+                            ) : (
+                              <span>
+                                <strong>Under Audit:</strong> Submitted for Portal Admin verification. Not yet counted in official profile.
+                              </span>
+                            )}
+                          </div>
+                        </article>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {/* Clean '+ Add More Projects' button below the project list/cards */}
+                <div className="sae-add-more-container">
+                  <button
+                    type="button"
+                    className="sae-btn-add-more"
+                    onClick={() => {
+                      setIsAddProjectFormOpen(true)
+                      setTimeout(() => {
+                        addProjectFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                      }, 50)
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    + Add More Projects
+                  </button>
+                </div>
+              </>
             )}
           </div>
         )}
 
-        {/* TAB 2: PROJECTS (PLACEHOLDER FOR FUTURE IMPLEMENTATION) */}
-        {activeTab === 'projects' && (
-          <section className="sae-placeholder-card">
-            <span className="sae-placeholder-badge">Coming Soon</span>
-            <h2 className="sae-placeholder-title">Student Academic & Innovation Projects</h2>
-            <p className="sae-placeholder-desc">
-              The dedicated Project Verification workflow is being finalized. You will soon be able to submit projects from Engineering, Arts, Sciences, Management, and Commerce with institutional supervisor endorsements for Portal Admin verification.
-            </p>
-            <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
-              <button
-                type="button"
-                className="sae-btn-cancel"
-                onClick={() => setActiveTab('skills')}
-              >
-                ← Back to Skills
-              </button>
-            </div>
-          </section>
-        )}
-
-        {/* TAB 3: INTERNSHIPS & EXPERIENCE (PLACEHOLDER FOR FUTURE IMPLEMENTATION) */}
+        {/* TAB 3: INTERNSHIPS & EXPERIENCE */}
         {activeTab === 'experience' && (
-          <section className="sae-placeholder-card">
-            <span className="sae-placeholder-badge">Coming Soon</span>
-            <h2 className="sae-placeholder-title">Internships & Industrial Experience</h2>
-            <p className="sae-placeholder-desc">
-              The dedicated Industrial Experience workflow is being finalized. You will soon be able to log company, clinic, research lab, and corporate tenures with mentor evaluations for Portal Admin verification.
-            </p>
-            <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
-              <button
-                type="button"
-                className="sae-btn-cancel"
-                onClick={() => setActiveTab('skills')}
-              >
-                ← Back to Skills
-              </button>
+          <div className="sae-tab-content">
+            {/* TOOLBAR */}
+            <div className="sae-toolbar">
+              <div className="sae-chips">
+                <button
+                  type="button"
+                  className={`sae-chip ${internshipFilter === 'all' ? 'active' : ''}`}
+                  onClick={() => setInternshipFilter('all')}
+                >
+                  All Internships <span className="sae-chip-count">{internships.length}</span>
+                </button>
+                <button
+                  type="button"
+                  className={`sae-chip ${internshipFilter === 'verified' ? 'active' : ''}`}
+                  onClick={() => setInternshipFilter('verified')}
+                >
+                  Verified <span className="sae-chip-count">{verifiedInternshipsCount}</span>
+                </button>
+                <button
+                  type="button"
+                  className={`sae-chip ${internshipFilter === 'pending' ? 'active' : ''}`}
+                  onClick={() => setInternshipFilter('pending')}
+                >
+                  Pending Verification <span className="sae-chip-count">{pendingInternshipsCount}</span>
+                </button>
+                <button
+                  type="button"
+                  className={`sae-chip ${internshipFilter === 'unverified' ? 'active' : ''}`}
+                  onClick={() => setInternshipFilter('unverified')}
+                >
+                  Needs Revision <span className="sae-chip-count">{unverifiedInternshipsCount}</span>
+                </button>
+              </div>
+
+              <div className="sae-toolbar-actions">
+                <input
+                  type="text"
+                  className="sae-search-input"
+                  placeholder="Search by company, role, type..."
+                  value={internshipSearchQuery}
+                  onChange={(e) => setInternshipSearchQuery(e.target.value)}
+                />
+
+                <button
+                  type="button"
+                  className="sae-btn-add"
+                  onClick={() => setIsAddInternshipFormOpen(!isAddInternshipFormOpen)}
+                >
+                  {isAddInternshipFormOpen ? (
+                    'Cancel'
+                  ) : (
+                    <>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                      Add Internship
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
-          </section>
+
+            {/* ADD INTERNSHIP FORM */}
+            {isAddInternshipFormOpen && (
+              <form ref={addInternshipFormRef} className="sae-form-card" onSubmit={handleCreateInternship}>
+                <div className="sae-form-header">
+                  <div className="sae-form-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                    </svg>
+                    Add Internship & Submit for Admin Verification
+                  </div>
+                </div>
+
+                {internshipFormError && (
+                  <div className="sae-form-alert" role="alert">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <span>{internshipFormError}</span>
+                  </div>
+                )}
+
+                <div className="sae-form-grid">
+                  {/* Field 1: Organization / Company Name */}
+                  <div className="sae-form-field">
+                    <label>Company / Organization Name *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Google, Microsoft, ISRO, AIIMS, Tata Consultancy"
+                      value={internshipOrg}
+                      onChange={(e) => setInternshipOrg(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Field 2: Role / Designation */}
+                  <div className="sae-form-field">
+                    <label>Role / Designation *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Software Engineering Intern, Research Fellow"
+                      value={internshipRole}
+                      onChange={(e) => setInternshipRole(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Field 3: Internship Type */}
+                  <div className="sae-form-field">
+                    <label>Internship / Experience Type *</label>
+                    <select
+                      required
+                      value={internshipType}
+                      onChange={(e) => setInternshipType(e.target.value)}
+                    >
+                      <option value="">-- Select Type --</option>
+                      <option value="Corporate / Industry">Corporate / Industry Internship</option>
+                      <option value="Research & Lab">Academic Research / Lab Tenure</option>
+                      <option value="Government & PSU">Government Agency / PSU Fellowship</option>
+                      <option value="Hospital & Clinic">Clinical / Hospital Residency</option>
+                      <option value="Startup / Tech">Tech Startup / Incubator Role</option>
+                      <option value="NGO / Non-Profit">Social Impact / NGO Internship</option>
+                    </select>
+                  </div>
+
+                  {/* Field 4: Duration */}
+                  <div className="sae-form-field">
+                    <label>Duration *</label>
+                    <select
+                      required
+                      value={internshipDuration}
+                      onChange={(e) => {
+                        setInternshipDuration(e.target.value)
+                        if (e.target.value !== 'Other') setCustomInternshipDuration('')
+                      }}
+                    >
+                      <option value="">-- Select Duration --</option>
+                      <option value="1 Month">1 Month</option>
+                      <option value="2 Months">2 Months</option>
+                      <option value="3 Months">3 Months</option>
+                      <option value="6 Months">6 Months</option>
+                      <option value="1 Year">1 Year</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  {/* Custom Duration if Other */}
+                  {internshipDuration === 'Other' && (
+                    <div className="sae-form-field">
+                      <label>Custom Duration *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. 4 Months, 8 Weeks, 45 Days"
+                        value={customInternshipDuration}
+                        onChange={(e) => setCustomInternshipDuration(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {/* Field 5: Location / Mode */}
+                  <div className="sae-form-field">
+                    <label>Location / Mode</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Bengaluru, Remote, Hybrid"
+                      value={internshipLocation}
+                      onChange={(e) => setInternshipLocation(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Field 6: Experience Description */}
+                  <div className="sae-form-field sae-form-field-full">
+                    <label>Key Responsibilities & Contributions</label>
+                    <textarea
+                      rows={2}
+                      placeholder="Briefly describe key tasks, tech stack used, deliverables, or research contributions..."
+                      value={internshipDescription}
+                      onChange={(e) => setInternshipDescription(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Field 7: Certificate / Offer Letter / Completion Doc */}
+                  <div className="sae-form-field sae-form-field-full">
+                    <label>Completion Certificate or Official Offer / Letter *</label>
+                    <input
+                      ref={internshipDocInputRef}
+                      type="file"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null
+                        handleInternshipDocSelect(file)
+                      }}
+                    />
+                    {!internshipDocFile ? (
+                      <div
+                        className={`sae-upload-box ${isInternshipDocDragOver ? 'dragover' : ''}`}
+                        onClick={() => internshipDocInputRef.current?.click()}
+                        onDragOver={(e) => {
+                          e.preventDefault()
+                          setIsInternshipDocDragOver(true)
+                        }}
+                        onDragLeave={(e) => {
+                          e.preventDefault()
+                          setIsInternshipDocDragOver(false)
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault()
+                          setIsInternshipDocDragOver(false)
+                          const file = e.dataTransfer.files?.[0] || null
+                          handleInternshipDocSelect(file)
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            internshipDocInputRef.current?.click()
+                          }
+                        }}
+                        aria-label="Upload Internship Document"
+                      >
+                        <div className="sae-upload-icon-circle">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                          </svg>
+                        </div>
+                        <div className="sae-upload-title">Upload Internship Certificate or Document</div>
+                        <div className="sae-upload-hint">PDF, DOC, DOCX, JPG or PNG • Max 10 MB</div>
+                      </div>
+                    ) : (
+                      <div className="sae-file-card">
+                        <div className="sae-file-info">
+                          <div className="sae-file-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                              <polyline points="14 2 14 8 20 8" />
+                            </svg>
+                          </div>
+                          <div className="sae-file-text">
+                            <span className="sae-file-name" title={internshipDocFile.name}>
+                              {internshipDocFile.name}
+                            </span>
+                            <span className="sae-file-meta">
+                              {internshipDocFile.size > 1024 * 1024
+                                ? `${(internshipDocFile.size / (1024 * 1024)).toFixed(2)} MB`
+                                : `${(internshipDocFile.size / 1024).toFixed(1)} KB`} • Document Attached
+                            </span>
+                          </div>
+                        </div>
+                        <div className="sae-file-actions">
+                          <button
+                            type="button"
+                            className="sae-file-btn sae-file-btn-replace"
+                            onClick={() => internshipDocInputRef.current?.click()}
+                            title="Replace Document"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="1 4 1 10 7 10" />
+                              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                            </svg>
+                            Replace
+                          </button>
+                          <button
+                            type="button"
+                            className="sae-file-btn sae-file-btn-delete"
+                            onClick={handleDeleteInternshipDoc}
+                            title="Delete Document"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="sae-form-actions">
+                  <button
+                    type="button"
+                    className="sae-btn-cancel"
+                    onClick={() => {
+                      setIsAddInternshipFormOpen(false)
+                      setInternshipFormError('')
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="sae-btn-submit"
+                  >
+                    Submit for Admin Verification
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* INTERNSHIPS LISTING */}
+            {internships.length === 0 ? (
+              !isAddInternshipFormOpen ? (
+                <div className="sae-empty-state">
+                  <div className="sae-empty-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                    </svg>
+                  </div>
+                  <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0f1f2e' }}>
+                    No internships submitted yet
+                  </div>
+                  <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: 460, margin: 0 }}>
+                    Log your company, research lab, clinic, or corporate tenures and submit them for Portal Admin verification.
+                  </p>
+                  <button
+                    type="button"
+                    className="sae-btn-add"
+                    style={{ marginTop: 8 }}
+                    onClick={() => {
+                      setIsAddInternshipFormOpen(true)
+                      setTimeout(() => {
+                        addInternshipFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                      }, 50)
+                    }}
+                  >
+                    + Add Your First Internship
+                  </button>
+                </div>
+              ) : null
+            ) : (
+              <>
+                {filteredInternships.length === 0 ? (
+                  <div className="sae-empty-state">
+                    <div className="sae-empty-icon">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                      </svg>
+                    </div>
+                    <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0f1f2e' }}>
+                      No internships match the selected filter
+                    </div>
+                    <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: 460, margin: 0 }}>
+                      Try clearing your search query or selecting a different status filter.
+                    </p>
+                    <button
+                      type="button"
+                      className="sae-btn-cancel"
+                      style={{ marginTop: 8 }}
+                      onClick={() => {
+                        setInternshipFilter('all')
+                        setInternshipSearchQuery('')
+                      }}
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                ) : (
+                  <div className="sae-projects-grid">
+                    {filteredInternships.map((item) => {
+                      const isVerified = item.verified || item.status === 'verified'
+                      const isRejected = item.status === 'rejected'
+                      const cardClass = isVerified ? 'is-verified' : isRejected ? 'is-unverified' : 'is-pending'
+
+                      return (
+                        <article key={item.id} className={`sae-project-card ${cardClass}`}>
+                          <div className="sae-project-header">
+                            <div>
+                              <h3 className="sae-project-name">{item.organization || item.company}</h3>
+                              <div className="sae-project-badges-row">
+                                <span className="sae-badge-type software">{item.type || 'Internship'}</span>
+                                {item.location && <span className="sae-badge-part">{item.location}</span>}
+                              </div>
+                            </div>
+                            <span className={`sae-status-badge ${isVerified ? 'verified' : isRejected ? 'unverified' : 'pending'}`}>
+                              {isVerified ? 'Verified' : isRejected ? 'Needs Revision' : 'Pending Verification'}
+                            </span>
+                          </div>
+
+                          <div className="sae-project-meta-row">
+                            <span style={{ fontWeight: 600, color: '#0f172a' }}>{item.role}</span>
+                            <span>•</span>
+                            <span>{item.duration}</span>
+                          </div>
+
+                          {item.description && (
+                            <p style={{ fontSize: '0.82rem', color: '#475569', margin: 0, lineHeight: 1.45 }}>
+                              {item.description}
+                            </p>
+                          )}
+
+                          <div className="sae-project-doc-box">
+                            <div className="sae-project-doc-header">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0284c7" strokeWidth="2.2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                              </svg>
+                              <span className="sae-project-doc-name" title={item.certificateFile || item.documentFile}>
+                                {item.certificateFile || item.documentFile || 'Certificate Document'}
+                              </span>
+                            </div>
+                            <span className="sae-project-doc-badge">Certificate Attached</span>
+                          </div>
+
+                          <div className={`sae-card-status-note ${isVerified ? 'verified' : isRejected ? 'unverified' : 'pending'}`}>
+                            {isVerified ? (
+                              <span>
+                                <strong>Officially Verified:</strong> Authenticated by Portal Admin. Counted in official profile.
+                              </span>
+                            ) : isRejected ? (
+                              <span>
+                                <strong>Admin Review:</strong> {item.rejectionReason || 'Internship documentation could not be verified.'}
+                              </span>
+                            ) : (
+                              <span>
+                                <strong>Under Audit:</strong> Submitted for Portal Admin verification. Not yet counted in official profile.
+                              </span>
+                            )}
+                          </div>
+                        </article>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {/* Clean '+ Add More Internships' button below list/cards */}
+                <div className="sae-add-more-container">
+                  <button
+                    type="button"
+                    className="sae-btn-add-more"
+                    onClick={() => {
+                      setIsAddInternshipFormOpen(true)
+                      setTimeout(() => {
+                        addInternshipFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                      }, 50)
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    + Add More Internships
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         )}
       </main>
     </div>
