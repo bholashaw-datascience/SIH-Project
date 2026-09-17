@@ -18,6 +18,7 @@ export default function StudentDashboard({
   onViewPendingDiff,
   onNavigateHome,
   onLogout,
+  onOpenAchievementsExperience,
   verificationStatus = 'approved',
   rejectionReason = '',
 }) {
@@ -869,42 +870,36 @@ export default function StudentDashboard({
           text-transform: uppercase;
         }
 
-        /* Section 2: Verification Overview (3 Compact Cards) */
-        .sd-verif-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
-        }
-
-        @media (max-width: 768px) {
-          .sd-verif-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        .sd-verif-card {
+        /* Section 2: Verification Overview (One Unified Button & Card) */
+        .sd-verif-overview-card {
           background: #ffffff;
           border: 1px solid #ded9cc;
+          border-left: 4px solid #16a34a;
           border-radius: 8px;
-          padding: 16px;
+          padding: 18px 22px;
           display: flex;
           align-items: center;
-          gap: 14px;
-          cursor: pointer;
-          transition: all 0.15s ease;
-          border-left: 4px solid #16a34a;
+          justify-content: space-between;
+          gap: 18px;
           box-shadow: 0 2px 8px rgba(15, 29, 47, 0.04);
         }
 
-        .sd-verif-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(15, 29, 47, 0.09);
-          border-color: #16a34a;
+        @media (max-width: 768px) {
+          .sd-verif-overview-card {
+            flex-direction: column;
+            align-items: flex-start;
+          }
         }
 
-        .sd-verif-icon-box {
-          width: 44px;
-          height: 44px;
+        .sd-verif-overview-content {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+
+        .sd-verif-overview-icon {
+          width: 48px;
+          height: 48px;
           border-radius: 8px;
           background: #dcfce7;
           color: #166534;
@@ -914,27 +909,53 @@ export default function StudentDashboard({
           flex-shrink: 0;
         }
 
-        .sd-verif-title {
-          font-size: 0.8rem;
+        .sd-verif-overview-title {
+          margin: 0;
+          font-size: 1.05rem;
           font-weight: 700;
-          color: #475569;
-          text-transform: uppercase;
-          letter-spacing: 0.04em;
-          margin-bottom: 2px;
+          color: #0f1f2e;
         }
 
-        .sd-verif-count {
-          font-size: 1.4rem;
-          font-weight: 800;
-          color: #112233;
-          line-height: 1;
-        }
-
-        .sd-verif-sub {
-          font-size: 0.72rem;
+        .sd-verif-badge-pill {
+          font-size: 0.74rem;
+          font-weight: 700;
+          background: #dcfce7;
           color: #166534;
-          font-weight: 600;
-          margin-top: 4px;
+          border: 1px solid #86efac;
+          padding: 2px 9px;
+          border-radius: 9999px;
+        }
+
+        .sd-verif-overview-sub {
+          margin: 4px 0 0 0;
+          font-size: 0.82rem;
+          color: #64748b;
+          line-height: 1.4;
+        }
+
+        .sd-btn-verif-overview-cta {
+          background: #112233;
+          color: #ffffff;
+          border: 1px solid #b38e44;
+          border-radius: 6px;
+          padding: 10px 20px;
+          font-size: 0.9rem;
+          font-weight: 700;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          white-space: nowrap;
+          box-shadow: 0 2px 6px rgba(17, 34, 51, 0.2);
+          transition: all 0.15s ease;
+          flex-shrink: 0;
+        }
+
+        .sd-btn-verif-overview-cta:hover {
+          background: #1a3650;
+          border-color: #f1cf7c;
+          color: #f1cf7c;
+          transform: translateY(-1px);
         }
 
         /* Section 3: My Institution */
@@ -1445,70 +1466,40 @@ export default function StudentDashboard({
           </div>
         </section>
 
-        {/* SECTION 2: VERIFICATION OVERVIEW (Requirement 5) */}
-        <section>
-          <div style={{ marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#475569', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                <polyline points="22 4 12 14.01 9 11.01" />
+        {/* SECTION 2: VERIFICATION OVERVIEW */}
+        <section className="sd-verif-overview-section">
+          <div className="sd-verif-overview-card">
+            <div className="sd-verif-overview-content">
+              <div className="sd-verif-overview-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                  <h3 className="sd-verif-overview-title">Student Achievements & Experience Verification</h3>
+                  <span className="sd-verif-badge-pill">
+                    {verifiedSkillsCount + verifiedProjectsCount + verifiedInternshipsCount} Officially Verified
+                  </span>
+                </div>
+                <p className="sd-verif-overview-sub">
+                  Track and submit technical skills, academic projects, and industrial internships. Only Portal Admin verified items count towards official totals and transcripts.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="sd-btn-verif-overview-cta"
+              onClick={() => onOpenAchievementsExperience ? onOpenAchievementsExperience('skills') : openSkillsTab('skills')}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M9 12l2 2 4-4" />
+                <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
               </svg>
               Verification Overview
-            </h3>
-            <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
-              Only Portal Admin verified items count towards official totals
-            </span>
-          </div>
-
-          <div className="sd-verif-grid">
-            {/* Card 1: Verified Skills */}
-            <div className="sd-verif-card" onClick={() => openSkillsTab('skills')}>
-              <div className="sd-verif-icon-box">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-              </div>
-              <div>
-                <div className="sd-verif-title">Verified Skills</div>
-                <div className="sd-verif-count">{verifiedSkillsCount}</div>
-                <div className="sd-verif-sub">
-                  {skills.length - verifiedSkillsCount > 0 ? `+${skills.length - verifiedSkillsCount} Pending Review` : skills.length === 0 ? 'No verified items yet' : 'All Submissions Verified'}
-                </div>
-              </div>
-            </div>
-
-            {/* Card 2: Verified Projects */}
-            <div className="sd-verif-card" onClick={() => openSkillsTab('projects')}>
-              <div className="sd-verif-icon-box" style={{ background: '#e0f2fe', color: '#0369a1' }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                </svg>
-              </div>
-              <div>
-                <div className="sd-verif-title">Verified Projects</div>
-                <div className="sd-verif-count">{verifiedProjectsCount}</div>
-                <div className="sd-verif-sub" style={{ color: '#0369a1' }}>
-                  {projects.length - verifiedProjectsCount > 0 ? `+${projects.length - verifiedProjectsCount} Pending Review` : projects.length === 0 ? 'No verified items yet' : 'Institutional Code Verified'}
-                </div>
-              </div>
-            </div>
-
-            {/* Card 3: Verified Internship Experience */}
-            <div className="sd-verif-card" onClick={() => openSkillsTab('experience')}>
-              <div className="sd-verif-icon-box" style={{ background: '#fef3c7', color: '#b45309' }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-                </svg>
-              </div>
-              <div>
-                <div className="sd-verif-title">Verified Experience</div>
-                <div className="sd-verif-count">{verifiedInternshipsCount}</div>
-                <div className="sd-verif-sub" style={{ color: '#b45309' }}>
-                  {internships.length - verifiedInternshipsCount > 0 ? `+${internships.length - verifiedInternshipsCount} Pending Review` : internships.length === 0 ? 'No verified items yet' : 'Industry Tenures Accredited'}
-                </div>
-              </div>
-            </div>
+            </button>
           </div>
         </section>
 
@@ -1633,21 +1624,21 @@ export default function StudentDashboard({
               <button
                 type="button"
                 className="sd-btn-primary"
-                onClick={() => openSkillsTab('skills')}
+                onClick={() => onOpenAchievementsExperience ? onOpenAchievementsExperience('skills') : openSkillsTab('skills')}
               >
                 Manage Technical Skills ({verifiedSkillsCount} Verified)
               </button>
               <button
                 type="button"
                 className="sd-btn-secondary"
-                onClick={() => openSkillsTab('projects')}
+                onClick={() => onOpenAchievementsExperience ? onOpenAchievementsExperience('projects') : openSkillsTab('projects')}
               >
                 Manage Projects ({verifiedProjectsCount} Verified)
               </button>
               <button
                 type="button"
                 className="sd-btn-secondary"
-                onClick={() => openSkillsTab('experience')}
+                onClick={() => onOpenAchievementsExperience ? onOpenAchievementsExperience('experience') : openSkillsTab('experience')}
               >
                 Manage Internships ({verifiedInternshipsCount} Verified)
               </button>
