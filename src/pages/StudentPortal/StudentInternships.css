@@ -192,33 +192,6 @@
   line-height: 1.35;
 }
 
-.si-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.si-header-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  background: #ffffff;
-  color: #112233;
-  border: 1px solid #dcd6c8;
-  border-radius: 6px;
-  padding: 6px 13px;
-  font-size: 0.79rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.16s ease;
-}
-
-.si-header-btn:hover,
-.si-header-btn.active {
-  background: #112233;
-  color: #ffffff;
-  border-color: #112233;
-}
 
 /* --------------------------------------------------------------------------
    WORKSPACE 2-COLUMN LAYOUT (Desktop: Feed + Right Sidebar)
@@ -1964,105 +1937,6 @@
   flex-shrink: 0;
 }
 
-/* --------------------------------------------------------------------------
-   Company Publish Internship Modal
-   -------------------------------------------------------------------------- */
-.si-modal-card.publish-modal {
-  max-width: 780px;
-  width: 100%;
-}
 
-.si-publish-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.si-publish-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px 18px;
-}
-
-@media (max-width: 640px) {
-  .si-publish-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-}
-
-.si-publish-field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.si-publish-field.full-width {
-  grid-column: 1 / -1;
-}
-
-.si-publish-label {
-  font-size: 0.73rem;
-  font-weight: 700;
-  color: #334155;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.si-req-star {
-  color: #dc2626;
-  font-size: 0.85rem;
-}
-
-.si-publish-input,
-.si-publish-select,
-.si-publish-textarea {
-  width: 100%;
-  padding: 8px 12px;
-  background: #ffffff;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 0.84rem;
-  color: #0f1d2f;
-  font-family: inherit;
-  box-sizing: border-box;
-  transition: all 0.16s ease;
-}
-
-.si-publish-input:focus,
-.si-publish-select:focus,
-.si-publish-textarea:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-}
-
-.si-publish-textarea {
-  resize: vertical;
-  min-height: 68px;
-  line-height: 1.45;
-}
-
-.si-publish-hint {
-  font-size: 0.72rem;
-  color: #64748b;
-  margin-top: 2px;
-}
-
-.si-publish-alert-error {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #991b1b;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 
 

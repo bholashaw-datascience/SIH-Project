@@ -35,6 +35,7 @@ export default function StudentAchievementsExperience({
   student = {},
   initialTab = 'skills',
   onBack,
+  onNavigateHome,
 }) {
   const [activeTab, setActiveTab] = useState(initialTab || 'skills')
   const [prevInitialTab, setPrevInitialTab] = useState(initialTab)
@@ -2615,9 +2616,21 @@ export default function StudentAchievementsExperience({
           </button>
 
           <div className="sae-brand-title">
-            <span>IAS Collaboration Portal</span>
+            <span
+              onClick={onNavigateHome}
+              style={{ cursor: onNavigateHome ? 'pointer' : 'default' }}
+              title={onNavigateHome ? 'Return to Portal Home' : ''}
+            >
+              IAS Collaboration Portal
+            </span>
             <span className="sae-breadcrumb-slash">/</span>
-            <span style={{ color: '#ffffff', fontWeight: 500 }}>Student Portal</span>
+            <span
+              onClick={onBack}
+              style={{ cursor: onBack ? 'pointer' : 'default', color: '#ffffff', fontWeight: 500 }}
+              title={onBack ? 'Return to Student Dashboard' : ''}
+            >
+              Student Portal
+            </span>
             <span className="sae-breadcrumb-slash">/</span>
             <span className="sae-breadcrumb-active">Achievements & Experience</span>
           </div>

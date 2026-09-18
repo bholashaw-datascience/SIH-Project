@@ -472,6 +472,7 @@ export default function SkillsProjectsModal({
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             style={{ background: 'transparent', border: 'none', color: '#cbd5e1', cursor: 'pointer', padding: 6 }}
             aria-label="Close modal"
@@ -486,6 +487,7 @@ export default function SkillsProjectsModal({
         {/* Tab Navigation */}
         <div className="sp-tab-bar">
           <button
+            type="button"
             className={`sp-tab-btn ${activeTab === 'skills' ? 'active' : ''}`}
             onClick={() => { setActiveTab('skills'); setShowAddForm(false) }}
           >
@@ -493,6 +495,7 @@ export default function SkillsProjectsModal({
             <span className="sp-badge-count">{skills.filter((s) => s.verified).length}/{skills.length}</span>
           </button>
           <button
+            type="button"
             className={`sp-tab-btn ${activeTab === 'projects' ? 'active' : ''}`}
             onClick={() => { setActiveTab('projects'); setShowAddForm(false) }}
           >
@@ -500,6 +503,7 @@ export default function SkillsProjectsModal({
             <span className="sp-badge-count">{projects.filter((p) => p.verified).length}/{projects.length}</span>
           </button>
           <button
+            type="button"
             className={`sp-tab-btn ${activeTab === 'experience' ? 'active' : ''}`}
             onClick={() => { setActiveTab('experience'); setShowAddForm(false) }}
           >
@@ -523,7 +527,7 @@ export default function SkillsProjectsModal({
               </span>
             </div>
 
-            <button className="sp-add-btn" onClick={() => setShowAddForm(!showAddForm)}>
+            <button type="button" className="sp-add-btn" onClick={() => setShowAddForm(!showAddForm)}>
               {showAddForm ? (
                 <>Cancel</>
               ) : (
@@ -1021,7 +1025,7 @@ export default function SkillsProjectsModal({
           <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
             Verification authority: <strong>IAS Collaboration Portal Administration</strong>
           </div>
-          <button className="sp-add-btn" onClick={onClose}>
+          <button type="button" className="sp-add-btn" onClick={onClose}>
             Done
           </button>
         </div>

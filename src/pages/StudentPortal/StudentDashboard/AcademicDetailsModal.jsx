@@ -324,7 +324,7 @@ export default function AcademicDetailsModal({ isOpen, onClose, student }) {
               </p>
             </div>
           </div>
-          <button className="acad-close-btn" onClick={onClose} aria-label="Close modal">
+          <button type="button" className="acad-close-btn" onClick={onClose} aria-label="Close modal">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
@@ -488,6 +488,7 @@ export default function AcademicDetailsModal({ isOpen, onClose, student }) {
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
+              type="button"
               className="acad-print-btn"
               onClick={() => window.print()}
               title="Print academic summary"
@@ -499,7 +500,7 @@ export default function AcademicDetailsModal({ isOpen, onClose, student }) {
               </svg>
               Print Transcript
             </button>
-            <button className="acad-done-btn" onClick={onClose}>
+            <button type="button" className="acad-done-btn" onClick={onClose}>
               Close
             </button>
           </div>

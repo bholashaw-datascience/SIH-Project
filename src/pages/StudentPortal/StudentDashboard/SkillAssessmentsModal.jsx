@@ -233,6 +233,7 @@ export default function SkillAssessmentsModal({ isOpen, onClose }) {
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             style={{ background: 'transparent', border: 'none', color: '#cbd5e1', cursor: 'pointer', padding: 6 }}
             aria-label="Close modal"
@@ -247,18 +248,21 @@ export default function SkillAssessmentsModal({ isOpen, onClose }) {
         {/* Tab Filters */}
         <div className="sa-tabs">
           <button
+            type="button"
             className={`sa-tab-btn ${activeTab === 'all' ? 'active' : ''}`}
             onClick={() => setActiveTab('all')}
           >
             All Assessments ({assessments.length})
           </button>
           <button
+            type="button"
             className={`sa-tab-btn ${activeTab === 'completed' ? 'active' : ''}`}
             onClick={() => setActiveTab('completed')}
           >
             Completed & Verified ({assessments.filter((a) => a.status === 'completed').length})
           </button>
           <button
+            type="button"
             className={`sa-tab-btn ${activeTab === 'available' ? 'active' : ''}`}
             onClick={() => setActiveTab('available')}
           >
@@ -298,6 +302,7 @@ export default function SkillAssessmentsModal({ isOpen, onClose }) {
                     </div>
                   ) : (
                     <button
+                      type="button"
                       className="sa-btn-start"
                       onClick={() => alert(`Starting assessment: "${item.title}". Proctored environment initialization will begin.`)}
                     >
@@ -330,7 +335,7 @@ export default function SkillAssessmentsModal({ isOpen, onClose }) {
           <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
             Assessment criteria aligned with <strong>National Institutional Framework</strong>
           </div>
-          <button className="sa-btn-start" onClick={onClose}>
+          <button type="button" className="sa-btn-start" onClick={onClose}>
             Close
           </button>
         </div>

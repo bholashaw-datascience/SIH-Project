@@ -1320,7 +1320,7 @@ export default function StudentDashboard({
                 You recently submitted changes to your profile. Your currently approved profile remains active until your Principal reviews and approves the updates.
               </div>
             </div>
-            <button className="sd-alert-btn" onClick={onViewPendingDiff}>
+            <button type="button" className="sd-alert-btn" onClick={onViewPendingDiff}>
               View Pending Changes Diff →
             </button>
           </div>
@@ -1345,7 +1345,7 @@ export default function StudentDashboard({
                 Your previously approved profile remains active as your official institutional record.
               </div>
             </div>
-            <button className="sd-alert-btn" onClick={onEditProfile}>
+            <button type="button" className="sd-alert-btn" onClick={onEditProfile}>
               Correct & Resubmit
             </button>
           </div>

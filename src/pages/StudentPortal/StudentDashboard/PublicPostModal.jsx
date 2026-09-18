@@ -53,8 +53,9 @@ export default function PublicPostModal({
   }
 
   useEffect(() => {
+    const urls = objectUrlsRef.current
     return () => {
-      objectUrlsRef.current.forEach((url) => {
+      urls.forEach((url) => {
         try {
           URL.revokeObjectURL(url)
         } catch {}

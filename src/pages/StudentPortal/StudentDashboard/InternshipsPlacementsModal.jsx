@@ -317,6 +317,7 @@ export default function InternshipsPlacementsModal({ isOpen, onClose, student })
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             style={{ background: 'transparent', border: 'none', color: '#cbd5e1', cursor: 'pointer', padding: 6 }}
             aria-label="Close modal"
@@ -331,24 +332,28 @@ export default function InternshipsPlacementsModal({ isOpen, onClose, student })
         {/* Tab Filters */}
         <div className="ip-tabs">
           <button
+            type="button"
             className={`ip-tab-btn ${filter === 'all' ? 'active' : ''}`}
             onClick={() => setFilter('all')}
           >
             All Opportunities ({opportunities.length})
           </button>
           <button
+            type="button"
             className={`ip-tab-btn ${filter === 'placements' ? 'active' : ''}`}
             onClick={() => setFilter('placements')}
           >
             Full-Time Placements
           </button>
           <button
+            type="button"
             className={`ip-tab-btn ${filter === 'internships' ? 'active' : ''}`}
             onClick={() => setFilter('internships')}
           >
             Summer Internships
           </button>
           <button
+            type="button"
             className={`ip-tab-btn ${filter === 'applied' ? 'active' : ''}`}
             onClick={() => setFilter('applied')}
           >
@@ -426,6 +431,7 @@ export default function InternshipsPlacementsModal({ isOpen, onClose, student })
                       </div>
                     ) : (
                       <button
+                        type="button"
                         className="ip-btn-apply"
                         disabled={!isEligible}
                         onClick={() => handleApply(op.id)}
@@ -445,7 +451,7 @@ export default function InternshipsPlacementsModal({ isOpen, onClose, student })
           <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
             Managed by: <strong>Office of Training & Placement Cell</strong>
           </div>
-          <button className="ip-btn-apply" onClick={onClose}>
+          <button type="button" className="ip-btn-apply" onClick={onClose}>
             Close
           </button>
         </div>
