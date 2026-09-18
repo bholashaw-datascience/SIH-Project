@@ -10,6 +10,8 @@ function ImageCropModal({
   title = 'Crop & Position Profile Photo',
   subtitle = 'Drag to reposition, use slider to zoom',
   roleBadge = 'PHOTO ADJUSTMENT',
+  aspectRatio = '1:1',
+  shape = 'circle',
 }) {
   const [cropZoom, setCropZoom] = useState(1)
   const [cropPan, setCropPan] = useState({ x: 0, y: 0 })
@@ -18,11 +20,32 @@ function ImageCropModal({
   const isDraggingRef = useRef(false)
   const dragStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 })
 
-  const CROP_FRAME_SIZE = 220
+  // Compute frame size and export resolution based on aspect ratio and shape
+  let frameWidth = 240
+  let frameHeight = 240
+  let exportWidth = 800
+  let exportHeight = 800
 
-  const [prevOpenSrc, setPrevOpenSrc] = useState({ isOpen, imageSrc })
-  if (isOpen !== prevOpenSrc.isOpen || imageSrc !== prevOpenSrc.imageSrc) {
-    setPrevOpenSrc({ isOpen, imageSrc })
+  if (aspectRatio === '4:5') {
+    frameWidth = 216
+    frameHeight = 270
+    exportWidth = 800
+    exportHeight = 1000
+  } else if (aspectRatio === '16:9') {
+    frameWidth = 304
+    frameHeight = 171
+    exportWidth = 1280
+    exportHeight = 720
+  } else if (shape === 'circle') {
+    frameWidth = 220
+    frameHeight = 220
+    exportWidth = 360
+    exportHeight = 360
+  }
+
+  const [prevOpenSrc, setPrevOpenSrc] = useState({ isOpen, imageSrc, aspectRatio })
+  if (isOpen !== prevOpenSrc.isOpen || imageSrc !== prevOpenSrc.imageSrc || aspectRatio !== prevOpenSrc.aspectRatio) {
+    setPrevOpenSrc({ isOpen, imageSrc, aspectRatio })
     if (isOpen) {
       setCropZoom(1)
       setCropPan({ x: 0, y: 0 })
@@ -41,14 +64,14 @@ function ImageCropModal({
   const baseScale =
     cropNaturalSize.width && cropNaturalSize.height
       ? Math.max(
-          CROP_FRAME_SIZE / cropNaturalSize.width,
-          CROP_FRAME_SIZE / cropNaturalSize.height
+          frameWidth / cropNaturalSize.width,
+          frameHeight / cropNaturalSize.height
         )
       : 1
   const cropEffectiveScale = baseScale * cropZoom
 
-  const maxPanX = Math.max(0, (cropNaturalSize.width * cropEffectiveScale - CROP_FRAME_SIZE) / 2)
-  const maxPanY = Math.max(0, (cropNaturalSize.height * cropEffectiveScale - CROP_FRAME_SIZE) / 2)
+  const maxPanX = Math.max(0, (cropNaturalSize.width * cropEffectiveScale - frameWidth) / 2)
+  const maxPanY = Math.max(0, (cropNaturalSize.height * cropEffectiveScale - frameHeight) / 2)
 
   const clampPan = (x, y) => ({
     x: Math.max(-maxPanX, Math.min(maxPanX, x)),
@@ -110,28 +133,28 @@ function ImageCropModal({
     if (!cropImgRef.current || !cropNaturalSize.width) return
 
     const canvas = document.createElement('canvas')
-    const exportSize = 360
-    canvas.width = exportSize
-    canvas.height = exportSize
+    canvas.width = exportWidth
+    canvas.height = exportHeight
     const ctx = canvas.getContext('2d')
 
     // Position of crop frame center relative to image center in source image coordinates
-    const sourceCropDiameter = CROP_FRAME_SIZE / cropEffectiveScale
+    const sourceCropWidth = frameWidth / cropEffectiveScale
+    const sourceCropHeight = frameHeight / cropEffectiveScale
     const sourceCenterX = cropNaturalSize.width / 2 - cropPan.x / cropEffectiveScale
     const sourceCenterY = cropNaturalSize.height / 2 - cropPan.y / cropEffectiveScale
-    const sourceX = sourceCenterX - sourceCropDiameter / 2
-    const sourceY = sourceCenterY - sourceCropDiameter / 2
+    const sourceX = sourceCenterX - sourceCropWidth / 2
+    const sourceY = sourceCenterY - sourceCropHeight / 2
 
     ctx.drawImage(
       cropImgRef.current,
       sourceX,
       sourceY,
-      sourceCropDiameter,
-      sourceCropDiameter,
+      sourceCropWidth,
+      sourceCropHeight,
       0,
       0,
-      exportSize,
-      exportSize
+      exportWidth,
+      exportHeight
     )
 
     const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.92)
@@ -162,6 +185,7 @@ function ImageCropModal({
           {/* Crop Viewport Area */}
           <div
             className="crop-viewport"
+            style={{ width: aspectRatio === '16:9' ? 320 : 280, height: 280 }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -183,8 +207,11 @@ function ImageCropModal({
               }}
             />
 
-            {/* Circular Crop Mask Overlay */}
-            <div className="crop-circle-mask">
+            {/* Crop Mask Overlay (supports circular & rectangular aspect ratios) */}
+            <div
+              className={`crop-frame-mask ${shape === 'circle' ? 'is-circle' : 'is-rect'}`}
+              style={{ width: frameWidth, height: frameHeight }}
+            >
               <div className="crop-grid-lines">
                 <div className="crop-grid-h"></div>
                 <div className="crop-grid-v"></div>

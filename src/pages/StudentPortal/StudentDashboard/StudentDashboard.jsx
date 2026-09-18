@@ -254,13 +254,24 @@ export default function StudentDashboard({
   const handleCreatePost = (postData, isDraft) => {
     const newPost = {
       id: `post_${Date.now()}`,
-      title: postData.title,
-      category: postData.category,
-      content: postData.content,
-      attachment: postData.attachment,
-      attachmentUrl: postData.attachmentUrl,
-      attachmentSize: postData.attachmentSize,
-      attachmentType: postData.attachmentType,
+      title: postData.title || (postData.caption ? postData.caption.slice(0, 45) + '...' : 'Public Post'),
+      caption: postData.caption || postData.content || '',
+      content: postData.caption || postData.content || '',
+      category: postData.category || 'Technical Achievement',
+      aspectRatio: postData.aspectRatio || '1:1',
+      media: postData.media || [],
+      attachment: postData.attachment || (postData.media?.[0]?.name || ''),
+      attachmentUrl: postData.attachmentUrl || (postData.media?.[0]?.url || ''),
+      attachmentSize: postData.attachmentSize || (postData.media?.[0]?.size || ''),
+      attachmentType: postData.attachmentType || (postData.media?.[0]?.type || 'image'),
+      author: {
+        name: s.name || 'Student Member',
+        email: s.email || '',
+        avatar: s.profilePic || '',
+        institution: s.institution || 'Institutional Member',
+        course: s.course || '',
+        roll: s.universityRollNo || s.collegeRollNo || '',
+      },
       status: isDraft ? 'draft' : 'pending',
       createdAt: new Date().toISOString(),
     }
@@ -270,13 +281,44 @@ export default function StudentDashboard({
       const notif = {
         id: `n_${Date.now()}`,
         type: 'info',
-        title: `Public Post Submitted: ${newPost.title}`,
+        title: `Public Post Submitted for Verification`,
         message: 'Your post is under moderation review by IAS Collaboration Portal Admin.',
         timestamp: 'Just now',
         read: false,
       }
       setNotifications((prev) => [notif, ...prev])
     }
+  }
+
+  const handleUpdatePost = (updatedPost, isSubmit = false) => {
+    setPosts((prev) =>
+      prev.map((p) => {
+        if (p.id === updatedPost.id) {
+          return {
+            ...p,
+            ...updatedPost,
+            status: isSubmit ? 'pending' : (updatedPost.status || p.status),
+            updatedAt: new Date().toISOString(),
+          }
+        }
+        return p
+      })
+    )
+    if (isSubmit) {
+      const notif = {
+        id: `n_${Date.now()}`,
+        type: 'info',
+        title: 'Post Resubmitted for Admin Verification',
+        message: 'Your revised post has been resubmitted for moderation review by Portal Admin.',
+        timestamp: 'Just now',
+        read: false,
+      }
+      setNotifications((prev) => [notif, ...prev])
+    }
+  }
+
+  const handleDeletePost = (postId) => {
+    setPosts((prev) => prev.filter((p) => p.id !== postId))
   }
 
   const handleSubmitPostDraft = (postId) => {
@@ -1727,7 +1769,10 @@ export default function StudentDashboard({
         isOpen={isPostModalOpen}
         onClose={() => setIsPostModalOpen(false)}
         posts={posts}
+        student={s}
         onCreatePost={handleCreatePost}
+        onUpdatePost={handleUpdatePost}
+        onDeletePost={handleDeletePost}
         onSubmitDraft={handleSubmitPostDraft}
       />
 

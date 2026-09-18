@@ -141,14 +141,12 @@
   display: block;
 }
 
-.crop-circle-mask {
+.crop-circle-mask,
+.crop-frame-mask {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
   box-shadow: 0 0 0 9999px rgba(15, 29, 47, 0.72);
   border: 2px solid #d4af37;
   pointer-events: none;
@@ -156,6 +154,15 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
+}
+
+.crop-circle-mask,
+.crop-frame-mask.is-circle {
+  border-radius: 50%;
+}
+
+.crop-frame-mask.is-rect {
+  border-radius: 4px;
 }
 
 .crop-grid-lines {
