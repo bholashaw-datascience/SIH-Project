@@ -848,13 +848,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
   }, [customInternships])
 
   // Company Publish Internship Modal State
-  const [isPublishModalOpen, setIsPublishModalOpen] = useState(() => {
-    try {
-      const params = new URLSearchParams(window.location.search)
-      return params.get('action') === 'post' || window.location.hash.includes('post-internship')
-    } catch {}
-    return false
-  })
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
 
   const [publishForm, setPublishForm] = useState({
     company: '',
@@ -1411,21 +1405,6 @@ ${company}
             <p className="si-page-subtitle">
               Discover accredited internship opportunities across all institutional academic departments.
             </p>
-          </div>
-          <div className="si-header-actions">
-            <button
-              type="button"
-              className="si-header-btn"
-              onClick={() => setIsPublishModalOpen(true)}
-              id="si-post-internship-btn"
-              title="Publish a verified internship opportunity"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-              <span>Post Internship</span>
-            </button>
           </div>
         </div>
 
