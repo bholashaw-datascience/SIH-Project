@@ -3,6 +3,7 @@ import StudentProfileOnboarding from './StudentProfileOnboarding'
 import StudentProfileDiffView from './StudentProfileDiffView'
 import StudentDashboard from './StudentDashboard/StudentDashboard'
 import StudentAchievementsExperience from './StudentAchievementsExperience'
+import PublicPost from './PublicPost'
 
 function StudentPortal({
   onNavigateHome,
@@ -21,6 +22,9 @@ function StudentPortal({
       const s = parseInt(params.get('step'), 10)
       if (s >= 1 && s <= 5) return s
       if (params.get('view') === 'achievements_experience' || window.location.hash.includes('achievements')) {
+        return 5
+      }
+      if (params.get('view') === 'public_post' || window.location.hash.includes('public-post') || window.location.hash.includes('public_post')) {
         return 5
       }
     } catch {}
@@ -146,6 +150,9 @@ function StudentPortal({
       if (params.get('view') === 'achievements_experience' || window.location.hash.includes('achievements')) {
         return 'achievements_experience'
       }
+      if (params.get('view') === 'public_post' || window.location.hash.includes('public-post') || window.location.hash.includes('public_post')) {
+        return 'public_post'
+      }
     } catch {}
     return 'auto'
   })
@@ -223,10 +230,11 @@ function StudentPortal({
   // Determine current route/screen:
   // Rule 1 & 8: Main Student Dashboard opens ONLY after profile setup completed AND status is verified.
   const showAchievementsExperience = activeView === 'achievements_experience'
-  const showDashboard = isProfileCompleted && verificationStatus === 'verified' && activeView !== 'diff_view' && activeView !== 'edit_form' && !showAchievementsExperience
-  const showDiffView = (activeView === 'diff_view' || (isProfileCompleted && hasPendingChanges && activeView !== 'edit_form' && activeView !== 'auto_dashboard')) && !showAchievementsExperience
-  const showEditForm = activeView === 'edit_form' && !showAchievementsExperience
-  const showFirstTimeOnboarding = (!isProfileCompleted || verificationStatus === 'unverified' || verificationStatus === 'draft') && !showDashboard && !showDiffView && !showEditForm && !showAchievementsExperience && !['pending', 'approved', 'rejected'].includes(verificationStatus)
+  const showPublicPost = activeView === 'public_post'
+  const showDashboard = isProfileCompleted && verificationStatus === 'verified' && activeView !== 'diff_view' && activeView !== 'edit_form' && !showAchievementsExperience && !showPublicPost
+  const showDiffView = (activeView === 'diff_view' || (isProfileCompleted && hasPendingChanges && activeView !== 'edit_form' && activeView !== 'auto_dashboard')) && !showAchievementsExperience && !showPublicPost
+  const showEditForm = activeView === 'edit_form' && !showAchievementsExperience && !showPublicPost
+  const showFirstTimeOnboarding = (!isProfileCompleted || verificationStatus === 'unverified' || verificationStatus === 'draft') && !showDashboard && !showDiffView && !showEditForm && !showAchievementsExperience && !showPublicPost && !['pending', 'approved', 'rejected'].includes(verificationStatus)
 
   return (
     <div className="sp-canvas">
@@ -1327,11 +1335,17 @@ function StudentPortal({
 
           {/* STEP 5: Student Dashboard */}
           {demoStep === 5 && (
-            <div style={{ paddingBottom: activeView === 'achievements_experience' ? 0 : '100px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <div style={{ paddingBottom: (activeView === 'achievements_experience' || activeView === 'public_post') ? 0 : '100px', display: 'flex', flexDirection: 'column', flex: 1 }}>
               {activeView === 'achievements_experience' ? (
                 <StudentAchievementsExperience
                   student={currentLive}
                   initialTab={achievementsTab}
+                  onBack={() => setActiveView('auto')}
+                  onNavigateHome={onNavigateHome}
+                />
+              ) : activeView === 'public_post' ? (
+                <PublicPost
+                  student={currentLive}
                   onBack={() => setActiveView('auto')}
                   onNavigateHome={onNavigateHome}
                 />
@@ -1346,6 +1360,7 @@ function StudentPortal({
                     setAchievementsTab(tab || 'skills')
                     setActiveView('achievements_experience')
                   }}
+                  onOpenPublicPost={() => setActiveView('public_post')}
                   onNavigateHome={onNavigateHome}
                   onLogout={onNavigateHome}
                   verificationStatus="verified"
@@ -1566,6 +1581,7 @@ function StudentPortal({
                 setAchievementsTab(tab || 'skills')
                 setActiveView('achievements_experience')
               }}
+              onOpenPublicPost={() => setActiveView('public_post')}
               onNavigateHome={onNavigateHome}
               onLogout={() => {
                 try {
@@ -1587,11 +1603,20 @@ function StudentPortal({
               onNavigateHome={onNavigateHome}
             />
           )}
+
+          {/* 7. DEDICATED CREATE PUBLIC POST PAGE */}
+          {showPublicPost && (
+            <PublicPost
+              student={currentLive}
+              onBack={() => setActiveView('auto')}
+              onNavigateHome={onNavigateHome}
+            />
+          )}
         </>
       )}
 
       {/* Footer */}
-      {(!showDashboard && !showAchievementsExperience && (!isDemoActive || demoStep === 1 || demoStep === 4)) && (
+      {(!showDashboard && !showAchievementsExperience && !showPublicPost && (!isDemoActive || demoStep === 1 || demoStep === 4)) && (
         <footer className="sp-footer">
           <div className="sp-footer-inner">
             <div>

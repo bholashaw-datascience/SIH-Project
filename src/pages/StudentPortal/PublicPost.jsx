@@ -1,0 +1,1420 @@
+import { useState, useRef, useEffect } from 'react'
+import ImageCropModal from '../../components/Auth/ImageCropModal'
+import './PublicPost.css'
+
+const DEFAULT_POSTS = [
+  {
+    id: 'post_sample_1',
+    title: 'Autonomous Quadcopter Research Demonstration',
+    caption: 'Successfully demonstrated our autonomous obstacle-avoidance quadcopter at the Regional Robotics Symposium. Our paper has also been accepted by the IAS Technical Review!',
+    category: 'Academic Research',
+    aspectRatio: '16:9',
+    media: [
+      {
+        id: 'm_demo_1',
+        name: 'quadcopter_demo.mp4',
+        size: '12.4 MB',
+        type: 'video',
+        url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+      },
+      {
+        id: 'm_demo_2',
+        name: 'robotics_symposium_booth.jpg',
+        size: '2.1 MB',
+        type: 'image',
+        url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
+      },
+    ],
+    author: {
+      name: 'Dev Roy',
+      handle: '@devroy',
+      avatar: '',
+      institution: 'IAS Collaboration Network',
+      course: 'B.Tech - Computer Science',
+    },
+    status: 'approved',
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'post_sample_2',
+    title: 'Smart Health Monitoring IoT Prototype',
+    caption: 'Completed the hardware prototype for real-time cardiac tele-monitoring. Ready for pilot testing with the University Healthcare wing.',
+    category: 'Technical Achievement',
+    aspectRatio: '1:1',
+    media: [
+      {
+        id: 'm_demo_3',
+        name: 'iot_pcb_prototype.jpg',
+        size: '3.4 MB',
+        type: 'image',
+        url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&auto=format&fit=crop&q=80',
+      },
+    ],
+    author: {
+      name: 'Dev Roy',
+      handle: '@devroy',
+      avatar: '',
+      institution: 'IAS Collaboration Network',
+      course: 'B.Tech - Computer Science',
+    },
+    status: 'pending',
+    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'post_sample_3',
+    title: 'Inter-College Hackathon 1st Runner Up',
+    caption: 'Team UDAAN secured 2nd place among 120 engineering teams at Smart Hack 2026. Built an AI triage assistant for rural health centres.',
+    category: 'Technical Achievement',
+    aspectRatio: '4:5',
+    media: [
+      {
+        id: 'm_demo_4',
+        name: 'hackathon_trophy.jpg',
+        size: '1.8 MB',
+        type: 'image',
+        url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop&q=80',
+      },
+    ],
+    author: {
+      name: 'Dev Roy',
+      handle: '@devroy',
+      avatar: '',
+      institution: 'IAS Collaboration Network',
+      course: 'B.Tech - Computer Science',
+    },
+    status: 'revision',
+    rejectionReason: 'Please attach a higher resolution photo of the official institutional certificate or tag team members.',
+    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+]
+
+export default function PublicPost({
+  student = {},
+  onBack,
+  onNavigateHome,
+}) {
+  // Student metadata with reliable fallbacks
+  const s = {
+    name: student?.name || 'Verified Student Member',
+    email: student?.email || 'student@institution.edu',
+    handle: student?.email ? `@${student.email.split('@')[0]}` : '@student',
+    profilePic: student?.profilePic || '',
+    institution: student?.institution || 'IAS Collaboration Portal',
+    branch: student?.branch || student?.course || 'Engineering & Technology',
+  }
+
+  // Posts State (synced with localStorage key 'udaan_student_posts')
+  const [posts, setPosts] = useState(() => {
+    try {
+      const saved = localStorage.getItem('udaan_student_posts')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed
+      }
+    } catch {}
+    return DEFAULT_POSTS
+  })
+
+  // Persist posts changes to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('udaan_student_posts', JSON.stringify(posts))
+    } catch {}
+  }, [posts])
+
+  // Form State
+  const [mediaList, setMediaList] = useState([]) // [{ id, name, size, type: 'image'|'video', url, croppedUrl, file }]
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0)
+  const [aspectRatio, setAspectRatio] = useState('1:1') // '1:1' | '4:5' | '16:9'
+  const [category, setCategory] = useState('Technical Achievement')
+  const [description, setDescription] = useState('')
+  const [isDraggingOver, setIsDraggingOver] = useState(false)
+  const [fileError, setFileError] = useState('')
+  const [validationError, setValidationError] = useState('')
+  const [editingPostId, setEditingPostId] = useState(null)
+
+  // Sub-modals & Lightboxes
+  const [lightboxMedia, setLightboxMedia] = useState(null)
+  const [croppingItem, setCroppingItem] = useState(null)
+  const [confirmationPost, setConfirmationPost] = useState(null)
+
+  // Filter state for Recent Posts
+  const [recentFilter, setRecentFilter] = useState('all') // 'all' | 'pending' | 'approved' | 'revision'
+
+  // Refs
+  const initialDropInputRef = useRef(null)
+  const addMoreInputRef = useRef(null)
+  const replaceInputRef = useRef(null)
+  const replacingIndexRef = useRef(null)
+  const objectUrlsRef = useRef([])
+  const recentSectionRef = useRef(null)
+  const mainFormRef = useRef(null)
+
+  // Blob URL cleanup helper
+  const createTrackedBlobUrl = (file) => {
+    const url = URL.createObjectURL(file)
+    objectUrlsRef.current.push(url)
+    return url
+  }
+
+  useEffect(() => {
+    const activeUrls = objectUrlsRef.current
+    return () => {
+      activeUrls.forEach((url) => {
+        try {
+          URL.revokeObjectURL(url)
+        } catch {}
+      })
+    }
+  }, [])
+
+  // File size formatting helper
+  const formatFileSize = (bytes) => {
+    if (!bytes || bytes === 0) return '0 KB'
+    const k = 1024
+    if (bytes >= k * k) {
+      return `${(bytes / (k * k)).toFixed(1)} MB`
+    }
+    return `${Math.round(bytes / k)} KB`
+  }
+
+  // Handle file uploads (Photos & Videos)
+  const handleProcessFiles = (fileList, isAppend = true) => {
+    if (!fileList || fileList.length === 0) return
+    setFileError('')
+    setValidationError('')
+
+    const allowedImgExts = ['.jpg', '.jpeg', '.png', '.webp']
+    const allowedVidExts = ['.mp4', '.webm', '.mov', '.ogg']
+    const maxImgSize = 15 * 1024 * 1024 // 15MB
+    const maxVidSize = 60 * 1024 * 1024 // 60MB
+
+    const newMediaItems = []
+    let encounteredError = ''
+
+    Array.from(fileList).forEach((file) => {
+      const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase()
+      const isImage = file.type.startsWith('image/') || allowedImgExts.includes(ext)
+      const isVideo = file.type.startsWith('video/') || allowedVidExts.includes(ext)
+
+      if (!isImage && !isVideo) {
+        encounteredError = `"${file.name}" is not supported. Please upload photos (JPG, PNG, WEBP) or videos (MP4, WebM, MOV).`
+        return
+      }
+
+      if (isImage && file.size > maxImgSize) {
+        encounteredError = `"${file.name}" exceeds 15MB photo limit (${formatFileSize(file.size)}).`
+        return
+      }
+
+      if (isVideo && file.size > maxVidSize) {
+        encounteredError = `"${file.name}" exceeds 60MB video limit (${formatFileSize(file.size)}).`
+        return
+      }
+
+      const objectUrl = createTrackedBlobUrl(file)
+      newMediaItems.push({
+        id: `m_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+        name: file.name,
+        size: formatFileSize(file.size),
+        type: isImage ? 'image' : 'video',
+        url: objectUrl,
+        croppedUrl: null,
+        file,
+      })
+    })
+
+    if (encounteredError) {
+      setFileError(encounteredError)
+    }
+
+    if (newMediaItems.length > 0) {
+      if (isAppend) {
+        setMediaList((prev) => {
+          const combined = [...prev, ...newMediaItems]
+          setActiveMediaIndex(combined.length - 1)
+          return combined
+        })
+      } else {
+        setMediaList(newMediaItems)
+        setActiveMediaIndex(0)
+      }
+    }
+  }
+
+  // Replace a specific uploaded media item
+  const handleOpenReplace = (index) => {
+    replacingIndexRef.current = index
+    if (replaceInputRef.current) {
+      replaceInputRef.current.value = ''
+      replaceInputRef.current.click()
+    }
+  }
+
+  const handleExecuteReplace = (e) => {
+    const file = e.target.files?.[0]
+    const idx = replacingIndexRef.current
+    if (!file || idx === null || idx === undefined) return
+    setFileError('')
+
+    const allowedImgExts = ['.jpg', '.jpeg', '.png', '.webp']
+    const allowedVidExts = ['.mp4', '.webm', '.mov', '.ogg']
+    const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase()
+    const isImage = file.type.startsWith('image/') || allowedImgExts.includes(ext)
+    const isVideo = file.type.startsWith('video/') || allowedVidExts.includes(ext)
+
+    if (!isImage && !isVideo) {
+      setFileError('Invalid file format. Please choose a valid photo (JPG, PNG) or video (MP4, WebM).')
+      return
+    }
+
+    const objectUrl = createTrackedBlobUrl(file)
+    const replacement = {
+      id: `m_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+      name: file.name,
+      size: formatFileSize(file.size),
+      type: isImage ? 'image' : 'video',
+      url: objectUrl,
+      croppedUrl: null,
+      file,
+    }
+
+    setMediaList((prev) =>
+      prev.map((item, i) => (i === idx ? replacement : item))
+    )
+  }
+
+  // Delete an uploaded media item
+  const handleDeleteMedia = (indexToDelete) => {
+    setMediaList((prev) => {
+      const filtered = prev.filter((_, idx) => idx !== indexToDelete)
+      if (activeMediaIndex >= filtered.length) {
+        setActiveMediaIndex(Math.max(0, filtered.length - 1))
+      }
+      return filtered
+    })
+  }
+
+  // Apply photo crop from ImageCropModal
+  const handleCropApply = (croppedDataUrl) => {
+    if (!croppingItem) return
+    setMediaList((prev) =>
+      prev.map((item) =>
+        item.id === croppingItem.id
+          ? { ...item, croppedUrl: croppedDataUrl }
+          : item
+      )
+    )
+    setCroppingItem(null)
+  }
+
+  // Form Reset
+  const handleResetForm = () => {
+    setMediaList([])
+    setActiveMediaIndex(0)
+    setDescription('')
+    setAspectRatio('1:1')
+    setCategory('Technical Achievement')
+    setFileError('')
+    setValidationError('')
+    setEditingPostId(null)
+  }
+
+  // Submit Post for Admin Verification
+  const handleSubmitPost = () => {
+    setValidationError('')
+    setFileError('')
+
+    // Validation 1: At least 1 photo or video required
+    if (mediaList.length === 0) {
+      setValidationError('Please upload at least one photo or video before submitting.')
+      return
+    }
+
+    // Validation 2: Description is strictly required
+    if (!description.trim()) {
+      setValidationError('Please write a description for your post before submitting.')
+      return
+    }
+
+    const newPost = {
+      id: editingPostId || `post_${Date.now()}`,
+      title: description.trim().slice(0, 50) + (description.trim().length > 50 ? '...' : ''),
+      caption: description.trim(),
+      content: description.trim(),
+      category,
+      aspectRatio,
+      media: mediaList.map((m) => ({
+        id: m.id,
+        name: m.name,
+        size: m.size,
+        type: m.type,
+        url: m.croppedUrl || m.url,
+      })),
+      author: {
+        name: s.name,
+        handle: s.handle,
+        avatar: s.profilePic,
+        institution: s.institution,
+        course: s.branch,
+      },
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      updatedAt: editingPostId ? new Date().toISOString() : null,
+    }
+
+    if (editingPostId) {
+      setPosts((prev) => prev.map((p) => (p.id === editingPostId ? newPost : p)))
+    } else {
+      setPosts((prev) => [newPost, ...prev])
+    }
+
+    // Push notification to student notifications
+    try {
+      const savedNotifs = JSON.parse(localStorage.getItem('udaan_student_notifications') || '[]')
+      const notif = {
+        id: `n_${Date.now()}`,
+        type: 'info',
+        title: 'Public Post Submitted for Verification',
+        message: `Your post "${newPost.title}" has been submitted for moderation review by Portal Admin.`,
+        timestamp: 'Just now',
+        read: false,
+      }
+      localStorage.setItem('udaan_student_notifications', JSON.stringify([notif, ...savedNotifs]))
+    } catch {}
+
+    // Show Confirmation State Modal
+    setConfirmationPost(newPost)
+    handleResetForm()
+  }
+
+  // Load a post into form for revision
+  const handleLoadForRevision = (post) => {
+    setEditingPostId(post.id)
+    setDescription(post.caption || post.content || '')
+    setCategory(post.category || 'Technical Achievement')
+    setAspectRatio(post.aspectRatio || '1:1')
+
+    if (Array.isArray(post.media) && post.media.length > 0) {
+      setMediaList(post.media.map((m) => ({ ...m })))
+    } else {
+      setMediaList([])
+    }
+    setActiveMediaIndex(0)
+    setValidationError('')
+    setFileError('')
+
+    // Scroll to form
+    mainFormRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  // Delete an existing post
+  const handleDeleteExistingPost = (postId) => {
+    if (window.confirm('Are you sure you want to delete this public post?')) {
+      setPosts((prev) => prev.filter((p) => p.id !== postId))
+    }
+  }
+
+  // Filtered recent posts
+  const filteredPosts = posts.filter((p) => {
+    if (recentFilter === 'all') return true
+    if (recentFilter === 'approved') return p.status === 'approved' || p.status === 'verified'
+    if (recentFilter === 'revision') return p.status === 'revision' || p.status === 'rejected'
+    return p.status === recentFilter
+  })
+
+  // Current active media for preview carousel
+  const activeMediaItem = mediaList[activeMediaIndex] || mediaList[0]
+
+  return (
+    <div className="pp-page-wrapper">
+      {/* Hidden File Inputs */}
+      <input
+        type="file"
+        ref={initialDropInputRef}
+        multiple
+        accept="image/*,video/*"
+        style={{ display: 'none' }}
+        onChange={(e) => handleProcessFiles(e.target.files, false)}
+      />
+      <input
+        type="file"
+        ref={addMoreInputRef}
+        multiple
+        accept="image/*,video/*"
+        style={{ display: 'none' }}
+        onChange={(e) => handleProcessFiles(e.target.files, true)}
+      />
+      <input
+        type="file"
+        ref={replaceInputRef}
+        accept="image/*,video/*"
+        style={{ display: 'none' }}
+        onChange={handleExecuteReplace}
+      />
+
+      {/* TOP NAVBAR */}
+      <header className="pp-top-navbar" aria-label="Portal Header">
+        <div className="pp-nav-left">
+          <button
+            type="button"
+            className="pp-nav-back-btn"
+            onClick={onBack}
+            title="Return to Student Dashboard"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+            Back to Dashboard
+          </button>
+
+          <div className="pp-nav-brand">
+            <span className="pp-nav-brand-bold">IAS Collaboration Portal</span>
+            <span className="pp-nav-slash">/</span>
+            <span>Student Portal</span>
+            <span className="pp-nav-slash">/</span>
+            <span className="pp-nav-active-tag">Create Public Post</span>
+          </div>
+        </div>
+
+        <div className="pp-nav-right">
+          <div className="pp-nav-user-chip">
+            {s.profilePic ? (
+              <img src={s.profilePic} alt={s.name} className="pp-nav-avatar" />
+            ) : (
+              <div className="pp-nav-avatar">
+                {s.name.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <div className="pp-nav-user-meta">
+              <span className="pp-nav-user-name">{s.name}</span>
+              <span className="pp-nav-user-sub">{s.branch}</span>
+            </div>
+          </div>
+
+          {onNavigateHome && (
+            <button
+              type="button"
+              className="pp-nav-back-btn"
+              onClick={onNavigateHome}
+              title="Return to Portal Home"
+              style={{ background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.15)' }}
+            >
+              Exit
+            </button>
+          )}
+        </div>
+      </header>
+
+      {/* MAIN BODY CONTAINER */}
+      <main className="pp-main-content">
+        {/* 1. PAGE HEADER */}
+        <section className="pp-header-card" aria-label="Page Header">
+          <div className="pp-header-title-group">
+            <div className="pp-header-title-row">
+              <div className="pp-header-title-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                </svg>
+              </div>
+              <h1 className="pp-header-title">Create Public Post</h1>
+              <span className="pp-header-badge">Admin Moderation Enforced</span>
+            </div>
+            <p className="pp-header-subtitle">
+              Publish academic breakthroughs, capstone projects, research publications, and competition wins. Every submission is carefully reviewed by the Portal Admin before becoming publicly visible on the community portfolio.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="pp-header-back-btn"
+            onClick={onBack}
+            title="Return to Student Dashboard"
+          >
+            ← Back to Dashboard
+          </button>
+        </section>
+
+        {/* 2-COLUMN WORKSPACE GRID: FORM (LEFT) + GUIDELINES & PREVIEW (RIGHT) */}
+        <div className="pp-workspace-grid" ref={mainFormRef}>
+          {/* ================================================================
+              LEFT COLUMN: COMPOSER FORM
+              ================================================================ */}
+          <div className="pp-form-column">
+            {/* Revision Notice Banner if editing */}
+            {editingPostId && (
+              <div className="pp-alert-banner success" style={{ background: '#fef3c7', borderColor: '#fcd34d', color: '#92400e' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                </svg>
+                <span>Revising Post for Resubmission. Once submitted, it will be re-audited by Portal Admin.</span>
+                <button
+                  type="button"
+                  onClick={handleResetForm}
+                  style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: '#92400e', cursor: 'pointer', fontWeight: 700, textDecoration: 'underline' }}
+                >
+                  Cancel Edit
+                </button>
+              </div>
+            )}
+
+            {/* Validation & File Errors */}
+            {fileError && (
+              <div className="pp-alert-banner error" role="alert">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <span>{fileError}</span>
+              </div>
+            )}
+
+            {validationError && (
+              <div className="pp-alert-banner error" role="alert">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <span>{validationError}</span>
+              </div>
+            )}
+
+            {/* --------------------------------------------------------------
+                SECTION 2: ADD MEDIA
+                -------------------------------------------------------------- */}
+            <div className="pp-card">
+              <div className="pp-card-header">
+                <div className="pp-card-title-group">
+                  <span className="pp-card-step-badge">1</span>
+                  <h2 className="pp-card-title">Add Media</h2>
+                </div>
+                <span className="pp-card-badge">
+                  {mediaList.length} {mediaList.length === 1 ? 'file' : 'files'} selected • Photos & Videos
+                </span>
+              </div>
+
+              {mediaList.length === 0 ? (
+                /* Empty Dropzone */
+                <div
+                  className={`pp-dropzone ${isDraggingOver ? 'is-dragging' : ''}`}
+                  onDragOver={(e) => {
+                    e.preventDefault()
+                    setIsDraggingOver(true)
+                  }}
+                  onDragLeave={() => setIsDraggingOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    setIsDraggingOver(false)
+                    handleProcessFiles(e.dataTransfer.files, false)
+                  }}
+                  onClick={() => initialDropInputRef.current?.click()}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Upload photos and videos"
+                >
+                  <div className="pp-drop-icon-wrap">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                      <circle cx="12" cy="13" r="4" />
+                    </svg>
+                  </div>
+                  <h3 className="pp-drop-title">Upload Photos & Videos</h3>
+                  <p className="pp-drop-subtitle">
+                    Select multiple photos (JPG, PNG, WEBP) or videos (MP4, WebM, MOV). You can upload multiple media files together in a single post.
+                  </p>
+                  <button type="button" className="pp-btn-browse">
+                    Browse Media Files
+                  </button>
+                </div>
+              ) : (
+                /* Uploaded Media Thumbnails Grid with Actions */
+                <div className="pp-media-section">
+                  <div className="pp-media-grid">
+                    {mediaList.map((item, idx) => (
+                      <div
+                        key={item.id}
+                        className="pp-media-item-card"
+                        style={{
+                          borderColor: idx === activeMediaIndex ? '#b3881e' : '#e2e8f0',
+                        }}
+                      >
+                        {/* Media Preview Box */}
+                        <div
+                          className="pp-media-preview-box"
+                          onClick={() => setActiveMediaIndex(idx)}
+                          style={{ cursor: 'pointer' }}
+                          title="Click to preview on social card"
+                        >
+                          {item.type === 'video' ? (
+                            <>
+                              <video src={item.url} className="pp-media-video" />
+                              <div className="pp-media-video-overlay-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                  <polygon points="5 3 19 12 5 21 5 3" />
+                                </svg>
+                              </div>
+                            </>
+                          ) : (
+                            <img
+                              src={item.croppedUrl || item.url}
+                              alt={item.name}
+                              className="pp-media-img"
+                            />
+                          )}
+
+                          <span className="pp-media-type-tag">
+                            {item.type === 'video' ? '▶ Video' : '📷 Photo'}
+                          </span>
+                        </div>
+
+                        {/* Card Body & Actions */}
+                        <div className="pp-media-card-body">
+                          <div className="pp-media-info">
+                            <span className="pp-media-name" title={item.name}>
+                              {item.name}
+                            </span>
+                            <span className="pp-media-size">{item.size}</span>
+                          </div>
+
+                          {/* Action Buttons: View, Crop/Adjust, Replace, Delete */}
+                          <div className="pp-media-actions-bar">
+                            <button
+                              type="button"
+                              className="pp-item-btn"
+                              onClick={() => setLightboxMedia(item)}
+                              title="View full size"
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                              </svg>
+                              View
+                            </button>
+
+                            {item.type === 'image' && (
+                              <button
+                                type="button"
+                                className="pp-item-btn crop"
+                                onClick={() => setCroppingItem(item)}
+                                title="Adjust and crop to format"
+                              >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                  <path d="M6.13 1L6 16a2 2 0 0 0 2 2h15" />
+                                  <path d="M1 6.13L16 6a2 2 0 0 1 2 2v15" />
+                                </svg>
+                                Crop
+                              </button>
+                            )}
+
+                            <button
+                              type="button"
+                              className="pp-item-btn"
+                              onClick={() => handleOpenReplace(idx)}
+                              title="Replace this media item"
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                <polyline points="23 4 23 10 17 10" />
+                                <polyline points="1 20 1 14 7 14" />
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                              </svg>
+                              Replace
+                            </button>
+
+                            <button
+                              type="button"
+                              className="pp-item-btn danger"
+                              onClick={() => handleDeleteMedia(idx)}
+                              title="Delete this media"
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                              </svg>
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Add More Media Action Card */}
+                    <div
+                      className="pp-add-more-card"
+                      onClick={() => addMoreInputRef.current?.click()}
+                      role="button"
+                      tabIndex={0}
+                      title="Upload additional photos or videos"
+                    >
+                      <div className="pp-add-more-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <line x1="12" y1="5" x2="12" y2="19" />
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                      </div>
+                      <span className="pp-add-more-text">Add More</span>
+                      <span className="pp-add-more-sub">Photos or Videos</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* --------------------------------------------------------------
+                SECTION 3: CHOOSE POST FORMAT
+                -------------------------------------------------------------- */}
+            <div className="pp-card">
+              <div className="pp-card-header">
+                <div className="pp-card-title-group">
+                  <span className="pp-card-step-badge">2</span>
+                  <h2 className="pp-card-title">Choose Post Format</h2>
+                </div>
+                <span className="pp-card-badge">Selected: {aspectRatio}</span>
+              </div>
+
+              <div className="pp-format-grid" role="radiogroup" aria-label="Post Format Options">
+                {/* Format 1: Square (1:1) */}
+                <div
+                  className={`pp-format-option-card ${aspectRatio === '1:1' ? 'is-active' : ''}`}
+                  onClick={() => setAspectRatio('1:1')}
+                  role="radio"
+                  aria-checked={aspectRatio === '1:1'}
+                  tabIndex={0}
+                >
+                  <div className="pp-format-ratio-glyph pp-format-glyph-square" />
+                  <div className="pp-format-name">Square</div>
+                  <div className="pp-format-ratio-pill">1:1</div>
+                  <div className="pp-format-desc">Standard balanced format for certificates & highlights</div>
+                </div>
+
+                {/* Format 2: Portrait (4:5) */}
+                <div
+                  className={`pp-format-option-card ${aspectRatio === '4:5' ? 'is-active' : ''}`}
+                  onClick={() => setAspectRatio('4:5')}
+                  role="radio"
+                  aria-checked={aspectRatio === '4:5'}
+                  tabIndex={0}
+                >
+                  <div className="pp-format-ratio-glyph pp-format-glyph-portrait" />
+                  <div className="pp-format-name">Portrait</div>
+                  <div className="pp-format-ratio-pill">4:5</div>
+                  <div className="pp-format-desc">Tall vertical format for posters, banners & mobile feeds</div>
+                </div>
+
+                {/* Format 3: Landscape (16:9) */}
+                <div
+                  className={`pp-format-option-card ${aspectRatio === '16:9' ? 'is-active' : ''}`}
+                  onClick={() => setAspectRatio('16:9')}
+                  role="radio"
+                  aria-checked={aspectRatio === '16:9'}
+                  tabIndex={0}
+                >
+                  <div className="pp-format-ratio-glyph pp-format-glyph-landscape" />
+                  <div className="pp-format-name">Landscape</div>
+                  <div className="pp-format-ratio-pill">16:9</div>
+                  <div className="pp-format-desc">Widescreen format for presentation slides & video demos</div>
+                </div>
+              </div>
+            </div>
+
+            {/* --------------------------------------------------------------
+                SECTION 4: WRITE DESCRIPTION
+                -------------------------------------------------------------- */}
+            <div className="pp-card">
+              <div className="pp-card-header">
+                <div className="pp-card-title-group">
+                  <span className="pp-card-step-badge">3</span>
+                  <h2 className="pp-card-title">Write Description</h2>
+                </div>
+                <span className="pp-required-tag">* Required</span>
+              </div>
+
+              <div className="pp-description-group">
+                {/* Category Selection */}
+                <div className="pp-category-row">
+                  <label htmlFor="pp-category-select" className="pp-category-label">
+                    Achievement Category:
+                  </label>
+                  <select
+                    id="pp-category-select"
+                    className="pp-category-select"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                  >
+                    <option value="Technical Achievement">Technical Achievement & Hackathons</option>
+                    <option value="Academic Research">Academic Research & Publications</option>
+                    <option value="Open Source Project">Open Source & Software Release</option>
+                    <option value="Internship Experience">Internship & Industry Experience</option>
+                    <option value="Campus Initiative">Campus Initiative & Leadership</option>
+                  </select>
+                </div>
+
+                {/* Textarea & Counter */}
+                <div className="pp-textarea-wrap">
+                  <textarea
+                    id="pp-description-textarea"
+                    className={`pp-textarea ${validationError && !description.trim() ? 'is-invalid' : ''}`}
+                    placeholder="Write a clear description about this public post. Highlight the methodology, findings, honors received, or collaborative contributions..."
+                    value={description}
+                    onChange={(e) => {
+                      setDescription(e.target.value)
+                      if (validationError && e.target.value.trim()) {
+                        setValidationError('')
+                      }
+                    }}
+                    maxLength={1200}
+                    rows={4}
+                  />
+
+                  <div className="pp-textarea-footer">
+                    <span>
+                      {validationError && !description.trim() ? (
+                        <span style={{ color: '#dc2626', fontWeight: 600 }}>Description is required</span>
+                      ) : (
+                        'Provide meaningful academic context'
+                      )}
+                    </span>
+                    <span>{description.length} / 1200 characters</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* --------------------------------------------------------------
+                SECTION 5: SUBMIT POST
+                -------------------------------------------------------------- */}
+            <div className="pp-submit-section">
+              <div className="pp-submit-action-row">
+                <button
+                  type="button"
+                  id="pp-submit-btn"
+                  className="pp-btn-submit"
+                  onClick={handleSubmitPost}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                  </svg>
+                  Submit for Admin Verification
+                </button>
+
+                <button
+                  type="button"
+                  className="pp-btn-cancel"
+                  onClick={onBack}
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <div className="pp-submit-note">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b3881e" strokeWidth="2.4">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="16" x2="12" y2="12" />
+                  <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg>
+                <span>
+                  <strong>Admin Verification Standard:</strong> Your post will become publicly visible across the institutional network only after formal review and approval by the Portal Admin.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* ================================================================
+              RIGHT COLUMN: POST GUIDELINES & LIVE SOCIAL PREVIEW
+              ================================================================ */}
+          <div className="pp-sidebar-column">
+            {/* --------------------------------------------------------------
+                SECTION 6: POST GUIDELINES
+                -------------------------------------------------------------- */}
+            <div className="pp-guidelines-card">
+              <div className="pp-guidelines-header">
+                <div className="pp-guidelines-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                </div>
+                <h3 className="pp-guidelines-title">Post Guidelines</h3>
+              </div>
+
+              <ul className="pp-guidelines-list">
+                <li className="pp-guideline-item">
+                  <span className="pp-guideline-bullet check">✓</span>
+                  <div>
+                    <strong>Multiple Media Support:</strong> Multiple photos and videos can be uploaded together in a single post.
+                  </div>
+                </li>
+
+                <li className="pp-guideline-item">
+                  <span className="pp-guideline-bullet check">✓</span>
+                  <div>
+                    <strong>Supported Media Formats:</strong> Images (JPG, PNG, WEBP up to 15MB) and Videos (MP4, WebM, MOV up to 60MB).
+                  </div>
+                </li>
+
+                <li className="pp-guideline-item">
+                  <span className="pp-guideline-bullet check">✓</span>
+                  <div>
+                    <strong>Select Appropriate Format:</strong> Choose 1:1 Square, 4:5 Portrait, or 16:9 Landscape to showcase your media optimally.
+                  </div>
+                </li>
+
+                <li className="pp-guideline-item">
+                  <span className="pp-guideline-bullet check">✓</span>
+                  <div>
+                    <strong>Meaningful Description:</strong> Detail research methodology, conference title, competition results, or team credits.
+                  </div>
+                </li>
+
+                <li className="pp-guideline-item">
+                  <span className="pp-guideline-bullet shield">🛡️</span>
+                  <div>
+                    <strong>Admin Verification:</strong> Every post is audited by the Portal Admin before being published publicly.
+                  </div>
+                </li>
+
+                <li className="pp-guideline-item">
+                  <span className="pp-guideline-bullet shield">🛡️</span>
+                  <div>
+                    <strong>Public Visibility:</strong> Only verified posts appear on the institutional portfolio and recruiter showcase.
+                  </div>
+                </li>
+
+                <li className="pp-guideline-item">
+                  <span className="pp-guideline-bullet">✕</span>
+                  <div>
+                    <strong>Appropriate Content Only:</strong> Do not upload plagiarized, misleading, or irrelevant non-academic content.
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            {/* --------------------------------------------------------------
+                SECTION 7: SOCIAL-MEDIA LIVE PREVIEW
+                -------------------------------------------------------------- */}
+            <div className="pp-preview-card">
+              <div className="pp-preview-card-header">
+                <div className="pp-preview-card-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  Live Social Preview
+                </div>
+                <div className="pp-preview-live-badge">
+                  <span className="pp-preview-live-dot" />
+                  Live Sync
+                </div>
+              </div>
+
+              {/* Feed Simulation Card */}
+              <div className="pp-social-post-box">
+                {/* Author Header */}
+                <div className="pp-post-author-row">
+                  <div className="pp-author-left">
+                    {s.profilePic ? (
+                      <img src={s.profilePic} alt={s.name} className="pp-author-avatar" />
+                    ) : (
+                      <div className="pp-author-avatar">
+                        {s.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="pp-author-meta">
+                      <div className="pp-author-name">
+                        {s.name}
+                        <span className="pp-author-verified-badge" title="Verified Student Author">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="#2563eb">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                          </svg>
+                        </span>
+                      </div>
+                      <div className="pp-author-sub">
+                        {s.handle} • {s.branch}
+                      </div>
+                    </div>
+                  </div>
+
+                  <span className="pp-post-status-pill">
+                    Pending Verification
+                  </span>
+                </div>
+
+                {/* Media Viewport with Chosen Aspect Ratio */}
+                <div className={`pp-preview-stage-container aspect-${aspectRatio.replace(':', '-')}`}>
+                  {mediaList.length > 0 ? (
+                    <>
+                      {/* Active Media Renderer */}
+                      {activeMediaItem?.type === 'video' ? (
+                        <div className="pp-preview-video-wrap">
+                          <video
+                            src={activeMediaItem.url}
+                            controls
+                            playsInline
+                            className="pp-preview-video"
+                            key={activeMediaItem.url}
+                          />
+                        </div>
+                      ) : (
+                        <img
+                          src={activeMediaItem?.croppedUrl || activeMediaItem?.url}
+                          alt={activeMediaItem?.name || 'Preview'}
+                          className="pp-preview-img"
+                        />
+                      )}
+
+                      {/* Navigation Overlays if Multiple Media Files */}
+                      {mediaList.length > 1 && (
+                        <>
+                          <button
+                            type="button"
+                            className="pp-preview-nav-btn prev"
+                            onClick={() =>
+                              setActiveMediaIndex((prev) =>
+                                prev > 0 ? prev - 1 : mediaList.length - 1
+                              )
+                            }
+                            aria-label="Previous media"
+                          >
+                            ‹
+                          </button>
+
+                          <button
+                            type="button"
+                            className="pp-preview-nav-btn next"
+                            onClick={() =>
+                              setActiveMediaIndex((prev) =>
+                                prev < mediaList.length - 1 ? prev + 1 : 0
+                              )
+                            }
+                            aria-label="Next media"
+                          >
+                            ›
+                          </button>
+
+                          <div className="pp-preview-pagination-badge">
+                            {activeMediaIndex + 1} / {mediaList.length}
+                          </div>
+
+                          <div className="pp-preview-dots-row">
+                            {mediaList.map((_, dotIdx) => (
+                              <span
+                                key={dotIdx}
+                                className={`pp-preview-dot ${dotIdx === activeMediaIndex ? 'is-active' : ''}`}
+                                onClick={() => setActiveMediaIndex(dotIdx)}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    /* Clean Placeholder when no media uploaded */
+                    <div className="pp-preview-empty-stage">
+                      <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                        <circle cx="8.5" cy="8.5" r="1.5" />
+                        <polyline points="21 15 16 10 5 21" />
+                      </svg>
+                      <span>Media Preview Frame ({aspectRatio})</span>
+                      <small style={{ fontSize: '0.72rem', color: '#64748b' }}>
+                        Uploaded photos & videos will display here
+                      </small>
+                    </div>
+                  )}
+                </div>
+
+                {/* Social Card Body / Description */}
+                <div className="pp-social-body">
+                  <span className="pp-social-category-tag">{category}</span>
+
+                  <p className="pp-social-description">
+                    {description.trim() ? (
+                      description
+                    ) : (
+                      <span className="pp-social-description-placeholder">
+                        Your post description will appear here in real time...
+                      </span>
+                    )}
+                  </p>
+
+                  <div className="pp-social-timestamp">
+                    Just now • Institutional Public Feed
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ==================================================================
+            SECTION 8: YOUR RECENT POSTS
+            ================================================================== */}
+        <section className="pp-recent-section" ref={recentSectionRef} aria-label="Recent Public Posts">
+          <div className="pp-recent-header">
+            <div className="pp-recent-title-wrap">
+              <h2 className="pp-recent-title">Your Recent Posts</h2>
+              <span className="pp-recent-count-badge">{posts.length}</span>
+            </div>
+
+            {/* Filter Pills */}
+            <div className="pp-recent-filter-pills" role="tablist">
+              <button
+                type="button"
+                className={`pp-filter-pill ${recentFilter === 'all' ? 'is-active' : ''}`}
+                onClick={() => setRecentFilter('all')}
+              >
+                All ({posts.length})
+              </button>
+              <button
+                type="button"
+                className={`pp-filter-pill ${recentFilter === 'pending' ? 'is-active' : ''}`}
+                onClick={() => setRecentFilter('pending')}
+              >
+                Pending ({posts.filter((p) => p.status === 'pending').length})
+              </button>
+              <button
+                type="button"
+                className={`pp-filter-pill ${recentFilter === 'approved' ? 'is-active' : ''}`}
+                onClick={() => setRecentFilter('approved')}
+              >
+                Verified ({posts.filter((p) => p.status === 'approved' || p.status === 'verified').length})
+              </button>
+              <button
+                type="button"
+                className={`pp-filter-pill ${recentFilter === 'revision' ? 'is-active' : ''}`}
+                onClick={() => setRecentFilter('revision')}
+              >
+                Needs Revision ({posts.filter((p) => p.status === 'revision' || p.status === 'rejected').length})
+              </button>
+            </div>
+          </div>
+
+          {filteredPosts.length === 0 ? (
+            <div className="pp-empty-recent">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.8">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <span>No posts found under the &quot;{recentFilter}&quot; filter.</span>
+            </div>
+          ) : (
+            <div className="pp-recent-grid">
+              {filteredPosts.map((post) => {
+                const postMediaList = Array.isArray(post.media) && post.media.length > 0 ? post.media : []
+                const firstMedia = postMediaList[0]
+                const status = post.status || 'pending'
+
+                return (
+                  <div key={post.id} className="pp-recent-card">
+                    {/* Thumbnail Row */}
+                    <div
+                      className="pp-recent-thumb-row"
+                      onClick={() => firstMedia && setLightboxMedia(firstMedia)}
+                      style={{ cursor: firstMedia ? 'pointer' : 'default' }}
+                    >
+                      {firstMedia ? (
+                        firstMedia.type === 'video' ? (
+                          <>
+                            <video src={firstMedia.url} className="pp-recent-thumb-img" />
+                            <div className="pp-media-video-overlay-icon">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <polygon points="5 3 19 12 5 21 5 3" />
+                              </svg>
+                            </div>
+                          </>
+                        ) : (
+                          <img
+                            src={firstMedia.url}
+                            alt={post.title}
+                            className="pp-recent-thumb-img"
+                          />
+                        )
+                      ) : (
+                        <div className="pp-recent-thumb-placeholder">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                            <circle cx="8.5" cy="8.5" r="1.5" />
+                            <polyline points="21 15 16 10 5 21" />
+                          </svg>
+                          <span>No Media</span>
+                        </div>
+                      )}
+
+                      {/* Status Pill */}
+                      <span className={`pp-recent-status-pill ${status}`}>
+                        {status === 'pending' && 'Pending Verification'}
+                        {(status === 'approved' || status === 'verified') && '✓ Verified'}
+                        {(status === 'revision' || status === 'rejected') && 'Needs Revision'}
+                        {status === 'draft' && 'Draft'}
+                      </span>
+                    </div>
+
+                    {/* Card Content */}
+                    <div className="pp-recent-card-body">
+                      <div className="pp-recent-meta-line">
+                        <span>{post.category}</span>
+                        <span>•</span>
+                        <span>{post.aspectRatio || '1:1'}</span>
+                        <span>•</span>
+                        <span>{post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Recent'}</span>
+                      </div>
+
+                      <p className="pp-recent-card-caption">
+                        {post.caption || post.content || post.title}
+                      </p>
+
+                      {/* Admin Revision Note if Needed */}
+                      {(status === 'revision' || status === 'rejected') && (
+                        <div className="pp-recent-revision-box">
+                          <strong>Admin Feedback:</strong> &quot;{post.rejectionReason || 'Please review image clarity and provide additional project documentation.'}&quot;
+                        </div>
+                      )}
+
+                      {/* Card Action Bar */}
+                      <div className="pp-recent-actions">
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          {firstMedia && (
+                            <button
+                              type="button"
+                              className="pp-recent-btn"
+                              onClick={() => setLightboxMedia(firstMedia)}
+                              title="View media"
+                            >
+                              View
+                            </button>
+                          )}
+
+                          {(status === 'revision' || status === 'rejected') && (
+                            <button
+                              type="button"
+                              className="pp-recent-btn revise"
+                              onClick={() => handleLoadForRevision(post)}
+                              title="Revise & Resubmit post"
+                            >
+                              Revise & Resubmit
+                            </button>
+                          )}
+                        </div>
+
+                        <button
+                          type="button"
+                          className="pp-recent-btn delete"
+                          onClick={() => handleDeleteExistingPost(post.id)}
+                          title="Delete post"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </section>
+      </main>
+
+      {/* ====================================================================
+          SUB-MODALS: CONFIRMATION STATE MODAL
+          ==================================================================== */}
+      {confirmationPost && (
+        <div className="pp-modal-overlay" onClick={() => setConfirmationPost(null)}>
+          <div className="pp-confirmation-card" onClick={(e) => e.stopPropagation()}>
+            <div className="pp-confirmation-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+
+            <h3 className="pp-confirmation-title">Post Submitted for Admin Verification!</h3>
+            <p className="pp-confirmation-desc">
+              Your public post has been successfully queued for moderation review. It is saved under <strong>Pending Verification</strong> and will become publicly visible once approved by Portal Admin.
+            </p>
+
+            <div className="pp-confirmation-actions">
+              <button
+                type="button"
+                className="pp-confirmation-btn primary"
+                onClick={() => {
+                  setConfirmationPost(null)
+                  recentSectionRef.current?.scrollIntoView({ behavior: 'smooth' })
+                }}
+              >
+                View in Recent Posts
+              </button>
+              <button
+                type="button"
+                className="pp-confirmation-btn secondary"
+                onClick={() => setConfirmationPost(null)}
+              >
+                Create Another Post
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          SUB-MODALS: IMAGE CROP MODAL (REUSED)
+          ==================================================================== */}
+      {croppingItem && (
+        <ImageCropModal
+          isOpen={Boolean(croppingItem)}
+          imageSrc={croppingItem.url}
+          fileName={croppingItem.name}
+          aspectRatio={aspectRatio}
+          shape="rect"
+          title={`Adjust & Crop Photo (${aspectRatio})`}
+          subtitle="Drag to reposition frame, use slider to zoom into the crop frame"
+          roleBadge="ASPECT RATIO CROP"
+          onCancel={() => setCroppingItem(null)}
+          onApply={handleCropApply}
+        />
+      )}
+
+      {/* ====================================================================
+          SUB-MODALS: FULLSCREEN MEDIA LIGHTBOX
+          ==================================================================== */}
+      {lightboxMedia && (
+        <div className="pp-modal-overlay" onClick={() => setLightboxMedia(null)}>
+          <div className="pp-lightbox-card" onClick={(e) => e.stopPropagation()}>
+            <div className="pp-lightbox-header">
+              <span>{lightboxMedia.name || 'Media Preview'}</span>
+              <button
+                type="button"
+                className="pp-lightbox-close"
+                onClick={() => setLightboxMedia(null)}
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="pp-lightbox-body">
+              {lightboxMedia.type === 'video' ? (
+                <video
+                  src={lightboxMedia.url}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="pp-lightbox-video"
+                />
+              ) : (
+                <img
+                  src={lightboxMedia.croppedUrl || lightboxMedia.url}
+                  alt={lightboxMedia.name}
+                  className="pp-lightbox-img"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

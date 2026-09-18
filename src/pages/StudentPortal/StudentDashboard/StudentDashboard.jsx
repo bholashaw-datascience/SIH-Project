@@ -19,6 +19,7 @@ export default function StudentDashboard({
   onNavigateHome,
   onLogout,
   onOpenAchievementsExperience,
+  onOpenPublicPost,
   verificationStatus = 'approved',
   rejectionReason = '',
 }) {
@@ -1702,7 +1703,13 @@ export default function StudentDashboard({
           <button
             type="button"
             className="sd-post-action-btn"
-            onClick={() => setIsPostModalOpen(true)}
+            onClick={() => {
+              if (onOpenPublicPost) {
+                onOpenPublicPost()
+              } else {
+                setIsPostModalOpen(true)
+              }
+            }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <line x1="12" y1="5" x2="12" y2="19" />
