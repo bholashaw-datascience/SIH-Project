@@ -21,6 +21,7 @@ export default function StudentDashboard({
   onOpenAchievementsExperience,
   onOpenPublicPost,
   onOpenInternships,
+  onOpenPlacements,
   verificationStatus = 'approved',
   rejectionReason = '',
 }) {
@@ -1062,8 +1063,14 @@ export default function StudentDashboard({
         /* Section 4 & 5: Action Gateways & Detailed Cards */
         .sd-gateways-grid {
           display: grid;
-          grid-template-columns: repeat(2, 1fr);
+          grid-template-columns: repeat(3, 1fr);
           gap: 16px;
+        }
+
+        @media (max-width: 1024px) {
+          .sd-gateways-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
         }
 
         @media (max-width: 768px) {
@@ -1644,6 +1651,45 @@ export default function StudentDashboard({
                   onOpenInternships()
                 } else {
                   setIsInternshipsModalOpen(true)
+                }
+              }}
+            >
+              Explore →
+            </button>
+          </div>
+
+          {/* Card: Placements */}
+          <div
+            className="sd-gateway-card featured"
+            onClick={() => {
+              if (onOpenPlacements) {
+                onOpenPlacements()
+              }
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div className="sd-gw-icon" style={{ background: '#f0fdf4', color: '#166534' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                  <line x1="12" y1="11" x2="12" y2="17" />
+                  <line x1="9" y1="14" x2="15" y2="14" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="sd-gw-title">Placements</h4>
+                <p className="sd-gw-desc">
+                  Explore full-time campus recruitment drives, CTC packages, and corporate schedules.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="sd-btn-secondary"
+              style={{ flexShrink: 0 }}
+              onClick={(e) => {
+                e.stopPropagation()
+                if (onOpenPlacements) {
+                  onOpenPlacements()
                 }
               }}
             >
