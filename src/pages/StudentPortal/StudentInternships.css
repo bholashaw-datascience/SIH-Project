@@ -1698,3 +1698,249 @@
 .si-toast-close:hover {
   color: #ffffff;
 }
+
+/* --------------------------------------------------------------------------
+   Offer Letters Sub-section under My Internship Status
+   -------------------------------------------------------------------------- */
+.si-status-row.has-offers {
+  border-left: 3px solid #10b981;
+}
+
+.si-offer-letters-sublist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+}
+
+.si-offer-letter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #dcfce7;
+  border-radius: 6px;
+  padding: 8px 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.si-oli-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.si-oli-comp-wrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.si-oli-comp {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #0f1d2f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.si-oli-role {
+  font-size: 0.69rem;
+  color: #475569;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.si-oli-badge {
+  font-size: 0.64rem;
+  font-weight: 700;
+  background: #dcfce7;
+  color: #15803d;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.si-oli-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.si-btn-view-letter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.si-btn-view-letter:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.si-btn-download-letter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #15803d;
+  color: #ffffff;
+  border: none;
+  padding: 4px 9px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(21, 128, 61, 0.2);
+}
+
+.si-btn-download-letter:hover {
+  background: #166534;
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   Offer Letter Modal Letterhead Styling
+   -------------------------------------------------------------------------- */
+.si-offer-letter-modal {
+  max-width: 620px;
+}
+
+.si-letterhead-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px 22px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.si-lh-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid #0f1d2f;
+  padding-bottom: 12px;
+  gap: 12px;
+}
+
+.si-lh-institution {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #b45309;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.si-lh-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f1d2f;
+}
+
+.si-lh-ref {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 0.68rem;
+  color: #64748b;
+}
+
+.si-lh-ref strong {
+  color: #0f1d2f;
+  font-size: 0.75rem;
+}
+
+.si-lh-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+
+.si-lh-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.si-lh-label {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.si-lh-val {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0f1d2f;
+}
+
+.si-lh-body-text {
+  font-size: 0.82rem;
+  color: #334155;
+  line-height: 1.55;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.si-lh-body-text p {
+  margin: 0;
+}
+
+.si-lh-footer-strip {
+  border-top: 1px dashed #cbd5e1;
+  padding-top: 14px;
+  margin-top: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.si-lh-signatory {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0f1d2f;
+  margin-top: 2px;
+}
+
+.si-lh-approved-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+

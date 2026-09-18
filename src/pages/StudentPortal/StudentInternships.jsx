@@ -697,6 +697,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
   const [applicationNote, setApplicationNote] = useState('')
   const [isApplying, setIsApplying] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
+  const [viewingOfferLetter, setViewingOfferLetter] = useState(null)
 
   // Student Profile Data
   const s = student || {}
@@ -789,12 +790,19 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
   // Check if an internship is applied
   const isApplied = (id) => applications.some((app) => app.internshipId === id)
 
+  // Approved offer letters issued by companies
+  const approvedOffers = useMemo(() => {
+    return applications.filter(
+      (app) => app.status === 'offer' || app.offerLetter || app.offerLetterUrl || (app.status === 'selected' && app.hasOfferLetter)
+    )
+  }, [applications])
+
   // Metrics Count
   const metrics = useMemo(() => {
     const appliedCount = applications.filter((a) => a.status === 'applied').length
     const shortlistedCount = applications.filter((a) => a.status === 'shortlisted').length
     const selectedCount = applications.filter((a) => a.status === 'selected').length
-    const offerCount = applications.filter((a) => a.status === 'offer').length
+    const offerCount = approvedOffers.length
     return {
       applied: appliedCount,
       shortlisted: shortlistedCount,
@@ -802,7 +810,83 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
       offers: offerCount,
       total: applications.length,
     }
-  }, [applications])
+  }, [applications, approvedOffers])
+
+  // Download official offer letter issued by the company
+  const handleDownloadOfferLetter = (app) => {
+    if (!app) return
+    const offer = app.offerLetter || {}
+    const company = app.company || offer.company || 'Company'
+    const role = app.role || offer.role || 'Intern'
+    const stipend = app.stipend || offer.stipend || 'Accredited Monthly Stipend'
+    const docUrl = offer.documentUrl || app.offerLetterUrl
+
+    if (docUrl) {
+      const a = document.createElement('a')
+      a.href = docUrl
+      a.download = offer.fileName || `${company.replace(/\s+/g, '_')}_Offer_Letter.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    } else {
+      const letterContent = `
+================================================================================
+                    OFFICIAL INTERNSHIP OFFER LETTER
+               ACCREDITED BY IAS INSTITUTIONAL NETWORK
+================================================================================
+
+Date: ${offer.issueDate || new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+Reference ID: ${offer.letterId || `IAS-OFF-${app.internshipId ? app.internshipId.toUpperCase() : '2026'}-${Date.now().toString().slice(-4)}`}
+
+To:
+Candidate: ${studentName}
+Roll / Enrollment ID: ${studentRoll}
+Institution: ${studentCollege}
+Branch / Discipline: ${studentBranch}
+Verified CGPA: ${studentCgpa} / 10.0
+
+Subject: Offer of Internship for the position of ${role}
+
+Dear ${studentName},
+
+We are pleased to offer you an appointment as ${role} at ${company}.
+This selection has been approved following the successful verification of your
+institutional academic portfolio and faculty credentials via the IAS Collaboration Network.
+
+Key Internship Terms:
+--------------------------------------------------------------------------------
+• Company / Organization: ${company}
+• Department / Division: ${app.department || offer.department || 'Engineering'}
+• Position / Role: ${role}
+• Work Arrangement: ${app.type || offer.type || 'Accredited Internship'}
+• Primary Location: ${app.location || offer.location || 'India'}
+• Monthly Stipend: ${stipend}
+• Academic Accreditation: Eligible for institutional credits & NOC sign-off
+--------------------------------------------------------------------------------
+
+Please retain this official communication as your verified institutional offer.
+Upon departmental coordinator verification, an institutional No Objection Certificate (NOC)
+will be issued for your internship tenure.
+
+Authorized by:
+Campus Recruitment & Talent Acquisition Group
+${company}
+[IAS Verified Institutional Partner]
+================================================================================
+`
+      const blob = new Blob([letterContent.trim()], { type: 'text/plain;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${company.replace(/\s+/g, '_')}_Offer_Letter.txt`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    }
+
+    setToastMessage(`Offer letter downloaded for ${company}!`)
+  }
 
   // Filter & Search Logic across ALL Engineering Departments
   const filteredInternships = useMemo(() => {
@@ -1666,9 +1750,9 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
 
                   {/* Status Item 4: Offer Letters */}
                   <div
-                    className="si-status-row"
+                    className={`si-status-row ${approvedOffers.length > 0 ? 'has-offers' : ''}`}
                     onClick={() => setActiveTab('status')}
-                    title="View Offer Letters"
+                    title={approvedOffers.length > 0 ? 'View Approved Offer Letters' : 'No Offer Letters Issued Yet'}
                   >
                     <div className="si-status-mini-icon offer">
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
@@ -1680,10 +1764,66 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
                     </div>
                     <div className="si-status-text">
                       <span className="si-status-name">Offer Letters</span>
-                      <span className="si-status-subtext">Institutional NOC ready</span>
+                      <span className="si-status-subtext">
+                        {approvedOffers.length > 0
+                          ? `${approvedOffers.length} letter${approvedOffers.length > 1 ? 's' : ''} available`
+                          : 'Institutional NOC ready'}
+                      </span>
                     </div>
                     <div className="si-status-badge offer">{metrics.offers}</div>
                   </div>
+
+                  {/* Issued Offer Letters list (Generated/provided by company upon approval) */}
+                  {approvedOffers.length > 0 && (
+                    <div className="si-offer-letters-sublist">
+                      {approvedOffers.map((offer) => (
+                        <div key={offer.internshipId} className="si-offer-letter-item">
+                          <div className="si-oli-header">
+                            <div className="si-oli-comp-wrap">
+                              <span className="si-oli-comp">{offer.company}</span>
+                              <span className="si-oli-role">{offer.role}</span>
+                            </div>
+                            <span className="si-oli-badge">Approved ✓</span>
+                          </div>
+
+                          <div className="si-oli-actions">
+                            <button
+                              type="button"
+                              className="si-btn-view-letter"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setViewingOfferLetter(offer)
+                              }}
+                              title="View official offer letter preview"
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                              </svg>
+                              View
+                            </button>
+
+                            <button
+                              type="button"
+                              className="si-btn-download-letter"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDownloadOfferLetter(offer)
+                              }}
+                              title="Download official offer letter"
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                              </svg>
+                              Download Offer Letter
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -2030,6 +2170,122 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
                 ) : (
                   <>Confirm &amp; Submit Application →</>
                 )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          MODAL 3: OFFICIAL ISSUED OFFER LETTER PREVIEW MODAL
+          ==================================================================== */}
+      {viewingOfferLetter && (
+        <div className="si-modal-overlay" onClick={() => setViewingOfferLetter(null)} role="dialog" aria-modal="true">
+          <div className="si-modal-card si-offer-letter-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="si-modal-header" style={{ background: 'linear-gradient(135deg, #112233 0%, #1a3956 100%)' }}>
+              <div>
+                <div className="si-verified-header-badge" style={{ background: 'rgba(217, 119, 6, 0.2)', color: '#fcd34d', borderColor: 'rgba(251, 191, 36, 0.4)' }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                  </svg>
+                  Official Institutional Internship Offer Letter
+                </div>
+                <h2 className="si-modal-title" style={{ marginTop: 4 }}>
+                  {viewingOfferLetter.company}
+                </h2>
+                <span className="si-modal-sub">
+                  Role: <strong>{viewingOfferLetter.role}</strong> • {viewingOfferLetter.stipend}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                className="si-modal-close-btn"
+                onClick={() => setViewingOfferLetter(null)}
+                aria-label="Close modal"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="si-modal-body">
+              {/* Formal Letterhead Container */}
+              <div className="si-letterhead-card">
+                <div className="si-lh-top">
+                  <div>
+                    <span className="si-lh-institution">IAS COLLABORATION NETWORK • CAMPUS RECRUITMENT</span>
+                    <h3 className="si-lh-title">Formal Appointment &amp; Internship Offer</h3>
+                  </div>
+                  <div className="si-lh-ref">
+                    <span>Reference ID:</span>
+                    <strong>{viewingOfferLetter.offerLetter?.letterId || `IAS-OFF-${viewingOfferLetter.internshipId ? viewingOfferLetter.internshipId.toUpperCase() : '2026'}-7721`}</strong>
+                  </div>
+                </div>
+
+                <div className="si-lh-meta-grid">
+                  <div className="si-lh-field">
+                    <span className="si-lh-label">Candidate Name:</span>
+                    <strong className="si-lh-val">{studentName}</strong>
+                  </div>
+                  <div className="si-lh-field">
+                    <span className="si-lh-label">Enrollment / Roll:</span>
+                    <strong className="si-lh-val">{studentRoll}</strong>
+                  </div>
+                  <div className="si-lh-field">
+                    <span className="si-lh-label">Academic Institution:</span>
+                    <strong className="si-lh-val">{studentCollege}</strong>
+                  </div>
+                  <div className="si-lh-field">
+                    <span className="si-lh-label">Branch &amp; Discipline:</span>
+                    <strong className="si-lh-val">{studentBranch}</strong>
+                  </div>
+                </div>
+
+                <div className="si-lh-body-text">
+                  <p>
+                    Dear <strong>{studentName}</strong>,
+                  </p>
+                  <p>
+                    Following the review and institutional approval of your verified academic profile and credentials, we are pleased to confirm that <strong>{viewingOfferLetter.company}</strong> has approved your internship application for the role of <strong>{viewingOfferLetter.role}</strong>.
+                  </p>
+                  <p>
+                    This position offers a monthly stipend of <strong>{viewingOfferLetter.stipend}</strong>. Your appointment is officially registered with the institutional training cell and is eligible for faculty NOC sign-off and semester credits upon commencement.
+                  </p>
+                </div>
+
+                <div className="si-lh-footer-strip">
+                  <div>
+                    <span className="si-lh-label">Issuing Authority</span>
+                    <strong className="si-lh-signatory">Talent Acquisition Group, {viewingOfferLetter.company}</strong>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <span className="si-lh-label">Accreditation Status</span>
+                    <span className="si-lh-approved-tag">Institutional NOC Approved ✓</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="si-modal-footer">
+              <button
+                type="button"
+                className="si-btn-secondary"
+                onClick={() => setViewingOfferLetter(null)}
+              >
+                Close
+              </button>
+
+              <button
+                type="button"
+                className="si-btn-primary"
+                onClick={() => handleDownloadOfferLetter(viewingOfferLetter)}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" style={{ marginRight: 6 }}>
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Download Offer Letter
               </button>
             </div>
           </div>
