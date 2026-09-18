@@ -15,11 +15,100 @@ export const DEPARTMENTS = [
   'Aerospace / Multidisciplinary'
 ]
 
+// Date & Time formatting helper for internship postings
+// Example output: "Posted 18 Sep 2026, 6:30 PM"
+export function formatPostedDateTime(dateInput, postedDaysAgo = 0) {
+  let date
+  if (!dateInput) {
+    // Deterministic realistic time anchored to simulated today: 18 Sep 2026
+    const base = new Date('2026-09-18T18:30:00+05:30')
+    date = new Date(base.getTime() - (postedDaysAgo || 0) * 86400000)
+  } else {
+    date = typeof dateInput === 'string' || typeof dateInput === 'number' ? new Date(dateInput) : dateInput
+  }
+  if (isNaN(date.getTime())) return ''
+
+  const day = date.getDate()
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const month = monthNames[date.getMonth()]
+  const year = date.getFullYear()
+
+  let hours = date.getHours()
+  const minutes = date.getMinutes().toString().padStart(2, '0')
+  const ampm = hours >= 12 ? 'PM' : 'AM'
+  hours = hours % 12
+  hours = hours ? hours : 12
+
+  return `Posted ${day} ${month} ${year}, ${hours}:${minutes} ${ampm}`
+}
+
+// Application closing deadline formatting helper
+// - If > 2 days away: normal date e.g. "Closes 20 Oct 2026"
+// - If <= 2 days away: compact live countdown e.g. "Closes in 1d 8h" or "Closes in 6h 25m"
+// - If today: remaining hours/minutes e.g. "Closes in 4h 29m"
+export function formatClosingDeadline(deadlineStr, displayDeadline, now = new Date()) {
+  if (!deadlineStr) return displayDeadline ? `Closes ${displayDeadline.replace(/^Closes:?\s*/i, '')}` : ''
+
+  let deadlineDate
+  if (deadlineStr.includes('T')) {
+    deadlineDate = new Date(deadlineStr)
+  } else {
+    deadlineDate = new Date(`${deadlineStr}T23:59:59`)
+  }
+
+  if (isNaN(deadlineDate.getTime())) {
+    return displayDeadline ? `Closes ${displayDeadline.replace(/^Closes:?\s*/i, '')}` : ''
+  }
+
+  const diffMs = deadlineDate.getTime() - now.getTime()
+
+  if (diffMs <= 0) {
+    return 'Closed'
+  }
+
+  const totalHours = Math.floor(diffMs / (1000 * 60 * 60))
+  const diffDays = Math.floor(totalHours / 24)
+  const remainingHours = totalHours % 24
+  const remainingMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+
+  // 2 days or less remain (<= 48 hours)
+  if (diffMs <= 2 * 24 * 60 * 60 * 1000) {
+    if (diffDays >= 1) {
+      return `Closes in ${diffDays}d ${remainingHours}h`
+    }
+    if (remainingHours >= 1) {
+      return `Closes in ${remainingHours}h ${remainingMinutes}m`
+    }
+    return `Closes in ${remainingMinutes}m`
+  }
+
+  // More than 2 days away: Show normal formatted date, e.g. "Closes 20 Oct 2026"
+  if (displayDeadline) {
+    const cleanDisplay = displayDeadline.replace(/^Closes:?\s*/i, '')
+    return `Closes ${cleanDisplay}`
+  }
+
+  const day = deadlineDate.getDate().toString().padStart(2, '0')
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  return `Closes ${day} ${months[deadlineDate.getMonth()]} ${deadlineDate.getFullYear()}`
+}
+
+export function isUrgentDeadline(deadlineStr, now = new Date()) {
+  if (!deadlineStr) return false
+  const deadlineDate = deadlineStr.includes('T') ? new Date(deadlineStr) : new Date(`${deadlineStr}T23:59:59`)
+  if (isNaN(deadlineDate.getTime())) return false
+  const diffMs = deadlineDate.getTime() - now.getTime()
+  return diffMs > 0 && diffMs <= 2 * 24 * 60 * 60 * 1000
+}
+
+
 // Comprehensive Verified Opportunities across ALL Academic Engineering Departments
 const INITIAL_INTERNSHIPS = [
   // 1. MECHANICAL
   {
     id: 'int_mech_01',
+    postedAt: '2026-09-17T16:45:00+05:30',
+    postedDateTime: 'Posted 17 Sep 2026, 4:45 PM',
     company: 'Tata Motors',
     companyLogoBg: '#0f4c81',
     companyLogoText: 'TM',
@@ -53,6 +142,8 @@ const INITIAL_INTERNSHIPS = [
   },
   {
     id: 'int_mech_02',
+    postedAt: '2026-09-15T11:20:00+05:30',
+    postedDateTime: 'Posted 15 Sep 2026, 11:20 AM',
     company: 'Thermax Global',
     companyLogoBg: '#c2410c',
     companyLogoText: 'TX',
@@ -87,6 +178,8 @@ const INITIAL_INTERNSHIPS = [
   // 2. ELECTRICAL / ELECTRONICS
   {
     id: 'int_elec_01',
+    postedAt: '2026-09-16T14:30:00+05:30',
+    postedDateTime: 'Posted 16 Sep 2026, 2:30 PM',
     company: 'Texas Instruments India',
     companyLogoBg: '#cc0000',
     companyLogoText: 'TI',
@@ -120,6 +213,8 @@ const INITIAL_INTERNSHIPS = [
   },
   {
     id: 'int_elec_02',
+    postedAt: '2026-09-14T10:15:00+05:30',
+    postedDateTime: 'Posted 14 Sep 2026, 10:15 AM',
     company: 'Schneider Electric',
     companyLogoBg: '#059669',
     companyLogoText: 'SE',
@@ -154,6 +249,8 @@ const INITIAL_INTERNSHIPS = [
   // 3. CIVIL
   {
     id: 'int_civil_01',
+    postedAt: '2026-09-15T15:00:00+05:30',
+    postedDateTime: 'Posted 15 Sep 2026, 3:00 PM',
     company: 'Larsen & Toubro (L&T Construction)',
     companyLogoBg: '#1e3a8a',
     companyLogoText: 'LT',
@@ -187,6 +284,8 @@ const INITIAL_INTERNSHIPS = [
   },
   {
     id: 'int_civil_02',
+    postedAt: '2026-09-13T09:30:00+05:30',
+    postedDateTime: 'Posted 13 Sep 2026, 9:30 AM',
     company: 'Afcons Infrastructure',
     companyLogoBg: '#b45309',
     companyLogoText: 'AF',
@@ -221,6 +320,8 @@ const INITIAL_INTERNSHIPS = [
   // 4. CHEMICAL
   {
     id: 'int_chem_01',
+    postedAt: '2026-09-17T18:30:00+05:30',
+    postedDateTime: 'Posted 17 Sep 2026, 6:30 PM',
     company: 'Reliance Industries Limited (RIL)',
     companyLogoBg: '#0f766e',
     companyLogoText: 'RL',
@@ -254,6 +355,8 @@ const INITIAL_INTERNSHIPS = [
   },
   {
     id: 'int_chem_02',
+    postedAt: '2026-09-12T13:45:00+05:30',
+    postedDateTime: 'Posted 12 Sep 2026, 1:45 PM',
     company: 'Aarti Industries Limited',
     companyLogoBg: '#7c3aed',
     companyLogoText: 'AI',
@@ -288,6 +391,8 @@ const INITIAL_INTERNSHIPS = [
   // 5. INSTRUMENTATION
   {
     id: 'int_inst_01',
+    postedAt: '2026-09-16T16:00:00+05:30',
+    postedDateTime: 'Posted 16 Sep 2026, 4:00 PM',
     company: 'Honeywell Automation',
     companyLogoBg: '#dc2626',
     companyLogoText: 'HW',
@@ -321,6 +426,8 @@ const INITIAL_INTERNSHIPS = [
   },
   {
     id: 'int_06',
+    postedAt: '2026-09-14T11:30:00+05:30',
+    postedDateTime: 'Posted 14 Sep 2026, 11:30 AM',
     company: 'Siemens Healthineers',
     companyLogoBg: '#0d9488',
     companyLogoText: 'SH',
@@ -356,6 +463,8 @@ const INITIAL_INTERNSHIPS = [
   // 6. AUTOMOBILE
   {
     id: 'int_auto_01',
+    postedAt: '2026-09-15T12:15:00+05:30',
+    postedDateTime: 'Posted 15 Sep 2026, 12:15 PM',
     company: 'Mahindra & Mahindra EV Division',
     companyLogoBg: '#be123c',
     companyLogoText: 'MM',
@@ -389,6 +498,8 @@ const INITIAL_INTERNSHIPS = [
   },
   {
     id: 'int_auto_02',
+    postedAt: '2026-09-14T15:45:00+05:30',
+    postedDateTime: 'Posted 14 Sep 2026, 3:45 PM',
     company: 'Bosch Mobility Solutions',
     companyLogoBg: '#1e293b',
     companyLogoText: 'BS',
@@ -423,6 +534,8 @@ const INITIAL_INTERNSHIPS = [
   // 7. BIOTECHNOLOGY
   {
     id: 'int_bio_01',
+    postedAt: '2026-09-13T10:00:00+05:30',
+    postedDateTime: 'Posted 13 Sep 2026, 10:00 AM',
     company: 'Biocon Biologics',
     companyLogoBg: '#047857',
     companyLogoText: 'BB',
@@ -456,6 +569,8 @@ const INITIAL_INTERNSHIPS = [
   },
   {
     id: 'int_bio_02',
+    postedAt: '2026-09-11T14:30:00+05:30',
+    postedDateTime: 'Posted 11 Sep 2026, 2:30 PM',
     company: 'Serum Institute of India',
     companyLogoBg: '#0284c7',
     companyLogoText: 'SI',
@@ -490,6 +605,8 @@ const INITIAL_INTERNSHIPS = [
   // 8. COMPUTER SCIENCE / IT
   {
     id: 'int_01',
+    postedAt: '2026-09-16T09:30:00+05:30',
+    postedDateTime: 'Posted 16 Sep 2026, 9:30 AM',
     company: 'Microsoft India',
     companyLogoBg: '#0078d4',
     companyLogoText: 'MS',
@@ -523,6 +640,8 @@ const INITIAL_INTERNSHIPS = [
   },
   {
     id: 'int_02',
+    postedAt: '2026-09-17T17:15:00+05:30',
+    postedDateTime: 'Posted 17 Sep 2026, 5:15 PM',
     company: 'Google India',
     companyLogoBg: '#ea4335',
     companyLogoText: 'G',
@@ -556,6 +675,8 @@ const INITIAL_INTERNSHIPS = [
   },
   {
     id: 'int_03',
+    postedAt: '2026-09-15T16:45:00+05:30',
+    postedDateTime: 'Posted 15 Sep 2026, 4:45 PM',
     company: 'Razorpay Technologies',
     companyLogoBg: '#0c2340',
     companyLogoText: 'RZ',
@@ -589,6 +710,8 @@ const INITIAL_INTERNSHIPS = [
   },
   {
     id: 'int_04',
+    postedAt: '2026-09-13T14:00:00+05:30',
+    postedDateTime: 'Posted 13 Sep 2026, 2:00 PM',
     company: 'Tata Consultancy Services (TCS)',
     companyLogoBg: '#1e3a8a',
     companyLogoText: 'TCS',
@@ -624,6 +747,8 @@ const INITIAL_INTERNSHIPS = [
   // 9. MULTIDISCIPLINARY / AEROSPACE
   {
     id: 'int_08',
+    postedAt: '2026-09-11T11:00:00+05:30',
+    postedDateTime: 'Posted 11 Sep 2026, 11:00 AM',
     company: 'ISRO Telemetry & Space Center',
     companyLogoBg: '#ea580c',
     companyLogoText: 'IS',
@@ -678,6 +803,16 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
   const [activeTab, setActiveTab] = useState('all') // 'all' | 'remote' | 'on-site' | 'hybrid' | 'status'
   const [sortOption, setSortOption] = useState('latest') // 'latest' | 'stipend_high' | 'deadline_soon'
 
+  // Live auto-updating time ticker for compact countdowns
+  const [currentTime, setCurrentTime] = useState(() => new Date())
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 10000)
+    return () => clearInterval(timer)
+  }, [])
+
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedDepartment, setSelectedDepartment] = useState('All Departments')
@@ -690,6 +825,152 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
   const [selectedPostedDate, setSelectedPostedDate] = useState('all')
   const [selectedDeadline, setSelectedDeadline] = useState('all')
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false)
+
+  // Company Published Internships (persisted in localStorage)
+  const [customInternships, setCustomInternships] = useState(() => {
+    try {
+      const saved = localStorage.getItem('udaan_company_published_internships')
+      if (saved) return JSON.parse(saved)
+    } catch {}
+    return []
+  })
+
+  // Sync custom published internships to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('udaan_company_published_internships', JSON.stringify(customInternships))
+    } catch {}
+  }, [customInternships])
+
+  // Merge custom published internships with initial catalog
+  const allInternships = useMemo(() => {
+    return [...customInternships, ...INITIAL_INTERNSHIPS]
+  }, [customInternships])
+
+  // Company Publish Internship Modal State
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search)
+      return params.get('action') === 'post' || window.location.hash.includes('post-internship')
+    } catch {}
+    return false
+  })
+
+  const [publishForm, setPublishForm] = useState({
+    company: '',
+    role: '',
+    department: 'Computer Science / IT',
+    duration: '3 Months',
+    stipend: '₹35,000 / month',
+    type: 'On-site',
+    location: '',
+    deadline: '2026-10-31',
+    requiredSkills: '',
+    openings: '5',
+    eligibility: '',
+    overview: '',
+    responsibilities: '',
+  })
+  const [publishError, setPublishError] = useState('')
+
+  const handlePublishInternship = (e) => {
+    e.preventDefault()
+    if (!publishForm.company.trim() || !publishForm.role.trim() || !publishForm.location.trim()) {
+      setPublishError('Please fill in Company Name, Role Title, and Location.')
+      return
+    }
+
+    const now = new Date()
+    const postedAt = now.toISOString()
+    const postedDateTime = formatPostedDateTime(now)
+
+    let displayDeadline = '31 Oct 2026'
+    if (publishForm.deadline) {
+      try {
+        const d = new Date(publishForm.deadline)
+        const day = d.getDate().toString().padStart(2, '0')
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        displayDeadline = `${day} ${months[d.getMonth()]} ${d.getFullYear()}`
+      } catch {}
+    }
+
+    const skillsArray = publishForm.requiredSkills
+      ? publishForm.requiredSkills.split(',').map((s) => s.trim()).filter(Boolean)
+      : ['Problem Solving', 'Communication', 'Technical Fundamentals']
+
+    const respArray = publishForm.responsibilities
+      ? publishForm.responsibilities.split('\n').map((r) => r.trim()).filter(Boolean)
+      : [
+          'Collaborate on core engineering assignments and system improvements.',
+          'Document engineering workflows and contribute to agile deliverables.',
+          'Work under senior engineering and departmental mentorship.'
+        ]
+
+    const durationNum = parseInt(publishForm.duration, 10) || 3
+    const stipendNum = parseInt(publishForm.stipend.replace(/[^0-9]/g, ''), 10) || 0
+
+    const initials = publishForm.company
+      .trim()
+      .split(/\s+/)
+      .map((w) => w[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase() || 'CO'
+
+    const brandColors = ['#0f4c81', '#1e3a8a', '#059669', '#c2410c', '#7c3aed', '#0d9488', '#be123c', '#0f766e']
+    const logoBg = brandColors[Math.abs(publishForm.company.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)) % brandColors.length]
+
+    const newInternship = {
+      id: `int_pub_${Date.now()}`,
+      company: publishForm.company.trim(),
+      companyLogoBg: logoBg,
+      companyLogoText: initials,
+      verifiedCompany: true,
+      role: publishForm.role.trim(),
+      department: publishForm.department,
+      duration: publishForm.duration,
+      durationMonths: durationNum,
+      stipend: publishForm.stipend.includes('₹') ? publishForm.stipend : `₹${publishForm.stipend}`,
+      stipendAmount: stipendNum,
+      type: publishForm.type,
+      location: publishForm.location.trim(),
+      requiredSkills: skillsArray,
+      postedAt,
+      postedDateTime,
+      postedDate: 'Just now',
+      postedDaysAgo: 0,
+      deadline: publishForm.deadline || '2026-10-31',
+      displayDeadline,
+      isUrgent: false,
+      openings: parseInt(publishForm.openings, 10) || 5,
+      eligibility: publishForm.eligibility.trim() || `B.Tech / B.E. in ${publishForm.department} with CGPA ≥ 7.0`,
+      minCgpa: 7.0,
+      overview: publishForm.overview.trim() || `Accredited internship opportunity at ${publishForm.company.trim()} for ${publishForm.department} candidates.`,
+      responsibilities: respArray,
+      perks: ['Official Institutional NOC & Certificate', 'Pre-Placement Offer (PPO) potential', 'Direct corporate mentor guidance'],
+      selectionProcess: 'Profile Screening → Technical Assessment → Recruiter Alignment'
+    }
+
+    setCustomInternships((prev) => [newInternship, ...prev])
+    setToastMessage(`Internship "${newInternship.role}" published successfully!`)
+    setIsPublishModalOpen(false)
+    setPublishError('')
+    setPublishForm({
+      company: '',
+      role: '',
+      department: 'Computer Science / IT',
+      duration: '3 Months',
+      stipend: '₹35,000 / month',
+      type: 'On-site',
+      location: '',
+      deadline: '2026-10-31',
+      requiredSkills: '',
+      openings: '5',
+      eligibility: '',
+      overview: '',
+      responsibilities: '',
+    })
+  }
 
   // Modals
   const [detailsModalItem, setDetailsModalItem] = useState(null)
@@ -890,7 +1171,7 @@ ${company}
 
   // Filter & Search Logic across ALL Engineering Departments
   const filteredInternships = useMemo(() => {
-    return INITIAL_INTERNSHIPS.filter((item) => {
+    return allInternships.filter((item) => {
       // 1. Tab / Category Filter
       if (activeTab === 'remote' && item.type.toLowerCase() !== 'remote') return false
       if (activeTab === 'on-site' && item.type.toLowerCase() !== 'on-site') return false
@@ -972,7 +1253,10 @@ ${company}
       if (sortOption === 'deadline_soon') {
         return new Date(a.deadline) - new Date(b.deadline)
       }
-      // 'latest' default
+      // 'latest' default: newest timestamps first
+      if (a.postedAt && b.postedAt) {
+        return new Date(b.postedAt) - new Date(a.postedAt)
+      }
       return a.postedDaysAgo - b.postedDaysAgo
     })
   }, [
@@ -988,6 +1272,7 @@ ${company}
     selectedPostedDate,
     selectedDeadline,
     sortOption,
+    allInternships,
   ])
 
   // Clear / Reset All Filters
@@ -1127,6 +1412,21 @@ ${company}
               Discover accredited internship opportunities across all institutional academic departments.
             </p>
           </div>
+          <div className="si-header-actions">
+            <button
+              type="button"
+              className="si-header-btn"
+              onClick={() => setIsPublishModalOpen(true)}
+              id="si-post-internship-btn"
+              title="Publish a verified internship opportunity"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span>Post Internship</span>
+            </button>
+          </div>
         </div>
 
         {/* CONDITIONAL VIEW: MY APPLICATIONS TAB */}
@@ -1205,7 +1505,7 @@ ${company}
                         type="button"
                         className="si-btn-outline"
                         onClick={() => {
-                          const item = INITIAL_INTERNSHIPS.find((i) => i.id === app.internshipId)
+                          const item = allInternships.find((i) => i.id === app.internshipId)
                           if (item) setDetailsModalItem(item)
                         }}
                       >
@@ -1455,7 +1755,7 @@ ${company}
                     onClick={() => setActiveTab('all')}
                   >
                     All Opportunities
-                    <span className="si-tab-count">{INITIAL_INTERNSHIPS.length}</span>
+                    <span className="si-tab-count">{allInternships.length}</span>
                   </button>
 
                   <button
@@ -1467,7 +1767,7 @@ ${company}
                   >
                     On-site / Lab
                     <span className="si-tab-count">
-                      {INITIAL_INTERNSHIPS.filter((i) => i.type === 'On-site').length}
+                      {allInternships.filter((i) => i.type === 'On-site').length}
                     </span>
                   </button>
 
@@ -1480,7 +1780,7 @@ ${company}
                   >
                     Hybrid
                     <span className="si-tab-count">
-                      {INITIAL_INTERNSHIPS.filter((i) => i.type === 'Hybrid').length}
+                      {allInternships.filter((i) => i.type === 'Hybrid').length}
                     </span>
                   </button>
 
@@ -1493,7 +1793,7 @@ ${company}
                   >
                     Remote
                     <span className="si-tab-count">
-                      {INITIAL_INTERNSHIPS.filter((i) => i.type === 'Remote').length}
+                      {allInternships.filter((i) => i.type === 'Remote').length}
                     </span>
                   </button>
                 </div>
@@ -1609,14 +1909,27 @@ ${company}
                               {item.location}
                             </span>
 
-                            <span className={`si-spec-item deadline ${item.isUrgent ? 'urgent' : ''}`} title="Application Deadline">
+                            {/* 1. Posted Date and Time first */}
+                            <span className="si-spec-item posted-time" title="Posting Date and Time">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 14 14" />
+                              </svg>
+                              {formatPostedDateTime(item.postedAt, item.postedDaysAgo) || item.postedDateTime || `Posted ${item.postedDate}`}
+                            </span>
+
+                            {/* 2. Application Closing Deadline after it (compact live countdown when <= 2 days) */}
+                            <span
+                              className={`si-spec-item deadline ${isUrgentDeadline(item.deadline, currentTime) || item.isUrgent ? 'urgent' : ''}`}
+                              title="Application Closing Deadline"
+                            >
                               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                                 <line x1="16" y1="2" x2="16" y2="6" />
                                 <line x1="8" y1="2" x2="8" y2="6" />
                                 <line x1="3" y1="10" x2="21" y2="10" />
                               </svg>
-                              Closes: {item.displayDeadline} {item.isUrgent && '⚠️ Closing soon'}
+                              {formatClosingDeadline(item.deadline, item.displayDeadline, currentTime)}
                             </span>
                           </div>
 
@@ -1941,8 +2254,16 @@ ${company}
                   <strong className="si-dc-val">{detailsModalItem.location}</strong>
                 </div>
                 <div className="si-detail-chip">
+                  <span className="si-dc-label">Posted</span>
+                  <strong className="si-dc-val">
+                    {formatPostedDateTime(detailsModalItem.postedAt, detailsModalItem.postedDaysAgo) || detailsModalItem.postedDateTime || `Posted ${detailsModalItem.postedDate}`}
+                  </strong>
+                </div>
+                <div className="si-detail-chip">
                   <span className="si-dc-label">Deadline</span>
-                  <strong className="si-dc-val">{detailsModalItem.displayDeadline}</strong>
+                  <strong className="si-dc-val">
+                    {formatClosingDeadline(detailsModalItem.deadline, detailsModalItem.displayDeadline, currentTime)}
+                  </strong>
                 </div>
               </div>
 
@@ -2179,6 +2500,242 @@ ${company}
       {/* ====================================================================
           MODAL 3: OFFICIAL ISSUED OFFER LETTER PREVIEW MODAL
           ==================================================================== */}
+
+      {/* ====================================================================
+          MODAL 3: COMPANY PUBLISH INTERNSHIP MODAL
+          ==================================================================== */}
+      {isPublishModalOpen && (
+        <div className="si-modal-overlay" onClick={() => setIsPublishModalOpen(false)} role="dialog" aria-modal="true">
+          <div className="si-modal-card publish-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="si-modal-header">
+              <div>
+                <div className="si-verified-header-badge">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                  </svg>
+                  Enterprise &amp; Institutional Gateway
+                </div>
+                <h2 className="si-modal-title" style={{ marginTop: 4 }}>
+                  Publish Internship Opportunity
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                className="si-modal-close-btn"
+                onClick={() => setIsPublishModalOpen(false)}
+                aria-label="Close publish modal"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handlePublishInternship} className="si-publish-form">
+              <div className="si-modal-body">
+                {publishError && (
+                  <div className="si-publish-alert-error" role="alert">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <span>{publishError}</span>
+                  </div>
+                )}
+
+                <div className="si-publish-grid">
+                  <div className="si-publish-field">
+                    <label className="si-publish-label">
+                      Company Name <span className="si-req-star">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="si-publish-input"
+                      placeholder="e.g. Tata Motors / Microsoft India"
+                      value={publishForm.company}
+                      onChange={(e) => {
+                        setPublishForm({ ...publishForm, company: e.target.value })
+                        if (publishError) setPublishError('')
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <div className="si-publish-field">
+                    <label className="si-publish-label">
+                      Role / Position Title <span className="si-req-star">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="si-publish-input"
+                      placeholder="e.g. Mechanical Design & CAE Simulation Intern"
+                      value={publishForm.role}
+                      onChange={(e) => {
+                        setPublishForm({ ...publishForm, role: e.target.value })
+                        if (publishError) setPublishError('')
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <div className="si-publish-field">
+                    <label className="si-publish-label">
+                      Department <span className="si-req-star">*</span>
+                    </label>
+                    <select
+                      className="si-publish-select"
+                      value={publishForm.department}
+                      onChange={(e) => setPublishForm({ ...publishForm, department: e.target.value })}
+                    >
+                      {DEPARTMENTS.filter((d) => d !== 'All Departments').map((dept) => (
+                        <option key={dept} value={dept}>{dept}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="si-publish-field">
+                    <label className="si-publish-label">
+                      Work Mode <span className="si-req-star">*</span>
+                    </label>
+                    <select
+                      className="si-publish-select"
+                      value={publishForm.type}
+                      onChange={(e) => setPublishForm({ ...publishForm, type: e.target.value })}
+                    >
+                      <option value="On-site">On-site / Lab / Plant</option>
+                      <option value="Hybrid">Hybrid</option>
+                      <option value="Remote">Remote</option>
+                    </select>
+                  </div>
+
+                  <div className="si-publish-field">
+                    <label className="si-publish-label">
+                      Primary Location <span className="si-req-star">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="si-publish-input"
+                      placeholder="e.g. Pune, Maharashtra / Bengaluru"
+                      value={publishForm.location}
+                      onChange={(e) => {
+                        setPublishForm({ ...publishForm, location: e.target.value })
+                        if (publishError) setPublishError('')
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <div className="si-publish-field">
+                    <label className="si-publish-label">Duration</label>
+                    <select
+                      className="si-publish-select"
+                      value={publishForm.duration}
+                      onChange={(e) => setPublishForm({ ...publishForm, duration: e.target.value })}
+                    >
+                      <option value="3 Months">3 Months (Summer)</option>
+                      <option value="6 Months">6 Months (Semester / Comprehensive)</option>
+                      <option value="2 Months">2 Months (Intensive)</option>
+                    </select>
+                  </div>
+
+                  <div className="si-publish-field">
+                    <label className="si-publish-label">Monthly Stipend</label>
+                    <input
+                      type="text"
+                      className="si-publish-input"
+                      placeholder="e.g. ₹35,000 / month"
+                      value={publishForm.stipend}
+                      onChange={(e) => setPublishForm({ ...publishForm, stipend: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="si-publish-field">
+                    <label className="si-publish-label">Application Deadline</label>
+                    <input
+                      type="date"
+                      className="si-publish-input"
+                      value={publishForm.deadline}
+                      onChange={(e) => setPublishForm({ ...publishForm, deadline: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="si-publish-field">
+                    <label className="si-publish-label">Number of Openings</label>
+                    <input
+                      type="number"
+                      className="si-publish-input"
+                      min="1"
+                      value={publishForm.openings}
+                      onChange={(e) => setPublishForm({ ...publishForm, openings: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="si-publish-field">
+                    <label className="si-publish-label">Academic Eligibility</label>
+                    <input
+                      type="text"
+                      className="si-publish-input"
+                      placeholder="e.g. B.Tech / B.E. with CGPA ≥ 7.2"
+                      value={publishForm.eligibility}
+                      onChange={(e) => setPublishForm({ ...publishForm, eligibility: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="si-publish-field full-width">
+                    <label className="si-publish-label">Required Skills (comma separated)</label>
+                    <input
+                      type="text"
+                      className="si-publish-input"
+                      placeholder="e.g. SolidWorks, ANSYS, FEA, GD&T"
+                      value={publishForm.requiredSkills}
+                      onChange={(e) => setPublishForm({ ...publishForm, requiredSkills: e.target.value })}
+                    />
+                    <span className="si-publish-hint">Skills will appear as searchable tags on the internship card.</span>
+                  </div>
+
+                  <div className="si-publish-field full-width">
+                    <label className="si-publish-label">Role Overview &amp; Mission</label>
+                    <textarea
+                      className="si-publish-textarea"
+                      placeholder="Describe the department, project goals, and what the intern will learn..."
+                      value={publishForm.overview}
+                      onChange={(e) => setPublishForm({ ...publishForm, overview: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="si-publish-field full-width">
+                    <label className="si-publish-label">Key Responsibilities (one per line)</label>
+                    <textarea
+                      className="si-publish-textarea"
+                      placeholder="Perform static and dynamic simulations using ANSYS...&#10;Generate production-ready drawings...&#10;Collaborate with manufacturing line engineers..."
+                      value={publishForm.responsibilities}
+                      onChange={(e) => setPublishForm({ ...publishForm, responsibilities: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="si-modal-footer">
+                <button
+                  type="button"
+                  className="si-btn-secondary"
+                  onClick={() => setIsPublishModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="si-btn-primary"
+                  id="si-submit-publish-btn"
+                >
+                  Publish Internship Opportunity →
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {viewingOfferLetter && (
         <div className="si-modal-overlay" onClick={() => setViewingOfferLetter(null)} role="dialog" aria-modal="true">
           <div className="si-modal-card si-offer-letter-modal" onClick={(e) => e.stopPropagation()}>
