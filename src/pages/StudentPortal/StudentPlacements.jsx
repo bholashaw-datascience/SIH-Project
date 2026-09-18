@@ -692,6 +692,71 @@ export default function StudentPlacements({ student = {}, onBack, onNavigateHome
     }, 600)
   }
 
+  // Download Official Campus Placement Offer Letter
+  const handleDownloadOfferLetter = (offer) => {
+    if (!offer) return
+    const company = offer.company || 'Placement Partner'
+    const role = offer.role || 'Associate Engineer'
+    const pkg = offer.package || 'Competitive CTC'
+
+    const letterContent = `
+================================================================================
+OFFICIAL CAMPUS PLACEMENT SELECTION LETTER
+IAS COLLABORATION PLATFORM - TRAINING & PLACEMENT CELL
+================================================================================
+
+Date: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+Reference ID: IAS-PLC-${(offer.placementId || '2026').toUpperCase()}-${Date.now().toString().slice(-4)}
+
+To:
+Candidate: ${studentName}
+Roll / Enrollment ID: ${studentRoll}
+Institution: ${studentCollege}
+Department / Discipline: ${offer.department || studentBranch}
+Cumulative CGPA: ${studentCgpa} / 10.0
+
+Subject: Formal Letter of Selection - Campus Recruitment Drive
+
+Dear ${studentName},
+
+We are pleased to inform you that based on your exceptional performance in the
+institutional campus recruitment evaluation and verification of your academic credentials
+via the IAS Collaboration Network, you have been selected for employment at ${company}.
+
+Employment & Compensation Details:
+--------------------------------------------------------------------------------
+• Hiring Organization: ${company}
+• Department / Division: ${offer.department || studentBranch}
+• Designation / Role: ${role}
+• Work Arrangement: ${offer.type || 'Full-time On-site'}
+• Primary Location: ${offer.location || 'India'}
+• Annual CTC Compensation: ${pkg}
+• Drive Category: ${offer.driveType || 'Institutional Campus Drive'}
+--------------------------------------------------------------------------------
+
+Please retain this verified document as your institutional selection record.
+Formal joining guidelines, onboarding instructions, and pre-joining formalities will
+be coordinated through the institutional Training & Placement cell.
+
+Authorized by:
+Office of Campus Recruitment & Talent Acquisition
+${company}
+[IAS Verified Institutional Recruitment Partner]
+================================================================================
+`
+    const blob = new Blob([letterContent.trim()], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${company.replace(/\s+/g, '_')}_Placement_Offer_Letter.txt`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+
+    setToastMessage(`Placement offer letter downloaded for ${company}!`)
+  }
+
   // Placement metrics for sidebar
   const metrics = useMemo(() => {
     const appliedCount = applications.length
@@ -1340,12 +1405,12 @@ export default function StudentPlacements({ student = {}, onBack, onNavigateHome
             </div>
 
             {/* RIGHT SIDEBAR: MY PLACEMENT STATUS & TIPS */}
-            <aside className="sp-sidebar">
+            <aside className="sp-sidebar" aria-label="Placement Status and Application Tips">
               {/* 1. MY PLACEMENT STATUS WIDGET */}
               <div className="sp-side-card">
                 <div className="sp-side-header">
                   <div className="sp-side-title-group">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#166534" strokeWidth="2.4">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#166534" strokeWidth="2.4">
                       <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
                       <line x1="12" y1="11" x2="12" y2="17" />
                       <line x1="9" y1="14" x2="15" y2="14" />
@@ -1357,15 +1422,19 @@ export default function StudentPlacements({ student = {}, onBack, onNavigateHome
                     className="sp-side-link-btn"
                     onClick={() => setActiveTab('status')}
                   >
-                    View Details
+                    View All
                   </button>
                 </div>
 
                 <div className="sp-status-list">
-                  <div className="sp-status-row" onClick={() => setActiveTab('status')}>
+                  <div
+                    className="sp-status-row"
+                    onClick={() => setActiveTab('status')}
+                    title="View Applied Placement Drives"
+                  >
                     <div className="sp-status-left">
                       <div className="sp-status-icon-box applied">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
                           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
                         </svg>
                       </div>
@@ -1374,13 +1443,17 @@ export default function StudentPlacements({ student = {}, onBack, onNavigateHome
                         <span className="sp-status-subtitle">Profiles sent to recruiters</span>
                       </div>
                     </div>
-                    <span className="sp-status-count">{metrics.applied}</span>
+                    <span className="sp-status-count applied">{metrics.applied}</span>
                   </div>
 
-                  <div className="sp-status-row" onClick={() => setActiveTab('status')}>
+                  <div
+                    className="sp-status-row"
+                    onClick={() => setActiveTab('status')}
+                    title="View Shortlisted & Tests"
+                  >
                     <div className="sp-status-left">
                       <div className="sp-status-icon-box shortlisted">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
                           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                         </svg>
                       </div>
@@ -1389,13 +1462,17 @@ export default function StudentPlacements({ student = {}, onBack, onNavigateHome
                         <span className="sp-status-subtitle">Online test link active</span>
                       </div>
                     </div>
-                    <span className="sp-status-count">{metrics.shortlisted}</span>
+                    <span className="sp-status-count shortlisted">{metrics.shortlisted}</span>
                   </div>
 
-                  <div className="sp-status-row" onClick={() => setActiveTab('status')}>
+                  <div
+                    className="sp-status-row"
+                    onClick={() => setActiveTab('status')}
+                    title="View Technical Interviews"
+                  >
                     <div className="sp-status-left">
                       <div className="sp-status-icon-box interview">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
                           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                           <circle cx="9" cy="7" r="4" />
                           <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -1407,13 +1484,17 @@ export default function StudentPlacements({ student = {}, onBack, onNavigateHome
                         <span className="sp-status-subtitle">Panel rounds in progress</span>
                       </div>
                     </div>
-                    <span className="sp-status-count">{metrics.interviews}</span>
+                    <span className="sp-status-count interview">{metrics.interviews}</span>
                   </div>
 
-                  <div className="sp-status-row" onClick={() => setActiveTab('status')}>
+                  <div
+                    className={`sp-status-row ${approvedOffers.length > 0 ? 'has-offers' : ''}`}
+                    onClick={() => setActiveTab('status')}
+                    title={approvedOffers.length > 0 ? 'View Approved Offer Letters' : 'No Offer Letters Issued Yet'}
+                  >
                     <div className="sp-status-left">
                       <div className="sp-status-icon-box offers">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
                           <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                           <line x1="16" y1="2" x2="16" y2="6" />
                           <line x1="8" y1="2" x2="8" y2="6" />
@@ -1422,10 +1503,14 @@ export default function StudentPlacements({ student = {}, onBack, onNavigateHome
                       </div>
                       <div className="sp-status-info">
                         <span className="sp-status-title">Offer Letters</span>
-                        <span className="sp-status-subtitle">Final selection confirmed</span>
+                        <span className="sp-status-subtitle">
+                          {approvedOffers.length > 0
+                            ? `${approvedOffers.length} letter${approvedOffers.length > 1 ? 's' : ''} available`
+                            : 'Final selection confirmed'}
+                        </span>
                       </div>
                     </div>
-                    <span className="sp-status-count">{metrics.offers}</span>
+                    <span className="sp-status-count offers">{metrics.offers}</span>
                   </div>
                 </div>
 
@@ -1434,17 +1519,43 @@ export default function StudentPlacements({ student = {}, onBack, onNavigateHome
                     {approvedOffers.map((offer) => (
                       <div key={offer.placementId} className="sp-offer-item">
                         <div className="sp-offer-item-header">
-                          <span className="sp-offer-company">{offer.company}</span>
+                          <div className="sp-oli-comp-wrap">
+                            <span className="sp-offer-company">{offer.company}</span>
+                            <span className="sp-offer-role">{offer.role}</span>
+                          </div>
                           <span className="sp-offer-package">{offer.package}</span>
                         </div>
-                        <span className="sp-offer-role">{offer.role}</span>
                         <div className="sp-offer-actions">
                           <button
                             type="button"
                             className="sp-btn-offer-view"
-                            onClick={() => setViewingOfferLetter(offer)}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setViewingOfferLetter(offer)
+                            }}
+                            title="View official offer letter preview"
                           >
-                            View Offer Letter
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            View
+                          </button>
+                          <button
+                            type="button"
+                            className="sp-btn-offer-download"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDownloadOfferLetter(offer)
+                            }}
+                            title="Download official offer letter"
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                              <polyline points="7 10 12 15 17 10" />
+                              <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            Download Offer Letter
                           </button>
                         </div>
                       </div>
@@ -1457,7 +1568,7 @@ export default function StudentPlacements({ student = {}, onBack, onNavigateHome
               <div className="sp-side-card">
                 <div className="sp-side-header">
                   <div className="sp-side-title-group">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b3881e" strokeWidth="2.4">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b3881e" strokeWidth="2.4">
                       <circle cx="12" cy="12" r="10" />
                       <line x1="12" y1="16" x2="12" y2="12" />
                       <line x1="12" y1="8" x2="12.01" y2="8" />
@@ -1799,6 +1910,20 @@ export default function StudentPlacements({ student = {}, onBack, onNavigateHome
                 onClick={() => setViewingOfferLetter(null)}
               >
                 Close
+              </button>
+              <button
+                type="button"
+                className="sp-btn-offer-download"
+                style={{ padding: '6px 14px', fontSize: '0.78rem' }}
+                onClick={() => handleDownloadOfferLetter(viewingOfferLetter)}
+                title="Download official offer letter"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Download Offer Letter
               </button>
               <button
                 type="button"
