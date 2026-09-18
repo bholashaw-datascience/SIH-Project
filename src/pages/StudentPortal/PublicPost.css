@@ -1074,7 +1074,7 @@
   white-space: nowrap;
 }
 
-/* Social Media Stage Viewport with Compact Aspect Ratio */
+/* Social Media Stage Viewport - Automatically adapts to actual media aspect ratio */
 .pp-preview-stage-container {
   width: 100%;
   background: #020617;
@@ -1084,32 +1084,20 @@
   align-items: center;
   justify-content: center;
   user-select: none;
-  max-height: 210px;
+  border-radius: 6px;
+  max-height: 260px;
+  transition: width 0.2s ease, height 0.2s ease;
 }
 
-.pp-preview-stage-container.aspect-1-1 {
-  aspect-ratio: 1 / 1;
-  max-width: 210px;
-  margin: 0 auto;
-}
-
-.pp-preview-stage-container.aspect-4-5 {
-  aspect-ratio: 4 / 5;
-  max-width: 168px;
-  margin: 0 auto;
-}
-
-.pp-preview-stage-container.aspect-16-9 {
+.pp-preview-stage-container.is-empty {
   aspect-ratio: 16 / 9;
-  max-width: 100%;
   max-height: 180px;
-  margin: 0 auto;
 }
 
 .pp-preview-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 
@@ -1125,7 +1113,7 @@
 .pp-preview-video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 

@@ -130,7 +130,7 @@ export default function PublicPost({
       }
 
       const objectUrl = createTrackedBlobUrl(file)
-      newMediaItems.push({
+      const newItem = {
         id: `m_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
         name: file.name,
         size: formatFileSize(file.size),
@@ -138,7 +138,34 @@ export default function PublicPost({
         url: objectUrl,
         croppedUrl: null,
         file,
-      })
+        aspectRatio: null,
+      }
+
+      if (isImage) {
+        const tempImg = new Image()
+        tempImg.onload = () => {
+          if (tempImg.naturalWidth && tempImg.naturalHeight) {
+            const ratio = tempImg.naturalWidth / tempImg.naturalHeight
+            setMediaList((prev) =>
+              prev.map((m) => (m.id === newItem.id ? { ...m, aspectRatio: ratio } : m))
+            )
+          }
+        }
+        tempImg.src = objectUrl
+      } else if (isVideo) {
+        const tempVid = document.createElement('video')
+        tempVid.onloadedmetadata = () => {
+          if (tempVid.videoWidth && tempVid.videoHeight) {
+            const ratio = tempVid.videoWidth / tempVid.videoHeight
+            setMediaList((prev) =>
+              prev.map((m) => (m.id === newItem.id ? { ...m, aspectRatio: ratio } : m))
+            )
+          }
+        }
+        tempVid.src = objectUrl
+      }
+
+      newMediaItems.push(newItem)
     })
 
     if (encounteredError) {
@@ -194,6 +221,31 @@ export default function PublicPost({
       url: objectUrl,
       croppedUrl: null,
       file,
+      aspectRatio: null,
+    }
+
+    if (isImage) {
+      const tempImg = new Image()
+      tempImg.onload = () => {
+        if (tempImg.naturalWidth && tempImg.naturalHeight) {
+          const ratio = tempImg.naturalWidth / tempImg.naturalHeight
+          setMediaList((prev) =>
+            prev.map((m) => (m.id === replacement.id ? { ...m, aspectRatio: ratio } : m))
+          )
+        }
+      }
+      tempImg.src = objectUrl
+    } else if (isVideo) {
+      const tempVid = document.createElement('video')
+      tempVid.onloadedmetadata = () => {
+        if (tempVid.videoWidth && tempVid.videoHeight) {
+          const ratio = tempVid.videoWidth / tempVid.videoHeight
+          setMediaList((prev) =>
+            prev.map((m) => (m.id === replacement.id ? { ...m, aspectRatio: ratio } : m))
+          )
+        }
+      }
+      tempVid.src = objectUrl
     }
 
     setMediaList((prev) =>
@@ -215,13 +267,20 @@ export default function PublicPost({
   // Apply photo crop from ImageCropModal
   const handleCropApply = (croppedDataUrl) => {
     if (!croppingItem) return
-    setMediaList((prev) =>
-      prev.map((item) =>
-        item.id === croppingItem.id
-          ? { ...item, croppedUrl: croppedDataUrl }
-          : item
+    const tempImg = new Image()
+    tempImg.onload = () => {
+      const ratio = tempImg.naturalWidth && tempImg.naturalHeight
+        ? tempImg.naturalWidth / tempImg.naturalHeight
+        : null
+      setMediaList((prev) =>
+        prev.map((item) =>
+          item.id === croppingItem.id
+            ? { ...item, croppedUrl: croppedDataUrl, ...(ratio ? { aspectRatio: ratio } : {}) }
+            : item
+        )
       )
-    )
+    }
+    tempImg.src = croppedDataUrl
     setCroppingItem(null)
   }
 
@@ -342,6 +401,22 @@ export default function PublicPost({
 
   // Current active media for preview carousel
   const activeMediaItem = mediaList[activeMediaIndex] || mediaList[0]
+  const activeRatio = activeMediaItem?.aspectRatio || null
+
+  const stageContainerStyle = activeMediaItem
+    ? activeRatio
+      ? {
+          aspectRatio: `${activeRatio}`,
+          maxHeight: '260px',
+          width: `min(100%, calc(260px * ${activeRatio}))`,
+          margin: '0 auto',
+        }
+      : {
+          maxHeight: '260px',
+          width: '100%',
+          margin: '0 auto',
+        }
+    : undefined
 
   return (
     <div className="pp-page-wrapper">
@@ -426,15 +501,9 @@ export default function PublicPost({
 
       {/* MAIN BODY CONTAINER */}
       <main className="pp-main-content">
-        {/* Compact Page Heading (No large container box) */}
+        {/* Compact Page Heading */}
         <div className="pp-compact-heading">
-          <div className="pp-compact-heading-left">
-            <h1 className="pp-compact-title">Create Public Post</h1>
-            <span className="pp-compact-badge">Admin Verification Enforced</span>
-          </div>
-          <p className="pp-compact-subtitle">
-            Submissions are reviewed by Portal Admin before becoming publicly visible across the institutional network.
-          </p>
+          <h1 className="pp-compact-title">Create Public Post</h1>
         </div>
 
         {/* 2-COLUMN WORKSPACE GRID: FORM (LEFT) + GUIDELINES & PREVIEW (RIGHT) */}
@@ -905,10 +974,6 @@ export default function PublicPost({
                   </svg>
                   Live Social Preview
                 </div>
-                <div className="pp-preview-live-badge">
-                  <span className="pp-preview-live-dot" />
-                  Live Sync
-                </div>
               </div>
 
               {/* Feed Simulation Card */}
@@ -943,8 +1008,11 @@ export default function PublicPost({
                   </span>
                 </div>
 
-                {/* Media Viewport with Chosen Aspect Ratio */}
-                <div className={`pp-preview-stage-container aspect-${aspectRatio.replace(':', '-')}`}>
+                {/* Media Viewport with Original Aspect Ratio */}
+                <div
+                  className={`pp-preview-stage-container ${mediaList.length === 0 ? 'is-empty' : 'has-media'}`}
+                  style={stageContainerStyle}
+                >
                   {mediaList.length > 0 ? (
                     <>
                       {/* Active Media Renderer */}
@@ -956,6 +1024,16 @@ export default function PublicPost({
                             playsInline
                             className="pp-preview-video"
                             key={activeMediaItem.url}
+                            onLoadedMetadata={(e) => {
+                              if (e.currentTarget.videoWidth && e.currentTarget.videoHeight) {
+                                const ratio = e.currentTarget.videoWidth / e.currentTarget.videoHeight
+                                if (activeMediaItem && activeMediaItem.aspectRatio !== ratio) {
+                                  setMediaList((prev) =>
+                                    prev.map((m) => (m.id === activeMediaItem.id ? { ...m, aspectRatio: ratio } : m))
+                                  )
+                                }
+                              }
+                            }}
                           />
                         </div>
                       ) : (
@@ -963,6 +1041,16 @@ export default function PublicPost({
                           src={activeMediaItem?.croppedUrl || activeMediaItem?.url}
                           alt={activeMediaItem?.name || 'Preview'}
                           className="pp-preview-img"
+                          onLoad={(e) => {
+                            if (e.currentTarget.naturalWidth && e.currentTarget.naturalHeight) {
+                              const ratio = e.currentTarget.naturalWidth / e.currentTarget.naturalHeight
+                              if (activeMediaItem && activeMediaItem.aspectRatio !== ratio) {
+                                setMediaList((prev) =>
+                                  prev.map((m) => (m.id === activeMediaItem.id ? { ...m, aspectRatio: ratio } : m))
+                                )
+                              }
+                            }
+                          }}
                         />
                       )}
 
@@ -1019,9 +1107,9 @@ export default function PublicPost({
                         <circle cx="8.5" cy="8.5" r="1.5" />
                         <polyline points="21 15 16 10 5 21" />
                       </svg>
-                      <span>Media Preview Frame ({aspectRatio})</span>
+                      <span>Media Preview</span>
                       <small style={{ fontSize: '0.72rem', color: '#64748b' }}>
-                        Uploaded photos & videos will display here
+                        Uploaded photos &amp; videos will display here
                       </small>
                     </div>
                   )}
