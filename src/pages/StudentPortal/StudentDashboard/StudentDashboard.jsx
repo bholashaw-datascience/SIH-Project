@@ -1628,7 +1628,7 @@ export default function StudentDashboard({
                 </svg>
               </div>
               <div>
-                <h4 className="sd-gw-title">Internships & Placements</h4>
+                <h4 className="sd-gw-title">Internships</h4>
                 <p className="sd-gw-desc">
                   Browse verified campus recruitment drives, summer internships, and active applications.
                 </p>
