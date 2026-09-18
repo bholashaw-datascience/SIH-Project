@@ -43,7 +43,7 @@ export default function PublicPost({
   const [mediaList, setMediaList] = useState([]) // [{ id, name, size, type: 'image'|'video', url, croppedUrl, file }]
   const [activeMediaIndex, setActiveMediaIndex] = useState(0)
   const [aspectRatio, setAspectRatio] = useState('1:1') // '1:1' | '4:5' | '16:9'
-  const [category, setCategory] = useState('Technical Achievement')
+  const [caption, setCaption] = useState('')
   const [description, setDescription] = useState('')
   const [isDraggingOver, setIsDraggingOver] = useState(false)
   const [fileError, setFileError] = useState('')
@@ -288,9 +288,9 @@ export default function PublicPost({
   const handleResetForm = () => {
     setMediaList([])
     setActiveMediaIndex(0)
+    setCaption('')
     setDescription('')
     setAspectRatio('1:1')
-    setCategory('Technical Achievement')
     setFileError('')
     setValidationError('')
     setEditingPostId(null)
@@ -315,10 +315,10 @@ export default function PublicPost({
 
     const newPost = {
       id: editingPostId || `post_${Date.now()}`,
-      title: description.trim().slice(0, 50) + (description.trim().length > 50 ? '...' : ''),
-      caption: description.trim(),
+      title: caption.trim() || description.trim().slice(0, 50) + (description.trim().length > 50 ? '...' : ''),
+      caption: caption.trim() || description.trim(),
       content: description.trim(),
-      category,
+      category: caption.trim() || 'Public Post',
       aspectRatio,
       media: mediaList.map((m) => ({
         id: m.id,
@@ -367,8 +367,8 @@ export default function PublicPost({
   // Load a post into form for revision
   const handleLoadForRevision = (post) => {
     setEditingPostId(post.id)
-    setDescription(post.caption || post.content || '')
-    setCategory(post.category || 'Technical Achievement')
+    setCaption(post.caption || post.title || '')
+    setDescription(post.content || post.description || post.caption || '')
     setAspectRatio(post.aspectRatio || '1:1')
 
     if (Array.isArray(post.media) && post.media.length > 0) {
@@ -803,23 +803,19 @@ export default function PublicPost({
               </div>
 
               <div className="pp-description-group">
-                {/* Category Selection */}
-                <div className="pp-category-row">
-                  <label htmlFor="pp-category-select" className="pp-category-label">
-                    Achievement Category:
+                {/* Caption Field */}
+                <div className="pp-caption-row">
+                  <label htmlFor="pp-caption-input" className="pp-caption-label">
+                    Caption
                   </label>
-                  <select
-                    id="pp-category-select"
-                    className="pp-category-select"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                  >
-                    <option value="Technical Achievement">Technical Achievement & Hackathons</option>
-                    <option value="Academic Research">Academic Research & Publications</option>
-                    <option value="Open Source Project">Open Source & Software Release</option>
-                    <option value="Internship Experience">Internship & Industry Experience</option>
-                    <option value="Campus Initiative">Campus Initiative & Leadership</option>
-                  </select>
+                  <input
+                    type="text"
+                    id="pp-caption-input"
+                    className="pp-caption-input"
+                    placeholder="Write a caption for your post (e.g. 1st Place at National Smart Mobility Hackathon)..."
+                    value={caption}
+                    onChange={(e) => setCaption(e.target.value)}
+                  />
                 </div>
 
                 {/* Textarea & Counter */}
@@ -1117,7 +1113,9 @@ export default function PublicPost({
 
                 {/* Social Card Body / Description */}
                 <div className="pp-social-body">
-                  <span className="pp-social-category-tag">{category}</span>
+                  {caption.trim() ? (
+                    <span className="pp-social-category-tag">{caption.trim()}</span>
+                  ) : null}
 
                   <p className="pp-social-description">
                     {description.trim() ? (
