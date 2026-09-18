@@ -4,6 +4,7 @@ import StudentProfileDiffView from './StudentProfileDiffView'
 import StudentDashboard from './StudentDashboard/StudentDashboard'
 import StudentAchievementsExperience from './StudentAchievementsExperience'
 import PublicPost from './PublicPost'
+import StudentInternships from './StudentInternships'
 
 function StudentPortal({
   onNavigateHome,
@@ -25,6 +26,9 @@ function StudentPortal({
         return 5
       }
       if (params.get('view') === 'public_post' || window.location.hash.includes('public-post') || window.location.hash.includes('public_post')) {
+        return 5
+      }
+      if (params.get('view') === 'internships' || window.location.hash.includes('internships')) {
         return 5
       }
     } catch {}
@@ -153,6 +157,9 @@ function StudentPortal({
       if (params.get('view') === 'public_post' || window.location.hash.includes('public-post') || window.location.hash.includes('public_post')) {
         return 'public_post'
       }
+      if (params.get('view') === 'internships' || window.location.hash.includes('internships')) {
+        return 'internships'
+      }
     } catch {}
     return 'auto'
   })
@@ -231,10 +238,11 @@ function StudentPortal({
   // Rule 1 & 8: Main Student Dashboard opens ONLY after profile setup completed AND status is verified.
   const showAchievementsExperience = activeView === 'achievements_experience'
   const showPublicPost = activeView === 'public_post'
-  const showDashboard = isProfileCompleted && verificationStatus === 'verified' && activeView !== 'diff_view' && activeView !== 'edit_form' && !showAchievementsExperience && !showPublicPost
-  const showDiffView = (activeView === 'diff_view' || (isProfileCompleted && hasPendingChanges && activeView !== 'edit_form' && activeView !== 'auto_dashboard')) && !showAchievementsExperience && !showPublicPost
-  const showEditForm = activeView === 'edit_form' && !showAchievementsExperience && !showPublicPost
-  const showFirstTimeOnboarding = (!isProfileCompleted || verificationStatus === 'unverified' || verificationStatus === 'draft') && !showDashboard && !showDiffView && !showEditForm && !showAchievementsExperience && !showPublicPost && !['pending', 'approved', 'rejected'].includes(verificationStatus)
+  const showInternships = activeView === 'internships'
+  const showDashboard = isProfileCompleted && verificationStatus === 'verified' && activeView !== 'diff_view' && activeView !== 'edit_form' && !showAchievementsExperience && !showPublicPost && !showInternships
+  const showDiffView = (activeView === 'diff_view' || (isProfileCompleted && hasPendingChanges && activeView !== 'edit_form' && activeView !== 'auto_dashboard')) && !showAchievementsExperience && !showPublicPost && !showInternships
+  const showEditForm = activeView === 'edit_form' && !showAchievementsExperience && !showPublicPost && !showInternships
+  const showFirstTimeOnboarding = (!isProfileCompleted || verificationStatus === 'unverified' || verificationStatus === 'draft') && !showDashboard && !showDiffView && !showEditForm && !showAchievementsExperience && !showPublicPost && !showInternships && !['pending', 'approved', 'rejected'].includes(verificationStatus)
 
   return (
     <div className="sp-canvas">
@@ -1349,6 +1357,12 @@ function StudentPortal({
                   onBack={() => setActiveView('auto')}
                   onNavigateHome={onNavigateHome}
                 />
+              ) : activeView === 'internships' ? (
+                <StudentInternships
+                  student={currentLive}
+                  onBack={() => setActiveView('auto')}
+                  onNavigateHome={onNavigateHome}
+                />
               ) : (
                 <StudentDashboard
                   student={currentLive}
@@ -1361,6 +1375,7 @@ function StudentPortal({
                     setActiveView('achievements_experience')
                   }}
                   onOpenPublicPost={() => setActiveView('public_post')}
+                  onOpenInternships={() => setActiveView('internships')}
                   onNavigateHome={onNavigateHome}
                   onLogout={onNavigateHome}
                   verificationStatus="verified"
@@ -1582,6 +1597,7 @@ function StudentPortal({
                 setActiveView('achievements_experience')
               }}
               onOpenPublicPost={() => setActiveView('public_post')}
+              onOpenInternships={() => setActiveView('internships')}
               onNavigateHome={onNavigateHome}
               onLogout={() => {
                 try {
@@ -1612,11 +1628,20 @@ function StudentPortal({
               onNavigateHome={onNavigateHome}
             />
           )}
+
+          {/* 8. DEDICATED INTERNSHIPS PAGE */}
+          {showInternships && (
+            <StudentInternships
+              student={currentLive}
+              onBack={() => setActiveView('auto')}
+              onNavigateHome={onNavigateHome}
+            />
+          )}
         </>
       )}
 
       {/* Footer */}
-      {(!showDashboard && !showAchievementsExperience && !showPublicPost && (!isDemoActive || demoStep === 1 || demoStep === 4)) && (
+      {(!showDashboard && !showAchievementsExperience && !showPublicPost && !showInternships && (!isDemoActive || demoStep === 1 || demoStep === 4)) && (
         <footer className="sp-footer">
           <div className="sp-footer-inner">
             <div>

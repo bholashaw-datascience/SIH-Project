@@ -20,6 +20,7 @@ export default function StudentDashboard({
   onLogout,
   onOpenAchievementsExperience,
   onOpenPublicPost,
+  onOpenInternships,
   verificationStatus = 'approved',
   rejectionReason = '',
 }) {
@@ -1609,9 +1610,18 @@ export default function StudentDashboard({
         {/* SECTION 4: INTERNSHIPS & PLACEMENTS + SKILL ASSESSMENTS (Requirements 7 & 8) */}
         <section className="sd-gateways-grid">
           {/* Card: Internships & Placements */}
-          <div className="sd-gateway-card featured" onClick={() => setIsInternshipsModalOpen(true)}>
+          <div
+            className="sd-gateway-card featured"
+            onClick={() => {
+              if (onOpenInternships) {
+                onOpenInternships()
+              } else {
+                setIsInternshipsModalOpen(true)
+              }
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div className="sd-gw-icon" style={{ background: '#fdfbf7', color: '#b38e44' }}>
+              <div className="sd-gw-icon" style={{ background: '#fdfbf7', color: '#b3881e' }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
                   <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
@@ -1624,7 +1634,19 @@ export default function StudentDashboard({
                 </p>
               </div>
             </div>
-            <button type="button" className="sd-btn-secondary" style={{ flexShrink: 0 }}>
+            <button
+              type="button"
+              className="sd-btn-secondary"
+              style={{ flexShrink: 0 }}
+              onClick={(e) => {
+                e.stopPropagation()
+                if (onOpenInternships) {
+                  onOpenInternships()
+                } else {
+                  setIsInternshipsModalOpen(true)
+                }
+              }}
+            >
               Explore →
             </button>
           </div>
