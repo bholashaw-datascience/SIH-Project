@@ -2,92 +2,6 @@ import { useState, useRef, useEffect } from 'react'
 import ImageCropModal from '../../components/Auth/ImageCropModal'
 import './PublicPost.css'
 
-const DEFAULT_POSTS = [
-  {
-    id: 'post_sample_1',
-    title: 'Autonomous Quadcopter Research Demonstration',
-    caption: 'Successfully demonstrated our autonomous obstacle-avoidance quadcopter at the Regional Robotics Symposium. Our paper has also been accepted by the IAS Technical Review!',
-    category: 'Academic Research',
-    aspectRatio: '16:9',
-    media: [
-      {
-        id: 'm_demo_1',
-        name: 'quadcopter_demo.mp4',
-        size: '12.4 MB',
-        type: 'video',
-        url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-      },
-      {
-        id: 'm_demo_2',
-        name: 'robotics_symposium_booth.jpg',
-        size: '2.1 MB',
-        type: 'image',
-        url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
-      },
-    ],
-    author: {
-      name: 'Dev Roy',
-      handle: '@devroy',
-      avatar: '',
-      institution: 'IAS Collaboration Network',
-      course: 'B.Tech - Computer Science',
-    },
-    status: 'approved',
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 'post_sample_2',
-    title: 'Smart Health Monitoring IoT Prototype',
-    caption: 'Completed the hardware prototype for real-time cardiac tele-monitoring. Ready for pilot testing with the University Healthcare wing.',
-    category: 'Technical Achievement',
-    aspectRatio: '1:1',
-    media: [
-      {
-        id: 'm_demo_3',
-        name: 'iot_pcb_prototype.jpg',
-        size: '3.4 MB',
-        type: 'image',
-        url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&auto=format&fit=crop&q=80',
-      },
-    ],
-    author: {
-      name: 'Dev Roy',
-      handle: '@devroy',
-      avatar: '',
-      institution: 'IAS Collaboration Network',
-      course: 'B.Tech - Computer Science',
-    },
-    status: 'pending',
-    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 'post_sample_3',
-    title: 'Inter-College Hackathon 1st Runner Up',
-    caption: 'Team UDAAN secured 2nd place among 120 engineering teams at Smart Hack 2026. Built an AI triage assistant for rural health centres.',
-    category: 'Technical Achievement',
-    aspectRatio: '4:5',
-    media: [
-      {
-        id: 'm_demo_4',
-        name: 'hackathon_trophy.jpg',
-        size: '1.8 MB',
-        type: 'image',
-        url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop&q=80',
-      },
-    ],
-    author: {
-      name: 'Dev Roy',
-      handle: '@devroy',
-      avatar: '',
-      institution: 'IAS Collaboration Network',
-      course: 'B.Tech - Computer Science',
-    },
-    status: 'revision',
-    rejectionReason: 'Please attach a higher resolution photo of the official institutional certificate or tag team members.',
-    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-]
-
 export default function PublicPost({
   student = {},
   onBack,
@@ -109,10 +23,13 @@ export default function PublicPost({
       const saved = localStorage.getItem('udaan_student_posts')
       if (saved) {
         const parsed = JSON.parse(saved)
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed
+        const realPosts = (Array.isArray(parsed) ? parsed : []).filter(
+          (p) => p && !p.id?.startsWith('post_sample_')
+        )
+        return realPosts
       }
     } catch {}
-    return DEFAULT_POSTS
+    return []
   })
 
   // Persist posts changes to localStorage
@@ -509,33 +426,16 @@ export default function PublicPost({
 
       {/* MAIN BODY CONTAINER */}
       <main className="pp-main-content">
-        {/* 1. PAGE HEADER */}
-        <section className="pp-header-card" aria-label="Page Header">
-          <div className="pp-header-title-group">
-            <div className="pp-header-title-row">
-              <div className="pp-header-title-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-                  <path d="M12 20h9" />
-                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                </svg>
-              </div>
-              <h1 className="pp-header-title">Create Public Post</h1>
-              <span className="pp-header-badge">Admin Moderation Enforced</span>
-            </div>
-            <p className="pp-header-subtitle">
-              Publish academic breakthroughs, capstone projects, research publications, and competition wins. Every submission is carefully reviewed by the Portal Admin before becoming publicly visible on the community portfolio.
-            </p>
+        {/* Compact Page Heading (No large container box) */}
+        <div className="pp-compact-heading">
+          <div className="pp-compact-heading-left">
+            <h1 className="pp-compact-title">Create Public Post</h1>
+            <span className="pp-compact-badge">Admin Verification Enforced</span>
           </div>
-
-          <button
-            type="button"
-            className="pp-header-back-btn"
-            onClick={onBack}
-            title="Return to Student Dashboard"
-          >
-            ← Back to Dashboard
-          </button>
-        </section>
+          <p className="pp-compact-subtitle">
+            Submissions are reviewed by Portal Admin before becoming publicly visible across the institutional network.
+          </p>
+        </div>
 
         {/* 2-COLUMN WORKSPACE GRID: FORM (LEFT) + GUIDELINES & PREVIEW (RIGHT) */}
         <div className="pp-workspace-grid" ref={mainFormRef}>
@@ -1160,42 +1060,58 @@ export default function PublicPost({
               <span className="pp-recent-count-badge">{posts.length}</span>
             </div>
 
-            {/* Filter Pills */}
-            <div className="pp-recent-filter-pills" role="tablist">
-              <button
-                type="button"
-                className={`pp-filter-pill ${recentFilter === 'all' ? 'is-active' : ''}`}
-                onClick={() => setRecentFilter('all')}
-              >
-                All ({posts.length})
-              </button>
-              <button
-                type="button"
-                className={`pp-filter-pill ${recentFilter === 'pending' ? 'is-active' : ''}`}
-                onClick={() => setRecentFilter('pending')}
-              >
-                Pending ({posts.filter((p) => p.status === 'pending').length})
-              </button>
-              <button
-                type="button"
-                className={`pp-filter-pill ${recentFilter === 'approved' ? 'is-active' : ''}`}
-                onClick={() => setRecentFilter('approved')}
-              >
-                Verified ({posts.filter((p) => p.status === 'approved' || p.status === 'verified').length})
-              </button>
-              <button
-                type="button"
-                className={`pp-filter-pill ${recentFilter === 'revision' ? 'is-active' : ''}`}
-                onClick={() => setRecentFilter('revision')}
-              >
-                Needs Revision ({posts.filter((p) => p.status === 'revision' || p.status === 'rejected').length})
-              </button>
-            </div>
+            {/* Filter Pills only when student has created posts */}
+            {posts.length > 0 && (
+              <div className="pp-recent-filter-pills" role="tablist">
+                <button
+                  type="button"
+                  className={`pp-filter-pill ${recentFilter === 'all' ? 'is-active' : ''}`}
+                  onClick={() => setRecentFilter('all')}
+                >
+                  All ({posts.length})
+                </button>
+                <button
+                  type="button"
+                  className={`pp-filter-pill ${recentFilter === 'pending' ? 'is-active' : ''}`}
+                  onClick={() => setRecentFilter('pending')}
+                >
+                  Pending ({posts.filter((p) => p.status === 'pending').length})
+                </button>
+                <button
+                  type="button"
+                  className={`pp-filter-pill ${recentFilter === 'approved' ? 'is-active' : ''}`}
+                  onClick={() => setRecentFilter('approved')}
+                >
+                  Verified ({posts.filter((p) => p.status === 'approved' || p.status === 'verified').length})
+                </button>
+                <button
+                  type="button"
+                  className={`pp-filter-pill ${recentFilter === 'revision' ? 'is-active' : ''}`}
+                  onClick={() => setRecentFilter('revision')}
+                >
+                  Needs Revision ({posts.filter((p) => p.status === 'revision' || p.status === 'rejected').length})
+                </button>
+              </div>
+            )}
           </div>
 
-          {filteredPosts.length === 0 ? (
+          {posts.length === 0 ? (
+            /* Instagram-like clean empty state when student has no posts yet */
+            <div className="pp-empty-recent-instagram">
+              <div className="pp-empty-instagram-icon-circle">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+              </div>
+              <h3 className="pp-empty-instagram-title">No Posts Yet</h3>
+              <p className="pp-empty-instagram-sub">
+                Once you submit a post for verification, it will appear here.
+              </p>
+            </div>
+          ) : filteredPosts.length === 0 ? (
             <div className="pp-empty-recent">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.8">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.8">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="12" />
                 <line x1="12" y1="16" x2="12.01" y2="16" />

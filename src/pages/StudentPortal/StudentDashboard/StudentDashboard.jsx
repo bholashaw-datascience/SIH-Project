@@ -120,7 +120,13 @@ export default function StudentDashboard({
   const [posts, setPosts] = useState(() => {
     try {
       const saved = localStorage.getItem('udaan_student_posts')
-      return saved ? JSON.parse(saved) : []
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        return (Array.isArray(parsed) ? parsed : []).filter(
+          (p) => p && !p.id?.startsWith('post_sample_')
+        )
+      }
+      return []
     } catch {
       return []
     }
