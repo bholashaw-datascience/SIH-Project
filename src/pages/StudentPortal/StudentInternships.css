@@ -1,5 +1,6 @@
 /* ==========================================================================
    Student Portal Internships - Dedicated Page Styles
+   Approved Prototype Layout: Compact Horizontal Listings + Right-Side Panel
    ========================================================================== */
 
 .si-page-wrapper {
@@ -11,6 +12,18 @@
   flex-direction: column;
   box-sizing: border-box;
   font-family: inherit;
+}
+
+.si-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -132,14 +145,14 @@
 }
 
 /* --------------------------------------------------------------------------
-   Main Page Layout
+   Main Page Layout Container
    -------------------------------------------------------------------------- */
 .si-main-content {
   flex: 1;
-  max-width: 1440px;
+  max-width: 1480px;
   width: 100%;
   margin: 0 auto;
-  padding: 18px 24px 44px;
+  padding: 16px 24px 44px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -155,18 +168,18 @@
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-  padding: 2px 2px 4px;
+  padding: 2px 2px;
 }
 
 .si-header-info {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .si-page-title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.45rem;
   font-weight: 800;
   color: #0f1d2f;
   letter-spacing: -0.015em;
@@ -174,9 +187,9 @@
 
 .si-page-subtitle {
   margin: 0;
-  font-size: 0.84rem;
+  font-size: 0.83rem;
   color: #64748b;
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
 .si-header-actions {
@@ -193,8 +206,8 @@
   color: #112233;
   border: 1px solid #dcd6c8;
   border-radius: 6px;
-  padding: 7px 14px;
-  font-size: 0.8rem;
+  padding: 6px 13px;
+  font-size: 0.79rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.16s ease;
@@ -208,98 +221,32 @@
 }
 
 /* --------------------------------------------------------------------------
-   1. My Internship Status Strip
+   WORKSPACE 2-COLUMN LAYOUT (Desktop: Feed + Right Sidebar)
    -------------------------------------------------------------------------- */
-.si-status-strip {
+.si-workspace-layout {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  align-items: start;
+  width: 100%;
 }
 
-.si-status-card {
-  background: #ffffff;
-  border: 1px solid #ded9cc;
-  border-radius: 8px;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  transition: all 0.18s ease;
-  position: relative;
-  box-shadow: 0 1px 3px rgba(15, 29, 47, 0.04);
+@media (max-width: 1024px) {
+  .si-workspace-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 
-.si-status-card:hover {
-  transform: translateY(-2px);
-  border-color: #b3881e;
-  box-shadow: 0 6px 14px rgba(15, 29, 47, 0.08);
-}
-
-.si-status-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.si-status-icon.applied {
-  background: #eff6ff;
-  color: #2563eb;
-}
-
-.si-status-icon.shortlisted {
-  background: #fef3c7;
-  color: #b45309;
-}
-
-.si-status-icon.selected {
-  background: #ecfdf5;
-  color: #059669;
-}
-
-.si-status-icon.offer {
-  background: #fdf4ff;
-  color: #9333ea;
-}
-
-.si-status-info {
+.si-main-feed {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-}
-
-.si-status-label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.si-status-value {
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: #0f1d2f;
-  line-height: 1.1;
-}
-
-.si-status-tag {
-  margin-left: auto;
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 9999px;
-  background: #f1f5f9;
-  color: #475569;
-  white-space: nowrap;
+  gap: 14px;
+  min-width: 0;
 }
 
 /* --------------------------------------------------------------------------
-   2. Search & Advanced Multi-Filter Toolbar
+   Search & Multi-Filter Card
    -------------------------------------------------------------------------- */
 .si-filter-card {
   background: #ffffff;
@@ -315,11 +262,13 @@
 .si-search-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .si-search-input-wrap {
   flex: 1;
+  min-width: 240px;
   position: relative;
   display: flex;
   align-items: center;
@@ -327,17 +276,17 @@
 
 .si-search-icon {
   position: absolute;
-  left: 12px;
+  left: 11px;
   color: #64748b;
   pointer-events: none;
 }
 
 .si-search-input {
   width: 100%;
-  padding: 8px 36px 8px 38px;
+  padding: 8px 34px 8px 36px;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
-  font-size: 0.85rem;
+  font-size: 0.83rem;
   color: #0f1d2f;
   background: #f8fafc;
   outline: none;
@@ -362,6 +311,32 @@
   padding: 2px 6px;
 }
 
+/* Primary Department Dropdown in search bar */
+.si-dept-select-wrap {
+  min-width: 185px;
+}
+
+.si-dept-select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #0f1d2f;
+  font-size: 0.81rem;
+  font-weight: 600;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.si-dept-select:focus {
+  background: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
 .si-search-actions {
   display: flex;
   align-items: center;
@@ -376,7 +351,7 @@
   border: 1px solid #cbd5e1;
   border-radius: 6px;
   padding: 8px 12px;
-  font-size: 0.8rem;
+  font-size: 0.79rem;
   font-weight: 700;
   color: #334155;
   cursor: pointer;
@@ -399,30 +374,30 @@
   font-weight: 700;
   text-decoration: underline;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 4px 6px;
   white-space: nowrap;
 }
 
-/* 8-Attribute Filters Grid */
+/* Collapsible Multi-Filter Grid */
 .si-filters-grid {
-  display: grid;
+  display: none;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px 14px;
   padding-top: 12px;
   border-top: 1px solid #f1f5f9;
 }
 
+.si-filters-grid.is-open {
+  display: grid;
+}
+
 @media (max-width: 900px) {
-  .si-filters-grid {
-    display: none;
-  }
   .si-filters-grid.is-open {
-    display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 540px) {
+@media (max-width: 520px) {
   .si-filters-grid.is-open {
     grid-template-columns: 1fr;
   }
@@ -435,7 +410,7 @@
 }
 
 .si-filter-label {
-  font-size: 0.7rem;
+  font-size: 0.69rem;
   font-weight: 700;
   color: #475569;
   text-transform: uppercase;
@@ -460,23 +435,24 @@
 }
 
 /* --------------------------------------------------------------------------
-   3. Categories/Tabs & Sorting Bar
+   Tabs & Sort Bar
    -------------------------------------------------------------------------- */
 .si-sub-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .si-tabs-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   background: #e9e4d8;
   padding: 3px;
-  border-radius: 8px;
+  border-radius: 7px;
+  overflow-x: auto;
 }
 
 .si-tab-btn {
@@ -485,13 +461,14 @@
   gap: 6px;
   background: transparent;
   border: none;
-  padding: 6px 14px;
-  border-radius: 6px;
-  font-size: 0.8rem;
+  padding: 5px 12px;
+  border-radius: 5px;
+  font-size: 0.79rem;
   font-weight: 700;
   color: #475569;
   cursor: pointer;
-  transition: all 0.16s ease;
+  transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .si-tab-btn:hover {
@@ -505,7 +482,7 @@
 }
 
 .si-tab-count {
-  font-size: 0.68rem;
+  font-size: 0.67rem;
   background: #f1f5f9;
   color: #475569;
   padding: 1px 6px;
@@ -521,11 +498,11 @@
 .si-sort-wrap {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
 }
 
 .si-sort-label {
-  font-size: 0.78rem;
+  font-size: 0.77rem;
   font-weight: 700;
   color: #475569;
 }
@@ -536,65 +513,69 @@
   border-radius: 6px;
   background: #ffffff;
   color: #0f1d2f;
-  font-size: 0.8rem;
+  font-size: 0.79rem;
   font-weight: 600;
   font-family: inherit;
   outline: none;
 }
 
 /* --------------------------------------------------------------------------
-   4. Internship Listing Cards Grid (Responsive, Efficient Full-Width)
+   COMPACT HORIZONTAL OPPORTUNITY LISTINGS (PROTOTYPE DESIGN)
    -------------------------------------------------------------------------- */
-.si-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  gap: 16px;
+.si-listings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-@media (max-width: 480px) {
-  .si-cards-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.si-job-card {
+.si-listing-row {
   background: #ffffff;
   border: 1px solid #ded9cc;
   border-radius: 8px;
-  padding: 16px;
+  padding: 14px 18px;
   box-sizing: border-box;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
   box-shadow: 0 1px 3px rgba(15, 29, 47, 0.04);
-  transition: all 0.2s ease;
+  transition: all 0.18s ease;
   position: relative;
 }
 
-.si-job-card:hover {
-  transform: translateY(-2px);
+.si-listing-row:hover {
+  transform: translateY(-1px);
   border-color: #b3881e;
-  box-shadow: 0 8px 20px rgba(15, 29, 47, 0.08);
+  box-shadow: 0 5px 16px rgba(15, 29, 47, 0.08);
 }
 
-/* Card Header */
-.si-job-header {
+.si-row-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Row Header */
+.si-row-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
 }
 
-.si-comp-info {
+.si-row-comp-wrap {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  min-width: 0;
 }
 
 .si-comp-avatar {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  border-radius: 7px;
   color: #ffffff;
   font-weight: 800;
   font-size: 0.95rem;
@@ -602,26 +583,33 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
 }
 
 .si-comp-avatar.lg {
-  width: 48px;
-  height: 48px;
-  font-size: 1.1rem;
+  width: 46px;
+  height: 46px;
+  font-size: 1.05rem;
 }
 
-.si-comp-name-row {
+.si-comp-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.si-row-comp-names {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   flex-wrap: wrap;
 }
 
 .si-comp-name {
-  font-size: 0.85rem;
+  font-size: 0.83rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #334155;
 }
 
 .si-verified-pill {
@@ -639,17 +627,90 @@
   letter-spacing: 0.02em;
 }
 
-.si-comp-dept {
-  font-size: 0.72rem;
-  color: #64748b;
-  display: block;
+/* Department Color Badges */
+.si-dept-badge {
+  font-size: 0.67rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.si-dept-cs {
+  background: #eef2ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
+}
+
+.si-dept-mech {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.si-dept-elec {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.si-dept-civil {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.si-dept-chem {
+  background: #faf5ff;
+  color: #7e22ce;
+  border: 1px solid #e9d5ff;
+}
+
+.si-dept-inst {
+  background: #f0fdfa;
+  color: #0f766e;
+  border: 1px solid #99f6e4;
+}
+
+.si-dept-auto {
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+
+.si-dept-bio {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.si-dept-aero {
+  background: #fdf4ff;
+  color: #a21caf;
+  border: 1px solid #f5d0fe;
+}
+
+.si-dept-default {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.si-row-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #0f1d2f;
+  line-height: 1.3;
 }
 
 .si-bookmark-btn {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -667,78 +728,93 @@
   border-color: #fcd34d;
 }
 
-.si-job-title {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: #0f1d2f;
-  line-height: 1.25;
-}
-
-/* Badges Row */
-.si-job-badges-wrap {
+/* Specification Items Row */
+.si-row-specs {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   flex-wrap: wrap;
 }
 
-.si-pill {
+.si-spec-item {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.72rem;
-  font-weight: 700;
+  gap: 5px;
+  font-size: 0.73rem;
+  font-weight: 600;
   padding: 3px 8px;
   border-radius: 4px;
 }
 
-.si-pill.duration {
+.si-spec-item.duration {
   background: #f1f5f9;
   color: #334155;
   border: 1px solid #e2e8f0;
 }
 
-.si-pill.stipend {
+.si-spec-item.stipend {
   background: #fef3c7;
   color: #92400e;
   border: 1px solid #fcd34d;
+  font-weight: 700;
 }
 
-.si-pill.type {
+.si-spec-item.type {
   border: 1px solid transparent;
+  font-weight: 700;
 }
 
-.si-pill.type.remote {
+.si-spec-item.type.remote {
   background: #ecfdf5;
   color: #065f46;
   border-color: #a7f3d0;
 }
 
-.si-pill.type.hybrid {
+.si-spec-item.type.hybrid {
   background: #eff6ff;
   color: #1e40af;
   border-color: #bfdbfe;
 }
 
-.si-pill.type.on-site {
+.si-spec-item.type.on-site {
   background: #faf5ff;
   color: #6b21a8;
   border-color: #e9d5ff;
 }
 
-.si-pill.location {
+.si-spec-item.location {
   background: #f8fafc;
   color: #475569;
   border: 1px solid #e2e8f0;
 }
 
+.si-spec-item.deadline {
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.si-spec-item.deadline.urgent {
+  background: #fff1f2;
+  color: #e11d48;
+  border-color: #fecdd3;
+  font-weight: 700;
+}
+
 /* Skills Row */
-.si-skills-row {
+.si-row-skills {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   flex-wrap: wrap;
+}
+
+.si-skills-label {
+  font-size: 0.69rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .si-skill-tag {
@@ -748,71 +824,27 @@
   font-weight: 600;
   padding: 2px 7px;
   border-radius: 4px;
-  border: 1px solid #e2e8f0;
 }
 
-.si-job-desc {
-  margin: 0;
-  font-size: 0.78rem;
-  color: #475569;
-  line-height: 1.45;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Card Footer */
-.si-job-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-top: 10px;
-  border-top: 1px solid #f1f5f9;
-  margin-top: auto;
-}
-
-.si-deadline-info {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.si-deadline-label {
-  font-size: 0.66rem;
-  color: #94a3b8;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
-.si-deadline-date {
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: #334155;
-}
-
-.si-deadline-date.urgent {
-  color: #dc2626;
-}
-
-.si-job-actions {
+/* Action Buttons Column */
+.si-row-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .si-btn-view {
   background: #ffffff;
   color: #112233;
   border: 1px solid #cbd5e1;
+  padding: 8px 14px;
   border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 0.76rem;
+  font-size: 0.79rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.16s ease;
-  font-family: inherit;
+  transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .si-btn-view:hover {
@@ -824,17 +856,17 @@
   background: #112233;
   color: #ffffff;
   border: 1px solid #112233;
+  padding: 8px 15px;
   border-radius: 6px;
-  padding: 6px 14px;
-  font-size: 0.76rem;
+  font-size: 0.79rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.16s ease;
-  font-family: inherit;
+  transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .si-btn-apply:hover {
-  background: #1e3a5f;
+  background: #1a3956;
   border-color: #b3881e;
   box-shadow: 0 2px 8px rgba(17, 34, 51, 0.2);
 }
@@ -843,191 +875,348 @@
   background: #ecfdf5;
   color: #065f46;
   border: 1px solid #a7f3d0;
+  padding: 8px 14px;
   border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 0.76rem;
+  font-size: 0.79rem;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   cursor: default;
+  white-space: nowrap;
 }
 
-/* --------------------------------------------------------------------------
-   8. Application Tips Section
-   -------------------------------------------------------------------------- */
-.si-tips-card {
-  background: #ffffff;
-  border: 1px solid #ded9cc;
-  border-radius: 8px;
-  padding: 14px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+/* Responsive row adjustments */
+@media (max-width: 680px) {
+  .si-listing-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
 
-.si-tips-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.si-tips-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.si-tips-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: #fef3c7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.si-tips-title {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: #0f1d2f;
-}
-
-.si-tips-sub {
-  margin: 0;
-  font-size: 0.74rem;
-  color: #64748b;
-}
-
-.si-tips-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-}
-
-@media (max-width: 768px) {
-  .si-tips-grid {
-    grid-template-columns: 1fr;
+  .si-row-actions {
+    justify-content: flex-end;
+    padding-top: 10px;
+    border-top: 1px solid #f1f5f9;
   }
 }
 
-.si-tip-item {
-  background: #faf8f5;
-  border: 1px solid #e9e4d8;
-  border-radius: 6px;
-  padding: 10px 12px;
+/* --------------------------------------------------------------------------
+   RIGHT COLUMN: PROTOTYPE-STYLE SIDEBAR (STATUS & APPLICATION TIPS)
+   -------------------------------------------------------------------------- */
+.si-sidebar {
+  position: sticky;
+  top: 72px;
   display: flex;
+  flex-direction: column;
   gap: 10px;
+  width: 320px;
+  flex-shrink: 0;
 }
 
-.si-tip-num {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #112233;
-  color: #ffffff;
-  font-size: 0.7rem;
+@media (max-width: 1024px) {
+  .si-sidebar {
+    position: static;
+    width: 100%;
+  }
+}
+
+.si-side-panel {
+  background: #ffffff;
+  border: 1px solid #ded9cc;
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(15, 29, 47, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.si-side-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 7px;
+}
+
+.si-side-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.si-side-title {
+  margin: 0;
+  font-size: 0.86rem;
   font-weight: 800;
+  color: #0f1d2f;
+  letter-spacing: -0.01em;
+}
+
+.si-side-link-btn {
+  background: transparent;
+  border: none;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #2563eb;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.si-side-link-btn:hover {
+  color: #1d4ed8;
+}
+
+/* Vertical Status List */
+.si-status-vertical-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.si-status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.si-status-row:hover {
+  border-color: #b3881e;
+  background: #fdfbf7;
+  transform: translateX(2px);
+}
+
+.si-status-mini-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.si-tip-item strong {
-  display: block;
-  font-size: 0.78rem;
-  color: #0f1d2f;
-  margin-bottom: 2px;
+.si-status-mini-icon svg {
+  width: 13px;
+  height: 13px;
 }
 
-.si-tip-item p {
+.si-status-mini-icon.applied {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.si-status-mini-icon.shortlisted {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.si-status-mini-icon.selected {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.si-status-mini-icon.offer {
+  background: #fdf4ff;
+  color: #9333ea;
+}
+
+.si-status-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.si-status-name {
+  font-size: 0.77rem;
+  font-weight: 700;
+  color: #0f1d2f;
+  line-height: 1.15;
+}
+
+.si-status-subtext {
+  font-size: 0.64rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.si-status-badge {
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.si-status-badge.applied {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.si-status-badge.shortlisted {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.si-status-badge.selected {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.si-status-badge.offer {
+  background: #f3e8ff;
+  color: #7e22ce;
+}
+
+/* Application Tips List */
+.si-side-tips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.si-side-tip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.si-tip-bubble {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #112233;
+  color: #f6d87e;
+  font-size: 0.63rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.si-tip-heading {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #0f1d2f;
+  line-height: 1.15;
+  margin-bottom: 1px;
+}
+
+.si-tip-desc {
   margin: 0;
-  font-size: 0.72rem;
-  color: #475569;
-  line-height: 1.35;
+  font-size: 0.67rem;
+  color: #64748b;
+  line-height: 1.3;
 }
 
 /* --------------------------------------------------------------------------
-   My Applications View
+   My Applications Tracking View
    -------------------------------------------------------------------------- */
 .si-applications-view {
   background: #ffffff;
   border: 1px solid #ded9cc;
   border-radius: 8px;
-  padding: 18px 20px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  box-shadow: 0 1px 3px rgba(15, 29, 47, 0.04);
 }
 
 .si-applications-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
   flex-wrap: wrap;
-  padding-bottom: 12px;
   border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 14px;
 }
 
 .si-section-title {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 800;
   color: #0f1d2f;
 }
 
 .si-section-sub {
-  margin: 0;
-  font-size: 0.78rem;
+  margin: 3px 0 0;
+  font-size: 0.8rem;
   color: #64748b;
 }
 
 .si-applications-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 500px) {
+  .si-applications-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .si-app-card {
-  background: #fdfbf7;
-  border: 1px solid #ded9cc;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  background: #ffffff;
 }
 
 .si-app-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 8px;
+  gap: 12px;
+}
+
+.si-app-company-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
 }
 
 .si-app-company {
-  font-size: 0.74rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: #64748b;
-  text-transform: uppercase;
 }
 
 .si-app-role {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   font-weight: 800;
   color: #0f1d2f;
 }
 
 .si-app-status-badge {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  padding: 3px 8px;
+  padding: 3px 9px;
   border-radius: 9999px;
   white-space: nowrap;
 }
@@ -1046,65 +1235,80 @@
 
 .si-app-status-badge.selected {
   background: #ecfdf5;
-  color: #065f46;
+  color: #047857;
   border: 1px solid #a7f3d0;
 }
 
 .si-app-status-badge.offer {
   background: #fdf4ff;
-  color: #9333ea;
-  border: 1px solid #f0abfc;
+  color: #7e22ce;
+  border: 1px solid #f5d0fe;
 }
 
 .si-app-meta {
-  font-size: 0.74rem;
-  color: #475569;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: #475569;
   flex-wrap: wrap;
 }
 
 .si-app-feedback {
   margin: 0;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 8px 10px;
-  font-size: 0.74rem;
+  font-size: 0.77rem;
   color: #334155;
-  line-height: 1.35;
+  background: #f8fafc;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 3px solid #2563eb;
+  line-height: 1.4;
 }
 
 .si-app-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 12px;
   padding-top: 6px;
-  border-top: 1px solid #ede8dc;
-  margin-top: auto;
+  border-top: 1px solid #f1f5f9;
 }
 
 .si-app-date {
-  font-size: 0.7rem;
-  color: #94a3b8;
+  font-size: 0.73rem;
+  color: #64748b;
+}
+
+.si-btn-outline {
+  background: transparent;
+  border: 1px solid #cbd5e1;
+  padding: 5px 12px;
+  border-radius: 5px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.si-btn-outline:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
 }
 
 /* --------------------------------------------------------------------------
    Empty State
    -------------------------------------------------------------------------- */
 .si-empty-state {
+  padding: 44px 20px;
   text-align: center;
-  padding: 36px 16px;
-  background: #ffffff;
-  border: 1px dashed #cbd5e1;
-  border-radius: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  color: #64748b;
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
 }
 
 .si-empty-state h3 {
@@ -1117,27 +1321,25 @@
 .si-empty-state p {
   margin: 0;
   font-size: 0.8rem;
-  max-width: 420px;
+  color: #64748b;
+  max-width: 440px;
+  line-height: 1.4;
 }
 
-/* --------------------------------------------------------------------------
-   Buttons Generic
-   -------------------------------------------------------------------------- */
 .si-btn-primary {
   background: #112233;
   color: #ffffff;
   border: 1px solid #112233;
+  padding: 8px 18px;
   border-radius: 6px;
-  padding: 8px 16px;
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.16s ease;
-  font-family: inherit;
 }
 
 .si-btn-primary:hover {
-  background: #1e3a5f;
+  background: #1a3956;
   border-color: #b3881e;
 }
 
@@ -1145,84 +1347,26 @@
   background: #f1f5f9;
   color: #334155;
   border: 1px solid #cbd5e1;
+  padding: 7px 15px;
   border-radius: 6px;
-  padding: 8px 14px;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.16s ease;
-  font-family: inherit;
 }
 
 .si-btn-secondary:hover {
   background: #e2e8f0;
 }
 
-.si-btn-outline {
-  background: transparent;
-  color: #112233;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 5px 10px;
-  font-size: 0.74rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.16s ease;
-  font-family: inherit;
-}
-
-.si-btn-outline:hover {
-  background: #f1f5f9;
-  border-color: #94a3b8;
-}
-
 /* --------------------------------------------------------------------------
-   Toast Notice
-   -------------------------------------------------------------------------- */
-.si-toast-notice {
-  position: fixed;
-  top: 68px;
-  right: 24px;
-  background: #112233;
-  color: #ffffff;
-  border-left: 4px solid #10b981;
-  padding: 10px 16px;
-  border-radius: 6px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  z-index: 999;
-  font-size: 0.82rem;
-  font-weight: 600;
-  animation: siSlideIn 0.2s ease;
-}
-
-.si-toast-notice svg {
-  color: #10b981;
-  flex-shrink: 0;
-}
-
-.si-toast-close {
-  background: transparent;
-  border: none;
-  color: #94a3b8;
-  cursor: pointer;
-  font-size: 0.8rem;
-  margin-left: 6px;
-}
-
-/* --------------------------------------------------------------------------
-   Modals (Details & Application Flow)
+   Modals (Details & Direct Application)
    -------------------------------------------------------------------------- */
 .si-modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(15, 29, 47, 0.65);
-  backdrop-filter: blur(2px);
+  inset: 0;
+  background-color: rgba(15, 29, 47, 0.68);
+  backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1232,40 +1376,63 @@
   animation: siFadeIn 0.18s ease-out;
 }
 
+@keyframes siFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .si-modal-card {
   width: 100%;
-  max-width: 780px;
+  max-width: 720px;
   background: #ffffff;
-  border-radius: 8px;
-  border: 1px solid #d9d4c7;
+  border-radius: 10px;
+  border: 1px solid #dcd6c8;
   box-shadow: 0 20px 48px rgba(12, 24, 38, 0.28);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  max-height: 88vh;
+  max-height: 90vh;
   box-sizing: border-box;
   animation: siSlideUp 0.2s ease-out;
 }
 
 .si-modal-card.apply-modal {
-  max-width: 680px;
+  max-width: 650px;
+}
+
+@keyframes siSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .si-modal-header {
-  padding: 16px 20px;
+  padding: 16px 22px;
   background: #112233;
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
   border-bottom: 2px solid #b3881e;
+  gap: 12px;
 }
 
 .si-modal-comp {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+}
+
+.si-comp-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .si-modal-title {
@@ -1283,45 +1450,36 @@
 .si-modal-close-btn {
   background: transparent;
   border: none;
-  color: #ffffff;
-  font-size: 1.1rem;
+  color: #94a3b8;
+  font-size: 1.2rem;
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 4px;
-  line-height: 1;
-  transition: background 0.16s ease;
 }
 
 .si-modal-close-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .si-modal-body {
-  padding: 18px 20px;
+  padding: 20px 24px;
   overflow-y: auto;
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  box-sizing: border-box;
 }
 
-.si-modal-footer {
-  padding: 12px 20px;
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+.si-detail-chips-row {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: 10px;
-}
-
-/* Detail Modal Specifics */
-.si-detail-chips-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 8px;
+  flex-wrap: wrap;
   background: #f8fafc;
-  padding: 10px;
-  border-radius: 6px;
+  padding: 12px 14px;
+  border-radius: 8px;
   border: 1px solid #e2e8f0;
 }
 
@@ -1329,10 +1487,11 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 100px;
 }
 
 .si-dc-label {
-  font-size: 0.66rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: #64748b;
   text-transform: uppercase;
@@ -1340,7 +1499,7 @@
 
 .si-dc-val {
   font-size: 0.82rem;
-  font-weight: 800;
+  font-weight: 700;
   color: #0f1d2f;
 }
 
@@ -1354,9 +1513,7 @@
   margin: 0;
   font-size: 0.86rem;
   font-weight: 800;
-  color: #1e293b;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  color: #0f1d2f;
 }
 
 .si-ds-text {
@@ -1368,65 +1525,79 @@
 
 .si-ds-list {
   margin: 0;
-  padding-left: 18px;
-  font-size: 0.8rem;
+  padding-left: 20px;
+  font-size: 0.82rem;
   color: #334155;
-  line-height: 1.55;
+  line-height: 1.5;
 }
 
-/* Apply Modal Specifics */
+.si-modal-footer {
+  padding: 14px 22px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   Apply Modal Specifics (Verified Profile Banner & Card)
+   -------------------------------------------------------------------------- */
 .si-verified-header-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: rgba(16, 185, 129, 0.2);
-  color: #a7f3d0;
-  font-size: 0.68rem;
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-size: 0.67rem;
   font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 9999px;
+  padding: 2px 7px;
+  border-radius: 4px;
   text-transform: uppercase;
 }
 
 .si-apply-banner {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 6px;
-  padding: 10px 14px;
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  font-size: 0.78rem;
-  color: #1e40af;
+  gap: 12px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-left: 4px solid #2563eb;
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #1e3a8a;
   line-height: 1.45;
 }
 
 .si-profile-preview-card {
-  background: #faf8f5;
-  border: 1px solid #ded9cc;
-  border-radius: 6px;
-  padding: 12px 14px;
+  background: #fdfbf7;
+  border: 1px solid #e7dfcf;
+  border-radius: 8px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .si-pp-heading {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 800;
-  color: #112233;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  color: #0f1d2f;
+  border-bottom: 1px solid #ece4d4;
+  padding-bottom: 6px;
 }
 
 .si-pp-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px 12px;
+  gap: 8px 16px;
 }
 
-@media (max-width: 520px) {
+@media (max-width: 540px) {
   .si-pp-grid {
     grid-template-columns: 1fr;
   }
@@ -1440,12 +1611,13 @@
 
 .si-pp-label {
   font-size: 0.68rem;
-  color: #64748b;
   font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
 }
 
 .si-pp-val {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: #0f1d2f;
 }
@@ -1457,20 +1629,21 @@
 }
 
 .si-form-label {
-  font-size: 0.78rem;
+  font-size: 0.77rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #334155;
 }
 
 .si-form-textarea {
   width: 100%;
+  padding: 8px 12px;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
-  padding: 8px 10px;
-  font-size: 0.8rem;
-  color: #0f1d2f;
+  font-size: 0.82rem;
   font-family: inherit;
+  color: #0f1d2f;
   outline: none;
+  resize: vertical;
   box-sizing: border-box;
 }
 
@@ -1480,55 +1653,48 @@
 }
 
 /* --------------------------------------------------------------------------
-   Keyframe Animations
+   Toast Notice
    -------------------------------------------------------------------------- */
-@keyframes siFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.si-toast-notice {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #112233;
+  color: #ffffff;
+  border-left: 4px solid #10b981;
+  padding: 12px 18px;
+  border-radius: 6px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  z-index: 1500;
+  animation: siToastSlideIn 0.2s ease-out;
 }
 
-@keyframes siSlideUp {
-  from { transform: translateY(12px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+@keyframes siToastSlideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-@keyframes siSlideIn {
-  from { transform: translateX(20px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+.si-toast-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0 4px;
+  margin-left: 6px;
 }
 
-/* --------------------------------------------------------------------------
-   Mobile Viewport Adjustments
-   -------------------------------------------------------------------------- */
-@media (max-width: 768px) {
-  .si-top-navbar {
-    padding: 8px 14px;
-  }
-
-  .si-main-content {
-    padding: 12px 14px 32px;
-  }
-
-  .si-status-strip {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .si-sub-bar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .si-tabs-row {
-    overflow-x: auto;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .si-sort-wrap {
-    justify-content: flex-end;
-  }
-
-  .si-cards-grid {
-    grid-template-columns: 1fr;
-  }
+.si-toast-close:hover {
+  color: #ffffff;
 }

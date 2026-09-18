@@ -1,8 +1,493 @@
 import { useState, useMemo, useEffect } from 'react'
 import './StudentInternships.css'
 
-// Default Verified Opportunities for Institutional Network
+// Supported Institutional Academic Departments
+export const DEPARTMENTS = [
+  'All Departments',
+  'Computer Science / IT',
+  'Mechanical',
+  'Electrical / Electronics',
+  'Civil',
+  'Chemical',
+  'Instrumentation',
+  'Automobile',
+  'Biotechnology',
+  'Aerospace / Multidisciplinary'
+]
+
+// Comprehensive Verified Opportunities across ALL Academic Engineering Departments
 const INITIAL_INTERNSHIPS = [
+  // 1. MECHANICAL
+  {
+    id: 'int_mech_01',
+    company: 'Tata Motors',
+    companyLogoBg: '#0f4c81',
+    companyLogoText: 'TM',
+    verifiedCompany: true,
+    role: 'Mechanical Design & CAE Simulation Intern',
+    department: 'Mechanical',
+    duration: '6 Months',
+    durationMonths: 6,
+    stipend: '₹35,000 / month',
+    stipendAmount: 35000,
+    type: 'On-site',
+    location: 'Pune, Maharashtra',
+    requiredSkills: ['SolidWorks', 'CATIA', 'ANSYS', 'FEA', 'GD&T', 'Thermodynamics'],
+    postedDate: '1 day ago',
+    postedDaysAgo: 1,
+    deadline: '2026-10-22',
+    displayDeadline: '22 Oct 2026',
+    isUrgent: false,
+    openings: 10,
+    eligibility: 'B.Tech / B.E. in Mechanical or Production Engineering with CGPA ≥ 7.2',
+    minCgpa: 7.2,
+    overview: 'Work with the Vehicle Engineering Group at Tata Motors to conduct Finite Element Analysis (FEA), structural rigidity assessments, and 3D parametric CAD modeling for modern commercial vehicle chassis.',
+    responsibilities: [
+      'Perform static and dynamic structural FEA simulations using ANSYS Workbench.',
+      'Generate production-ready 2D manufacturing drawings with strict GD&T tolerances.',
+      'Collaborate with manufacturing line engineers during prototype assembly validation.',
+      'Conduct thermal dissipation checks on vehicle powertrain enclosures.'
+    ],
+    perks: ['Pre-Placement Offer (PPO) potential', 'Direct industrial CAD workstation access', 'Official Institutional NOC & Certificate', 'Subsidized campus accommodation in Pune'],
+    selectionProcess: 'Profile Screening → Mechanical CAD & Mechanics Test → Technical Interview → HR Onboarding'
+  },
+  {
+    id: 'int_mech_02',
+    company: 'Thermax Global',
+    companyLogoBg: '#c2410c',
+    companyLogoText: 'TX',
+    verifiedCompany: true,
+    role: 'Thermal Systems & Energy Engineering Intern',
+    department: 'Mechanical',
+    duration: '3 Months',
+    durationMonths: 3,
+    stipend: '₹30,000 / month',
+    stipendAmount: 30000,
+    type: 'On-site',
+    location: 'Pune, Maharashtra',
+    requiredSkills: ['Thermal Engineering', 'CFD', 'Fluid Dynamics', 'AutoCAD', 'Heat Transfer'],
+    postedDate: '3 days ago',
+    postedDaysAgo: 3,
+    deadline: '2026-11-05',
+    displayDeadline: '05 Nov 2026',
+    isUrgent: false,
+    openings: 6,
+    eligibility: 'B.Tech in Mechanical, Energy, or Chemical Engineering with CGPA ≥ 7.0',
+    minCgpa: 7.0,
+    overview: 'Design industrial heat exchangers, waste-heat recovery units, and sustainable boiler subsystems supporting clean energy transition across heavy industrial plants.',
+    responsibilities: [
+      'Model fluid flow and thermal gradients in heat exchange tubes using CFD software.',
+      'Prepare P&ID and thermodynamic mass and heat balance calculations.',
+      'Participate in energy efficiency audits for institutional client installations.'
+    ],
+    perks: ['Hands-on laboratory & plant trials', 'Mentorship by Chief Thermal Architect', 'Institutional Credit Sign-off'],
+    selectionProcess: 'Academic Review → Fluid & Thermal Concepts Assessment → Technical Discussion'
+  },
+
+  // 2. ELECTRICAL / ELECTRONICS
+  {
+    id: 'int_elec_01',
+    company: 'Texas Instruments India',
+    companyLogoBg: '#cc0000',
+    companyLogoText: 'TI',
+    verifiedCompany: true,
+    role: 'Analog & Digital VLSI Design Intern',
+    department: 'Electrical / Electronics',
+    duration: '6 Months',
+    durationMonths: 6,
+    stipend: '₹90,000 / month',
+    stipendAmount: 90000,
+    type: 'On-site',
+    location: 'Bengaluru, Karnataka',
+    requiredSkills: ['Verilog', 'VLSI', 'Cadence', 'CMOS Analog', 'Circuit Design', 'FPGA'],
+    postedDate: '2 days ago',
+    postedDaysAgo: 2,
+    deadline: '2026-10-18',
+    displayDeadline: '18 Oct 2026',
+    isUrgent: false,
+    openings: 8,
+    eligibility: 'B.Tech/M.Tech in ECE, EEE, Microelectronics with CGPA ≥ 8.0, 0 active backlogs',
+    minCgpa: 8.0,
+    overview: 'Join the Semiconductor Design Unit to simulate low-power CMOS mixed-signal integrated circuits, perform timing verification, and assist in silicon tape-out validation.',
+    responsibilities: [
+      'Write synthesizable RTL in SystemVerilog for high-speed serial bus controllers.',
+      'Simulate analog operational amplifiers and voltage regulators in Cadence Virtuoso.',
+      'Execute static timing analysis (STA) and formal functional verification testbenches.',
+      'Debug test chip silicon prototypes using high-bandwidth digital oscilloscopes.'
+    ],
+    perks: ['Fast-track PPO evaluation (CTC ₹28+ LPA)', 'High-performance compute cluster access', 'Dedicated Senior Silicon Mentor', 'Full wellness stipend'],
+    selectionProcess: 'Profile Screening → TI Online Aptitude & Circuit Test → Technical Interview (2 rounds) → HR Alignment'
+  },
+  {
+    id: 'int_elec_02',
+    company: 'Schneider Electric',
+    companyLogoBg: '#059669',
+    companyLogoText: 'SE',
+    verifiedCompany: true,
+    role: 'Power Systems & Smart Grid Automation Intern',
+    department: 'Electrical / Electronics',
+    duration: '3 Months',
+    durationMonths: 3,
+    stipend: '₹38,000 / month',
+    stipendAmount: 38000,
+    type: 'Hybrid',
+    location: 'Vadodara / Bengaluru',
+    requiredSkills: ['Power Systems', 'MATLAB/Simulink', 'PLC', 'SCADA', 'Switchgear'],
+    postedDate: '4 days ago',
+    postedDaysAgo: 4,
+    deadline: '2026-10-28',
+    displayDeadline: '28 Oct 2026',
+    isUrgent: false,
+    openings: 7,
+    eligibility: 'B.Tech in Electrical & Electronics Engineering (EEE) or Power Systems with CGPA ≥ 7.2',
+    minCgpa: 7.2,
+    overview: 'Develop automation logic for smart substations, microgrid telemetry gateways, and numerical protection relays driving industrial decarbonization.',
+    responsibilities: [
+      'Simulate microgrid stability and load shedding sequences using MATLAB/Simulink.',
+      'Configure Modbus and IEC 61850 communication profiles for smart energy meters.',
+      'Assist in commissioning switchgear protection panels at customer demonstration sites.'
+    ],
+    perks: ['Smart Grid Certification Voucher', 'PPO Opportunity', 'Corporate mentorship by Power Systems Lead'],
+    selectionProcess: 'Application Review → Technical Quiz on Power Electronics → Technical Interview'
+  },
+
+  // 3. CIVIL
+  {
+    id: 'int_civil_01',
+    company: 'Larsen & Toubro (L&T Construction)',
+    companyLogoBg: '#1e3a8a',
+    companyLogoText: 'LT',
+    verifiedCompany: true,
+    role: 'Structural Design & Site Engineering Intern',
+    department: 'Civil',
+    duration: '6 Months',
+    durationMonths: 6,
+    stipend: '₹32,000 / month',
+    stipendAmount: 32000,
+    type: 'On-site',
+    location: 'Mumbai / Chennai',
+    requiredSkills: ['STAAD.Pro', 'AutoCAD', 'ETABS', 'Concrete Technology', 'Quantity Surveying', 'GIS'],
+    postedDate: '3 days ago',
+    postedDaysAgo: 3,
+    deadline: '2026-10-24',
+    displayDeadline: '24 Oct 2026',
+    isUrgent: false,
+    openings: 15,
+    eligibility: 'B.Tech in Civil Engineering with CGPA ≥ 7.0, sound structural analysis fundamentals',
+    minCgpa: 7.0,
+    overview: 'Participate in the structural modeling, rebar detailing, and on-site quality compliance monitoring for high-speed transit viaducts and smart-city commercial infrastructure.',
+    responsibilities: [
+      'Perform structural finite element load analysis using STAAD.Pro and ETABS.',
+      'Review BBS (Bar Bending Schedules) and shop drawings against IS 456 / Eurocodes.',
+      'Conduct non-destructive testing (NDT) of high-performance reinforced concrete structures.',
+      'Track physical project milestones using Primavera and Building Information Modeling (BIM).'
+    ],
+    perks: ['L&T Build India Scholarship evaluation', 'Site safety and BIM certifications', 'Official institutional credit accreditation', 'On-site accommodation and mess allowance'],
+    selectionProcess: 'Institutional Nomination → Structural Engineering Aptitude Test → Panel Interview'
+  },
+  {
+    id: 'int_civil_02',
+    company: 'Afcons Infrastructure',
+    companyLogoBg: '#b45309',
+    companyLogoText: 'AF',
+    verifiedCompany: true,
+    role: 'Geotechnical & Highway Infrastructure Intern',
+    department: 'Civil',
+    duration: '3 Months',
+    durationMonths: 3,
+    stipend: '₹28,000 / month',
+    stipendAmount: 28000,
+    type: 'On-site',
+    location: 'Kolkata / Delhi NCR',
+    requiredSkills: ['Soil Mechanics', 'Total Station', 'Highway Engineering', 'MS Project', 'Surveying'],
+    postedDate: '5 days ago',
+    postedDaysAgo: 5,
+    deadline: '2026-11-10',
+    displayDeadline: '10 Nov 2026',
+    isUrgent: false,
+    openings: 9,
+    eligibility: 'B.Tech / Diploma in Civil Engineering with CGPA ≥ 6.8',
+    minCgpa: 6.8,
+    overview: 'Analyze soil bearing capacity, slope stability, and pavement design parameters for elevated expressway and urban tunneling projects.',
+    responsibilities: [
+      'Collect and log soil core samples for standard penetration tests (SPT).',
+      'Compute pavement layer thickness using IRC standards and geotechnical software.',
+      'Assist senior surveyors in setting out alignment curves using robotic Total Stations.'
+    ],
+    perks: ['Hands-on geotechnical laboratory exposure', 'Direct project recommendation letter', 'PPO consideration'],
+    selectionProcess: 'Profile Review → Geotechnical Fundamentals Test → Video Interview'
+  },
+
+  // 4. CHEMICAL
+  {
+    id: 'int_chem_01',
+    company: 'Reliance Industries Limited (RIL)',
+    companyLogoBg: '#0f766e',
+    companyLogoText: 'RL',
+    verifiedCompany: true,
+    role: 'Process Engineering & Petrochemical Refining Intern',
+    department: 'Chemical',
+    duration: '6 Months',
+    durationMonths: 6,
+    stipend: '₹42,000 / month',
+    stipendAmount: 42000,
+    type: 'On-site',
+    location: 'Jamnagar / Hazira, Gujarat',
+    requiredSkills: ['Aspen Plus', 'Heat & Mass Transfer', 'Process Safety (HAZOP)', 'Distillation', 'MATLAB'],
+    postedDate: 'Yesterday',
+    postedDaysAgo: 1,
+    deadline: '2026-10-20',
+    displayDeadline: '20 Oct 2026',
+    isUrgent: true,
+    openings: 12,
+    eligibility: 'B.Tech in Chemical Engineering or Petrochemical Technology with CGPA ≥ 7.5',
+    minCgpa: 7.5,
+    overview: 'Work in the world’s largest refining and petrochemical complex to simulate continuous distillation columns, optimize mass transfer kinetics, and model carbon-capture streams in Aspen Plus.',
+    responsibilities: [
+      'Build steady-state flowsheet simulations for cracking and fractionation units in Aspen Plus.',
+      'Calculate pressure drop across catalyst beds, control valves, and heat exchanger trains.',
+      'Participate in safety and environmental HAZOP reviews for new unit installations.',
+      'Collect pilot plant samples and analyze chemical composition with gas chromatography.'
+    ],
+    perks: ['PPO Opportunity for 2027 batch', 'Free township accommodation and sports access', 'Reliance Innovation Credential', 'Mentorship by Chief Process Technologist'],
+    selectionProcess: 'Academic Merit Screening → Chemical Process Assessment → Technical Panel Interview'
+  },
+  {
+    id: 'int_chem_02',
+    company: 'Aarti Industries Limited',
+    companyLogoBg: '#7c3aed',
+    companyLogoText: 'AI',
+    verifiedCompany: true,
+    role: 'Specialty Chemicals & Reaction Engineering Intern',
+    department: 'Chemical',
+    duration: '3 Months',
+    durationMonths: 3,
+    stipend: '₹30,000 / month',
+    stipendAmount: 30000,
+    type: 'On-site',
+    location: 'Vapi, Gujarat',
+    requiredSkills: ['Chemical Kinetics', 'Unit Operations', 'Industrial Safety', 'P&ID', 'Quality Control'],
+    postedDate: '6 days ago',
+    postedDaysAgo: 6,
+    deadline: '2026-11-02',
+    displayDeadline: '02 Nov 2026',
+    isUrgent: false,
+    openings: 5,
+    eligibility: 'B.Tech in Chemical Engineering or Industrial Chemistry with CGPA ≥ 7.0',
+    minCgpa: 7.0,
+    overview: 'Formulate specialty intermediates, scale continuous batch reactors, and optimize crystallization yields in compliant pharmaceutical and agrochemical production lines.',
+    responsibilities: [
+      'Optimize temperature and pressure profiles for multi-step exothermic chlorination reactions.',
+      'Evaluate material balances and solvent recovery efficiencies to reduce carbon footprints.',
+      'Draft Standard Operating Procedures (SOP) according to OSHA and cGMP guidelines.'
+    ],
+    perks: ['Specialty chemical plant training', 'Institutional NOC sign-off', 'Safety certification voucher'],
+    selectionProcess: 'Profile Evaluation → Organic Reaction Kinetics Test → Technical Discussion'
+  },
+
+  // 5. INSTRUMENTATION
+  {
+    id: 'int_inst_01',
+    company: 'Honeywell Automation',
+    companyLogoBg: '#dc2626',
+    companyLogoText: 'HW',
+    verifiedCompany: true,
+    role: 'Industrial Process Instrumentation & Control Intern',
+    department: 'Instrumentation',
+    duration: '6 Months',
+    durationMonths: 6,
+    stipend: '₹45,000 / month',
+    stipendAmount: 45000,
+    type: 'Hybrid',
+    location: 'Pune / Bengaluru',
+    requiredSkills: ['PLC/SCADA', 'DCS', 'Process Control', 'Sensors & Transducers', 'LabVIEW', 'Industrial IoT'],
+    postedDate: '2 days ago',
+    postedDaysAgo: 2,
+    deadline: '2026-10-26',
+    displayDeadline: '26 Oct 2026',
+    isUrgent: false,
+    openings: 8,
+    eligibility: 'B.Tech in Instrumentation, Electronics & Instrumentation, or Mechatronics with CGPA ≥ 7.2',
+    minCgpa: 7.2,
+    overview: 'Program Distributed Control Systems (DCS) and safety-critical PLC logic for refineries, pharmaceutical plants, and smart building energy management systems.',
+    responsibilities: [
+      'Configure Experion PKS DCS loop algorithms, PID tuning constants, and alarms.',
+      'Calibrate smart pressure, temperature, and Coriolis mass flow transducers.',
+      'Design Human-Machine Interface (HMI) graphics for real-time plant telemetry monitoring.',
+      'Integrate OPC UA protocols to transfer edge instrument data to cloud analytics.'
+    ],
+    perks: ['Honeywell Connected Enterprise Credential', 'Fast-track PPO evaluation', 'Hybrid work setup stipend', 'Official Academic NOC'],
+    selectionProcess: 'Resume Audit → Instrumentation & Logic Quiz → Technical Interview with DCS Lead'
+  },
+  {
+    id: 'int_06',
+    company: 'Siemens Healthineers',
+    companyLogoBg: '#0d9488',
+    companyLogoText: 'SH',
+    verifiedCompany: true,
+    role: 'Embedded Systems & Biomedical Instrumentation Intern',
+    department: 'Instrumentation',
+    duration: '6 Months',
+    durationMonths: 6,
+    stipend: '₹35,000 / month',
+    stipendAmount: 35000,
+    type: 'On-site',
+    location: 'Bengaluru, Karnataka',
+    requiredSkills: ['Embedded C', 'C++', 'RTOS', 'Microcontrollers', 'IoT Protocols', 'Sensors & Transducers'],
+    postedDate: '4 days ago',
+    postedDaysAgo: 4,
+    deadline: '2026-11-01',
+    displayDeadline: '01 Nov 2026',
+    isUrgent: false,
+    openings: 5,
+    eligibility: 'B.Tech/B.E. in Instrumentation, ECE, EEE, or Biomedical Engineering. CGPA ≥ 7.2.',
+    minCgpa: 7.2,
+    overview: 'Work on cutting-edge diagnostic equipment firmware, embedded telemetry sensors, and safety-critical RTOS routines that power medical imaging and patient monitors.',
+    responsibilities: [
+      'Develop embedded device drivers for SPI, I2C, and UART serial peripherals.',
+      'Write low-level firmware in Embedded C adhering to ISO medical safety standards.',
+      'Debug hardware-firmware timing interfaces using digital oscilloscopes and logic analyzers.',
+      'Participate in hardware-in-the-loop (HIL) automated validation suites.'
+    ],
+    perks: ['Hands-on laboratory access with medical-grade hardware', 'Published institutional project credit', 'PPO Consideration', 'Full health insurance coverage'],
+    selectionProcess: 'Resume Screening → Embedded C Technical Quiz → Lab Simulation Assessment → Panel Interview'
+  },
+
+  // 6. AUTOMOBILE
+  {
+    id: 'int_auto_01',
+    company: 'Mahindra & Mahindra EV Division',
+    companyLogoBg: '#be123c',
+    companyLogoText: 'MM',
+    verifiedCompany: true,
+    role: 'Electric Vehicle Powertrain & Battery Systems Intern',
+    department: 'Automobile',
+    duration: '6 Months',
+    durationMonths: 6,
+    stipend: '₹40,000 / month',
+    stipendAmount: 40000,
+    type: 'On-site',
+    location: 'Chennai, Tamil Nadu',
+    requiredSkills: ['BMS', 'EV Powertrain', 'MATLAB/Simulink', 'Vehicle Dynamics', 'CAN Protocol', 'Motor Drives'],
+    postedDate: '3 days ago',
+    postedDaysAgo: 3,
+    deadline: '2026-10-30',
+    displayDeadline: '30 Oct 2026',
+    isUrgent: false,
+    openings: 10,
+    eligibility: 'B.Tech in Automobile, Mechanical, or Electrical Engineering with CGPA ≥ 7.2',
+    minCgpa: 7.2,
+    overview: 'Architect Battery Management System (BMS) cell balancing algorithms, model regenerative braking kinematics, and evaluate thermal runaway mitigation for next-gen electric SUVs.',
+    responsibilities: [
+      'Simulate high-voltage Li-ion battery pack discharge curves in MATLAB/Simulink.',
+      'Develop CAN communication nodes for motor controller and battery pack sensors.',
+      'Conduct dynamometer test runs on prototype permanent magnet synchronous motors (PMSM).',
+      'Analyze vehicle crash test kinematics and battery enclosure deformation profiles.'
+    ],
+    perks: ['Hands-on exposure to Mahindra EV test tracks in MRV Chennai', 'PPO Opportunity', 'Hostel accommodation allowance', 'Mentorship by Chief EV Architect'],
+    selectionProcess: 'Profile Evaluation → EV Engineering Fundamentals Test → Technical Interview'
+  },
+  {
+    id: 'int_auto_02',
+    company: 'Bosch Mobility Solutions',
+    companyLogoBg: '#1e293b',
+    companyLogoText: 'BS',
+    verifiedCompany: true,
+    role: 'ADAS & Automotive Embedded Testing Intern',
+    department: 'Automobile',
+    duration: '6 Months',
+    durationMonths: 6,
+    stipend: '₹48,000 / month',
+    stipendAmount: 48000,
+    type: 'Hybrid',
+    location: 'Bengaluru, Karnataka',
+    requiredSkills: ['AUTOSAR', 'CANoe', 'Automotive Ethernet', 'Python', 'Chassis Control', 'ADAS Sensors'],
+    postedDate: '4 days ago',
+    postedDaysAgo: 4,
+    deadline: '2026-10-16',
+    displayDeadline: '16 Oct 2026',
+    isUrgent: true,
+    openings: 7,
+    eligibility: 'B.Tech in Automobile, ECE, or Computer Engineering with CGPA ≥ 7.5',
+    minCgpa: 7.5,
+    overview: 'Develop automated test scripts for Advanced Driver Assistance Systems (ADAS), automated emergency braking, and automotive radar/camera fusion modules.',
+    responsibilities: [
+      'Execute software-in-the-loop (SIL) test cases using Vector CANoe and Python automation.',
+      'Validate radar sensor calibration and lane keep assist trigger algorithms on test benches.',
+      'Analyze vehicle bus trace logs for latency and functional safety compliance (ISO 26262).'
+    ],
+    perks: ['Bosch Automotive Engineering Certificate', 'Pre-Placement Offer track', 'State-of-the-art ADAS testing lab access'],
+    selectionProcess: 'Application Review → Automotive Electronics Test → Technical Video Interview'
+  },
+
+  // 7. BIOTECHNOLOGY
+  {
+    id: 'int_bio_01',
+    company: 'Biocon Biologics',
+    companyLogoBg: '#047857',
+    companyLogoText: 'BB',
+    verifiedCompany: true,
+    role: 'Bioprocess Development & Fermentation Intern',
+    department: 'Biotechnology',
+    duration: '6 Months',
+    durationMonths: 6,
+    stipend: '₹36,000 / month',
+    stipendAmount: 36000,
+    type: 'On-site',
+    location: 'Bengaluru, Karnataka',
+    requiredSkills: ['Bioreactors', 'Fermentation', 'Downstream Processing', 'HPLC', 'GMP Protocols', 'Bio-analytics'],
+    postedDate: '5 days ago',
+    postedDaysAgo: 5,
+    deadline: '2026-10-29',
+    displayDeadline: '29 Oct 2026',
+    isUrgent: false,
+    openings: 6,
+    eligibility: 'B.Tech / M.Tech in Biotechnology, Biochemical Engineering, or Bioinformatics with CGPA ≥ 7.5',
+    minCgpa: 7.5,
+    overview: 'Operate pilot-scale microbial and mammalian cell culture bioreactors, optimize monoclonal antibody titers, and conduct chromatography purification in a cGMP facility.',
+    responsibilities: [
+      'Monitor pH, dissolved oxygen, and nutrient feed rates during batch fermentation cycles.',
+      'Purify recombinant proteins using affinity chromatography and tangential flow filtration (TFF).',
+      'Analyze sample purity and protein aggregation using HPLC and SDS-PAGE assays.',
+      'Document experimental runs in compliant Electronic Lab Notebooks (ELN).'
+    ],
+    perks: ['Biocon Academy Certification', 'PPO Track for 2027 graduates', 'Hands-on cleanroom training', 'Institutional NOC accreditation'],
+    selectionProcess: 'Academic Review → Biochemical & Molecular Biology Assessment → Scientist Panel Interview'
+  },
+  {
+    id: 'int_bio_02',
+    company: 'Serum Institute of India',
+    companyLogoBg: '#0284c7',
+    companyLogoText: 'SI',
+    verifiedCompany: true,
+    role: 'Immunology & Quality Assurance Testing Intern',
+    department: 'Biotechnology',
+    duration: '3 Months',
+    durationMonths: 3,
+    stipend: '₹34,000 / month',
+    stipendAmount: 34000,
+    type: 'On-site',
+    location: 'Pune, Maharashtra',
+    requiredSkills: ['Microbiology', 'Cell Culture', 'PCR', 'ELISA', 'Bio-Safety', 'Documentation'],
+    postedDate: '1 week ago',
+    postedDaysAgo: 7,
+    deadline: '2026-11-08',
+    displayDeadline: '08 Nov 2026',
+    isUrgent: false,
+    openings: 8,
+    eligibility: 'B.Tech/M.Sc in Biotechnology, Microbiology, or Life Sciences with CGPA ≥ 7.0',
+    minCgpa: 7.0,
+    overview: 'Conduct antibody titer quantification, sterility validation, and real-time PCR diagnostic assays for international vaccine manufacturing pipelines.',
+    responsibilities: [
+      'Execute high-throughput ELISA assays and spectrophotometric concentration measurements.',
+      'Maintain primary mammalian cell lines under BSL-2 laminar air flow hoods.',
+      'Prepare validation protocols for automated clean-in-place (CIP) autoclave sterilization.'
+    ],
+    perks: ['Global vaccine production facility exposure', 'Official Institutional Training Credential', 'Subsidized campus meals'],
+    selectionProcess: 'Profile Screening → Biotechnology Knowledge Assessment → Technical Q&A'
+  },
+
+  // 8. COMPUTER SCIENCE / IT
   {
     id: 'int_01',
     company: 'Microsoft India',
@@ -10,7 +495,7 @@ const INITIAL_INTERNSHIPS = [
     companyLogoText: 'MS',
     verifiedCompany: true,
     role: 'Software Engineering Intern',
-    department: 'Cloud & AI Division',
+    department: 'Computer Science / IT',
     duration: '3 Months',
     durationMonths: 3,
     stipend: '₹85,000 / month',
@@ -43,7 +528,7 @@ const INITIAL_INTERNSHIPS = [
     companyLogoText: 'G',
     verifiedCompany: true,
     role: 'AI & Machine Learning Research Intern',
-    department: 'Google Research India',
+    department: 'Computer Science / IT',
     duration: '6 Months',
     durationMonths: 6,
     stipend: '₹1,15,000 / month',
@@ -76,7 +561,7 @@ const INITIAL_INTERNSHIPS = [
     companyLogoText: 'RZ',
     verifiedCompany: true,
     role: 'Full Stack Web Developer Intern',
-    department: 'Fintech Payments Platform',
+    department: 'Computer Science / IT',
     duration: '3 Months',
     durationMonths: 3,
     stipend: '₹45,000 / month',
@@ -109,7 +594,7 @@ const INITIAL_INTERNSHIPS = [
     companyLogoText: 'TCS',
     verifiedCompany: true,
     role: 'Cloud Infrastructure & DevOps Intern',
-    department: 'Enterprise Cloud Transformation Unit',
+    department: 'Computer Science / IT',
     duration: '6 Months',
     durationMonths: 6,
     stipend: '₹30,000 / month',
@@ -135,113 +620,16 @@ const INITIAL_INTERNSHIPS = [
     perks: ['Formal TCS Digital Internship Credential', 'Dedicated Corporate Mentorship', 'Campus Placement Advantage', 'Free Cloud Certification Vouchers'],
     selectionProcess: 'Institutional Nomination → National Qualifier Test (NQT) → Technical Interview'
   },
-  {
-    id: 'int_05',
-    company: 'Zomato Design Studios',
-    companyLogoBg: '#e23744',
-    companyLogoText: 'ZM',
-    verifiedCompany: true,
-    role: 'UI/UX Design & Product Intern',
-    department: 'Consumer Experience Design',
-    duration: '3 Months',
-    durationMonths: 3,
-    stipend: '₹40,000 / month',
-    stipendAmount: 40000,
-    type: 'Hybrid',
-    location: 'Gurugram, Haryana',
-    requiredSkills: ['Figma', 'User Research', 'Design Systems', 'Prototyping', 'Wireframing'],
-    postedDate: 'Just now',
-    postedDaysAgo: 0,
-    deadline: '2026-10-05',
-    displayDeadline: '05 Oct 2026',
-    isUrgent: true,
-    openings: 4,
-    eligibility: 'Design, Engineering, or Humanities students with a portfolio showcasing interactive design work.',
-    minCgpa: 6.5,
-    overview: 'Design engaging consumer mobile applications and order tracking micro-interactions that delight millions of daily active users across urban metros.',
-    responsibilities: [
-      'Conduct user interviews, usability audits, and card-sorting exercises.',
-      'Create high-fidelity interactive prototypes in Figma with micro-animations.',
-      'Maintain and expand the design token library for iOS and Android platforms.',
-      'Collaborate with frontend engineers to ensure design fidelity in production builds.'
-    ],
-    perks: ['Zomato Gold Benefits', 'MacBook Pro workstation provided', 'Mentorship from Design Leads', 'Portfolio Case-Study Approval'],
-    selectionProcess: 'Portfolio Review → Design Challenge (48h) → Design Walkthrough Round → Final Chat'
-  },
-  {
-    id: 'int_06',
-    company: 'Siemens Healthineers',
-    companyLogoBg: '#0d9488',
-    companyLogoText: 'SH',
-    verifiedCompany: true,
-    role: 'Embedded Systems & IoT Intern',
-    department: 'Medical Device Engineering',
-    duration: '6 Months',
-    durationMonths: 6,
-    stipend: '₹35,000 / month',
-    stipendAmount: 35000,
-    type: 'On-site',
-    location: 'Bengaluru, Karnataka',
-    requiredSkills: ['Embedded C', 'C++', 'RTOS', 'Microcontrollers', 'IoT Protocols'],
-    postedDate: '4 days ago',
-    postedDaysAgo: 4,
-    deadline: '2026-11-01',
-    displayDeadline: '01 Nov 2026',
-    isUrgent: false,
-    openings: 5,
-    eligibility: 'B.Tech/B.E. in ECE, EEE, Instrumentation, or Biomedical Engineering. CGPA ≥ 7.2.',
-    minCgpa: 7.2,
-    overview: 'Work on cutting-edge diagnostic equipment firmware, embedded telemetry sensors, and safety-critical RTOS routines that power medical imaging and patient monitors.',
-    responsibilities: [
-      'Develop embedded device drivers for SPI, I2C, and UART serial peripherals.',
-      'Write low-level firmware in Embedded C adhering to ISO medical safety standards.',
-      'Debug hardware-firmware timing interfaces using digital oscilloscopes and logic analyzers.',
-      'Participate in hardware-in-the-loop (HIL) automated validation suites.'
-    ],
-    perks: ['Hands-on laboratory access with medical-grade hardware', 'Published institutional project credit', 'PPO Consideration', 'Full health insurance coverage'],
-    selectionProcess: 'Resume Screening → Embedded C Technical Quiz → Lab Simulation Assessment → Panel Interview'
-  },
-  {
-    id: 'int_07',
-    company: 'Wipro Cyber Defense Labs',
-    companyLogoBg: '#3b82f6',
-    companyLogoText: 'WP',
-    verifiedCompany: true,
-    role: 'Cybersecurity Analyst Intern',
-    department: 'Security Operations & Threat Intelligence',
-    duration: '3 Months',
-    durationMonths: 3,
-    stipend: '₹28,000 / month',
-    stipendAmount: 28000,
-    type: 'Remote',
-    location: 'Remote - India',
-    requiredSkills: ['Networking', 'Linux', 'Wireshark', 'Python', 'Vulnerability Assessment'],
-    postedDate: '6 days ago',
-    postedDaysAgo: 6,
-    deadline: '2026-10-18',
-    displayDeadline: '18 Oct 2026',
-    isUrgent: false,
-    openings: 10,
-    eligibility: 'Engineering students in CSE, IT, Cyber Security, or Information Assurance. CGPA ≥ 6.8.',
-    minCgpa: 6.8,
-    overview: 'Monitor enterprise security events, evaluate vulnerability scanners, conduct packet analysis, and write automated Python threat detection playbooks in a live SOC environment.',
-    responsibilities: [
-      'Analyze SIEM telemetry and identify anomalies using Splunk and Wireshark.',
-      'Perform authenticated vulnerability scans on simulated test networks.',
-      'Draft incident response documentation and remediation advisories.',
-      'Automate repetitive triage steps using Python scripts and REST APIs.'
-    ],
-    perks: ['Hands-on SIEM platform access', 'Cybersecurity certification sponsorship', 'Flexible remote hours', 'Institutional internship recognition'],
-    selectionProcess: 'Profile Evaluation → Cyber Knowledge Assessment → Technical Q&A with SOC Lead'
-  },
+
+  // 9. MULTIDISCIPLINARY / AEROSPACE
   {
     id: 'int_08',
     company: 'ISRO Telemetry & Space Center',
-    companyLogoBg: '#f97316',
+    companyLogoBg: '#ea580c',
     companyLogoText: 'IS',
     verifiedCompany: true,
-    role: 'Data Science & Scientific Computing Intern',
-    department: 'Satellite Data Processing Division',
+    role: 'Satellite Data & Remote Sensing Intern',
+    department: 'Aerospace / Multidisciplinary',
     duration: '6 Months',
     durationMonths: 6,
     stipend: '₹25,000 / month',
@@ -255,7 +643,7 @@ const INITIAL_INTERNSHIPS = [
     displayDeadline: '31 Oct 2026',
     isUrgent: false,
     openings: 7,
-    eligibility: 'Pre-final or Final year B.Tech/M.Sc students with strong math, statistics, and programming foundation. CGPA ≥ 7.5.',
+    eligibility: 'Pre-final or Final year B.Tech/M.Sc across all disciplines with strong math and programming. CGPA ≥ 7.5.',
     minCgpa: 7.5,
     overview: 'Participate in analyzing satellite imagery, atmospheric sensor telemetry, and geospatial GIS databases supporting national meteorological and resource planning missions.',
     responsibilities: [
@@ -269,6 +657,22 @@ const INITIAL_INTERNSHIPS = [
   }
 ]
 
+// Department styling class helper
+export const getDepartmentClass = (dept) => {
+  if (!dept) return 'si-dept-default'
+  const d = dept.toLowerCase()
+  if (d.includes('mech')) return 'si-dept-mech'
+  if (d.includes('elec')) return 'si-dept-elec'
+  if (d.includes('civil')) return 'si-dept-civil'
+  if (d.includes('chem')) return 'si-dept-chem'
+  if (d.includes('inst')) return 'si-dept-inst'
+  if (d.includes('auto')) return 'si-dept-auto'
+  if (d.includes('bio')) return 'si-dept-bio'
+  if (d.includes('comp') || d.includes('it')) return 'si-dept-cs'
+  if (d.includes('aero') || d.includes('space')) return 'si-dept-aero'
+  return 'si-dept-default'
+}
+
 export default function StudentInternships({ student = {}, onBack, onNavigateHome }) {
   // Navigation & View mode
   const [activeTab, setActiveTab] = useState('all') // 'all' | 'remote' | 'on-site' | 'hybrid' | 'status'
@@ -276,6 +680,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedDepartment, setSelectedDepartment] = useState('All Departments')
   const [selectedRole, setSelectedRole] = useState('all')
   const [selectedSkill, setSelectedSkill] = useState('all')
   const [selectedDuration, setSelectedDuration] = useState('all')
@@ -296,9 +701,9 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
   // Student Profile Data
   const s = student || {}
   const studentName = s.name || 'Student Member'
-  const studentBranch = s.branch || s.course || 'B.Tech - Computer Science'
+  const studentBranch = s.branch || s.course || 'B.Tech - Engineering Student'
   const studentCgpa = parseFloat(s.cgpa) || 8.4
-  const studentRoll = s.rollNo || s.roll || '2023-CS-1048'
+  const studentRoll = s.rollNo || s.roll || '2023-ENG-1048'
   const studentCollege = s.institution || s.college || 'Indian Institute of Engineering & Technology'
 
   // Verified items from localStorage
@@ -314,16 +719,17 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
     } catch {}
     return [
       {
-        internshipId: 'int_03',
-        company: 'Razorpay Technologies',
-        role: 'Full Stack Web Developer Intern',
-        stipend: '₹45,000 / month',
-        type: 'Remote',
-        location: 'Remote - India',
-        appliedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        internshipId: 'int_mech_01',
+        company: 'Tata Motors',
+        role: 'Mechanical Design & CAE Simulation Intern',
+        department: 'Mechanical',
+        stipend: '₹35,000 / month',
+        type: 'On-site',
+        location: 'Pune, Maharashtra',
+        appliedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         status: 'applied', // 'applied' | 'shortlisted' | 'selected' | 'offer'
         statusLabel: 'Application Under Review',
-        feedback: 'Your verified academic credentials and GitHub projects are currently being reviewed by the engineering talent team.'
+        feedback: 'Your verified academic credentials and CAD portfolio are currently being reviewed by the chassis engineering recruitment team.'
       }
     ]
   })
@@ -333,7 +739,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
       const saved = localStorage.getItem('udaan_student_saved_internships')
       if (saved) return JSON.parse(saved)
     } catch {}
-    return ['int_01']
+    return ['int_mech_01', 'int_elec_01']
   })
 
   // Load verified student credentials
@@ -375,7 +781,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
     setSavedIds((prev) => {
       const exists = prev.includes(id)
       const next = exists ? prev.filter((item) => item !== id) : [...prev, id]
-      setToastMessage(exists ? 'Internship removed from saved items.' : 'Internship saved to your bookmarks!')
+      setToastMessage(exists ? 'Internship removed from saved bookmarks.' : 'Internship saved to your bookmarks!')
       return next
     })
   }
@@ -398,7 +804,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
     }
   }, [applications])
 
-  // Filter & Search Logic
+  // Filter & Search Logic across ALL Engineering Departments
   const filteredInternships = useMemo(() => {
     return INITIAL_INTERNSHIPS.filter((item) => {
       // 1. Tab / Category Filter
@@ -406,56 +812,66 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
       if (activeTab === 'on-site' && item.type.toLowerCase() !== 'on-site') return false
       if (activeTab === 'hybrid' && item.type.toLowerCase() !== 'hybrid') return false
 
-      // 2. Keyword Search
+      // 2. Department Filter (CRITICAL REQUIREMENT)
+      if (selectedDepartment !== 'All Departments') {
+        const itemDept = item.department.toLowerCase()
+        const selDept = selectedDepartment.toLowerCase()
+        if (!itemDept.includes(selDept) && !selDept.includes(itemDept)) {
+          return false
+        }
+      }
+
+      // 3. Keyword Search
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase()
         const matchComp = item.company.toLowerCase().includes(q)
         const matchRole = item.role.toLowerCase().includes(q)
+        const matchDept = item.department.toLowerCase().includes(q)
         const matchLoc = item.location.toLowerCase().includes(q)
         const matchSkills = item.requiredSkills.some((s) => s.toLowerCase().includes(q))
-        if (!matchComp && !matchRole && !matchLoc && !matchSkills) return false
+        if (!matchComp && !matchRole && !matchDept && !matchLoc && !matchSkills) return false
       }
 
-      // 3. Role Filter
+      // 4. Role Filter
       if (selectedRole !== 'all') {
         if (!item.role.toLowerCase().includes(selectedRole.toLowerCase())) return false
       }
 
-      // 4. Skills Filter
+      // 5. Skills Filter
       if (selectedSkill !== 'all') {
         if (!item.requiredSkills.some((s) => s.toLowerCase() === selectedSkill.toLowerCase())) return false
       }
 
-      // 5. Duration Filter
+      // 6. Duration Filter
       if (selectedDuration !== 'all') {
         if (selectedDuration === '2' && item.durationMonths !== 2) return false
         if (selectedDuration === '3' && item.durationMonths !== 3) return false
         if (selectedDuration === '6' && item.durationMonths !== 6) return false
       }
 
-      // 6. Stipend Filter
+      // 7. Stipend Filter
       if (selectedStipend !== 'all') {
         const minStipend = parseInt(selectedStipend, 10) || 0
         if (item.stipendAmount < minStipend) return false
       }
 
-      // 7. Work Type Filter
+      // 8. Work Type Filter
       if (selectedType !== 'all') {
         if (item.type.toLowerCase() !== selectedType.toLowerCase()) return false
       }
 
-      // 8. Location Filter
+      // 9. Location Filter
       if (selectedLocation !== 'all') {
         if (!item.location.toLowerCase().includes(selectedLocation.toLowerCase())) return false
       }
 
-      // 9. Posted Date Filter
+      // 10. Posted Date Filter
       if (selectedPostedDate !== 'all') {
         const maxDays = parseInt(selectedPostedDate, 10)
         if (item.postedDaysAgo > maxDays) return false
       }
 
-      // 10. Application Deadline Filter
+      // 11. Application Deadline Filter
       if (selectedDeadline !== 'all') {
         if (selectedDeadline === 'urgent' && !item.isUrgent) return false
         if (selectedDeadline === '15days') {
@@ -477,6 +893,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
     })
   }, [
     activeTab,
+    selectedDepartment,
     searchQuery,
     selectedRole,
     selectedSkill,
@@ -492,6 +909,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
   // Clear / Reset All Filters
   const handleResetFilters = () => {
     setSearchQuery('')
+    setSelectedDepartment('All Departments')
     setSelectedRole('all')
     setSelectedSkill('all')
     setSelectedDuration('all')
@@ -504,6 +922,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
 
   const hasActiveFilters = Boolean(
     searchQuery ||
+    selectedDepartment !== 'All Departments' ||
     selectedRole !== 'all' ||
     selectedSkill !== 'all' ||
     selectedDuration !== 'all' ||
@@ -524,6 +943,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
         internshipId: applyModalItem.id,
         company: applyModalItem.company,
         role: applyModalItem.role,
+        department: applyModalItem.department,
         stipend: applyModalItem.stipend,
         type: applyModalItem.type,
         location: applyModalItem.location,
@@ -532,7 +952,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
         statusLabel: 'Application Submitted',
         note: applicationNote.trim(),
         verifiedCgpa: studentCgpa,
-        feedback: 'Your verified profile and approved academic records have been transmitted directly to the campus recruitment coordinator.'
+        feedback: `Your verified institutional credentials and profile have been transmitted to the ${applyModalItem.company} recruiting coordinator.`
       }
 
       setApplications((prev) => [newApp, ...prev.filter((a) => a.internshipId !== applyModalItem.id)])
@@ -554,7 +974,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
       setIsApplying(false)
       setApplyModalItem(null)
       setApplicationNote('')
-      setToastMessage(`Application successfully submitted to ${applyModalItem.company}!`)
+      setToastMessage(`Application submitted to ${applyModalItem.company} with verified credentials!`)
     }, 600)
   }
 
@@ -567,7 +987,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
             <polyline points="20 6 9 17 4 12" />
           </svg>
           <span>{toastMessage}</span>
-          <button type="button" onClick={() => setToastMessage('')} className="si-toast-close">✕</button>
+          <button type="button" onClick={() => setToastMessage('')} className="si-toast-close" aria-label="Close notification">✕</button>
         </div>
       )}
 
@@ -610,18 +1030,6 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
               <span className="si-nav-user-sub">{studentBranch}</span>
             </div>
           </div>
-
-          {onNavigateHome && (
-            <button
-              type="button"
-              className="si-nav-back-btn"
-              onClick={onNavigateHome}
-              title="Return to Portal Home"
-              style={{ background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.15)' }}
-            >
-              Exit
-            </button>
-          )}
         </div>
       </header>
 
@@ -632,95 +1040,19 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
           <div className="si-header-info">
             <h1 className="si-page-title">Internships</h1>
             <p className="si-page-subtitle">
-              Discover verified institutional internships and industry opportunities accredited by the IAS collaboration network.
+              Discover accredited internship opportunities across all institutional academic departments.
             </p>
           </div>
-
-          <div className="si-header-actions">
-            <button
-              type="button"
-              className={`si-header-btn ${activeTab === 'status' ? 'active' : ''}`}
-              onClick={() => setActiveTab((prev) => (prev === 'status' ? 'all' : 'status'))}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-                <polyline points="10 9 9 9 8 9" />
-              </svg>
-              <span>My Applications ({applications.length})</span>
-            </button>
-          </div>
         </div>
-
-        {/* 1. MY INTERNSHIP STATUS SECTION */}
-        <section className="si-status-strip" aria-label="Internship Application Status">
-          <div className="si-status-card" onClick={() => setActiveTab('status')}>
-            <div className="si-status-icon applied">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-              </svg>
-            </div>
-            <div className="si-status-info">
-              <span className="si-status-label">Applied</span>
-              <strong className="si-status-value">{metrics.applied}</strong>
-            </div>
-            <span className="si-status-tag">Under Review</span>
-          </div>
-
-          <div className="si-status-card" onClick={() => setActiveTab('status')}>
-            <div className="si-status-icon shortlisted">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-              </svg>
-            </div>
-            <div className="si-status-info">
-              <span className="si-status-label">Shortlisted</span>
-              <strong className="si-status-value">{metrics.shortlisted}</strong>
-            </div>
-            <span className="si-status-tag">Rounds Active</span>
-          </div>
-
-          <div className="si-status-card" onClick={() => setActiveTab('status')}>
-            <div className="si-status-icon selected">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                <polyline points="22 4 12 14.01 9 11.01" />
-              </svg>
-            </div>
-            <div className="si-status-info">
-              <span className="si-status-label">Selected</span>
-              <strong className="si-status-value">{metrics.selected}</strong>
-            </div>
-            <span className="si-status-tag">Finalized</span>
-          </div>
-
-          <div className="si-status-card" onClick={() => setActiveTab('status')}>
-            <div className="si-status-icon offer">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-            </div>
-            <div className="si-status-info">
-              <span className="si-status-label">Offer Letters</span>
-              <strong className="si-status-value">{metrics.offers}</strong>
-            </div>
-            <span className="si-status-tag">Institutional NOC Ready</span>
-          </div>
-        </section>
 
         {/* CONDITIONAL VIEW: MY APPLICATIONS TAB */}
         {activeTab === 'status' ? (
           <section className="si-applications-view">
             <div className="si-applications-header">
               <div>
-                <h2 className="si-section-title">My Submitted Applications</h2>
+                <h2 className="si-section-title">My Internship Applications</h2>
                 <p className="si-section-sub">
-                  Track the real-time review progress of your verified institutional applications.
+                  Track the real-time status of your verified institutional applications.
                 </p>
               </div>
               <button
@@ -728,19 +1060,19 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
                 className="si-btn-secondary"
                 onClick={() => setActiveTab('all')}
               >
-                ← Back to All Internships
+                ← Back to Opportunity Listings
               </button>
             </div>
 
             {applications.length === 0 ? (
               <div className="si-empty-state">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.8">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.8">
                   <circle cx="12" cy="12" r="10" />
                   <line x1="12" y1="8" x2="12" y2="12" />
                   <line x1="12" y1="16" x2="12.01" y2="16" />
                 </svg>
-                <h3>No Applications Yet</h3>
-                <p>Browse the verified internships directory below and apply directly using your verified portal credentials.</p>
+                <h3>No Applications Submitted Yet</h3>
+                <p>Browse the verified internship directory below and apply directly using your verified institutional profile.</p>
                 <button type="button" className="si-btn-primary" onClick={() => setActiveTab('all')}>
                   Browse Opportunities
                 </button>
@@ -751,7 +1083,14 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
                   <div key={app.internshipId} className="si-app-card">
                     <div className="si-app-top">
                       <div>
-                        <span className="si-app-company">{app.company}</span>
+                        <div className="si-app-company-row">
+                          <span className="si-app-company">{app.company}</span>
+                          {app.department && (
+                            <span className={`si-dept-badge ${getDepartmentClass(app.department)}`}>
+                              {app.department}
+                            </span>
+                          )}
+                        </div>
                         <h3 className="si-app-role">{app.role}</h3>
                       </div>
                       <span className={`si-app-status-badge ${app.status}`}>
@@ -771,7 +1110,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
                     </div>
 
                     <p className="si-app-feedback">
-                      <strong>Recruiter Note:</strong> {app.feedback || 'Your verified institutional profile has been forwarded to the department lead.'}
+                      <strong>Status Update:</strong> {app.feedback || 'Your verified academic credentials have been received by the hiring team.'}
                     </p>
 
                     <div className="si-app-bottom">
@@ -795,398 +1134,421 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
             )}
           </section>
         ) : (
-          /* MAIN DIRECTORY VIEW */
-          <>
-            {/* 2. SEARCH & ADVANCED FILTERS TOOLBAR */}
-            <section className="si-filter-card">
-              {/* Top Search & Filter Toggle Bar */}
-              <div className="si-search-row">
-                <div className="si-search-input-wrap">
-                  <svg className="si-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="11" cy="11" r="8" />
-                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  </svg>
-                  <input
-                    type="text"
-                    className="si-search-input"
-                    placeholder="Search by company, role title, required skills or location..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                  {searchQuery && (
+          /* WORKSPACE 2-COLUMN LAYOUT (Desktop: Listings + Right-Side Panel) */
+          <div className="si-workspace-layout">
+            {/* LEFT COLUMN: LISTINGS & FILTERS */}
+            <div className="si-main-feed">
+              {/* SEARCH & DEPARTMENT FILTER BAR */}
+              <section className="si-filter-card">
+                <div className="si-search-row">
+                  {/* Keyword Search */}
+                  <div className="si-search-input-wrap">
+                    <svg className="si-search-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input
+                      type="text"
+                      className="si-search-input"
+                      placeholder="Search company, role, skill (e.g. SolidWorks, VLSI, React, Aspen, FEA)..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        className="si-search-clear-btn"
+                        onClick={() => setSearchQuery('')}
+                        aria-label="Clear search query"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Primary Department Selector */}
+                  <div className="si-dept-select-wrap">
+                    <label htmlFor="si-primary-dept" className="si-sr-only">Filter by Department</label>
+                    <select
+                      id="si-primary-dept"
+                      className="si-dept-select"
+                      value={selectedDepartment}
+                      onChange={(e) => setSelectedDepartment(e.target.value)}
+                      title="Filter by Academic Department"
+                    >
+                      {DEPARTMENTS.map((dept) => (
+                        <option key={dept} value={dept}>
+                          {dept === 'All Departments' ? 'All Academic Departments' : dept}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Toggle Advanced Filters Button */}
+                  <div className="si-search-actions">
                     <button
                       type="button"
-                      className="si-search-clear-btn"
-                      onClick={() => setSearchQuery('')}
-                      aria-label="Clear search"
+                      className={`si-filter-toggle-btn ${isFilterDrawerOpen ? 'active' : ''}`}
+                      onClick={() => setIsFilterDrawerOpen((prev) => !prev)}
+                      title="Toggle detailed filters"
                     >
-                      ✕
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                      </svg>
+                      <span>Filters {hasActiveFilters && '●'}</span>
                     </button>
-                  )}
+
+                    {hasActiveFilters && (
+                      <button
+                        type="button"
+                        className="si-filter-reset-btn"
+                        onClick={handleResetFilters}
+                        title="Clear all filters"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                <div className="si-search-actions">
+                {/* Collapsible Advanced Filters Drawer */}
+                <div className={`si-filters-grid ${isFilterDrawerOpen ? 'is-open' : ''}`}>
+                  {/* Department in Drawer */}
+                  <div className="si-filter-col">
+                    <label className="si-filter-label" htmlFor="si-f-dept">Department</label>
+                    <select
+                      id="si-f-dept"
+                      className="si-filter-select"
+                      value={selectedDepartment}
+                      onChange={(e) => setSelectedDepartment(e.target.value)}
+                    >
+                      {DEPARTMENTS.map((dept) => (
+                        <option key={dept} value={dept}>{dept}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Filter: Role Title */}
+                  <div className="si-filter-col">
+                    <label className="si-filter-label" htmlFor="si-f-role">Role Discipline</label>
+                    <select
+                      id="si-f-role"
+                      className="si-filter-select"
+                      value={selectedRole}
+                      onChange={(e) => setSelectedRole(e.target.value)}
+                    >
+                      <option value="all">All Roles</option>
+                      <option value="Mechanical">Mechanical &amp; CAE</option>
+                      <option value="VLSI">VLSI &amp; Circuit Design</option>
+                      <option value="Power">Power Systems &amp; Smart Grid</option>
+                      <option value="Structural">Civil &amp; Structural</option>
+                      <option value="Chemical">Chemical &amp; Process</option>
+                      <option value="Instrumentation">Instrumentation &amp; Control</option>
+                      <option value="Automobile">Automobile &amp; EV</option>
+                      <option value="Biotechnology">Bioprocess &amp; Biotech</option>
+                      <option value="Software">Software Engineering</option>
+                      <option value="Machine Learning">AI &amp; Data Science</option>
+                    </select>
+                  </div>
+
+                  {/* Filter: Required Skill */}
+                  <div className="si-filter-col">
+                    <label className="si-filter-label" htmlFor="si-f-skills">Required Skill</label>
+                    <select
+                      id="si-f-skills"
+                      className="si-filter-select"
+                      value={selectedSkill}
+                      onChange={(e) => setSelectedSkill(e.target.value)}
+                    >
+                      <option value="all">All Skills</option>
+                      <option value="SolidWorks">SolidWorks</option>
+                      <option value="ANSYS">ANSYS / FEA</option>
+                      <option value="Verilog">Verilog / VLSI</option>
+                      <option value="MATLAB/Simulink">MATLAB / Simulink</option>
+                      <option value="STAAD.Pro">STAAD.Pro / AutoCAD</option>
+                      <option value="Aspen Plus">Aspen Plus</option>
+                      <option value="PLC/SCADA">PLC / SCADA</option>
+                      <option value="BMS">BMS / EV Powertrain</option>
+                      <option value="Bioreactors">Bioreactors / Fermentation</option>
+                      <option value="React">React / TypeScript</option>
+                      <option value="Python">Python / AI</option>
+                    </select>
+                  </div>
+
+                  {/* Filter: Duration */}
+                  <div className="si-filter-col">
+                    <label className="si-filter-label" htmlFor="si-f-duration">Duration</label>
+                    <select
+                      id="si-f-duration"
+                      className="si-filter-select"
+                      value={selectedDuration}
+                      onChange={(e) => setSelectedDuration(e.target.value)}
+                    >
+                      <option value="all">Any Duration</option>
+                      <option value="3">3 Months (Semester Summer)</option>
+                      <option value="6">6 Months (Comprehensive)</option>
+                    </select>
+                  </div>
+
+                  {/* Filter: Min Stipend */}
+                  <div className="si-filter-col">
+                    <label className="si-filter-label" htmlFor="si-f-stipend">Min. Stipend</label>
+                    <select
+                      id="si-f-stipend"
+                      className="si-filter-select"
+                      value={selectedStipend}
+                      onChange={(e) => setSelectedStipend(e.target.value)}
+                    >
+                      <option value="all">All Stipends</option>
+                      <option value="25000">₹25,000+ / mo</option>
+                      <option value="35000">₹35,000+ / mo</option>
+                      <option value="45000">₹45,000+ / mo</option>
+                      <option value="80000">₹80,000+ / mo</option>
+                    </select>
+                  </div>
+
+                  {/* Filter: Work Type */}
+                  <div className="si-filter-col">
+                    <label className="si-filter-label" htmlFor="si-f-type">Work Type</label>
+                    <select
+                      id="si-f-type"
+                      className="si-filter-select"
+                      value={selectedType}
+                      onChange={(e) => setSelectedType(e.target.value)}
+                    >
+                      <option value="all">All Types</option>
+                      <option value="On-site">On-site / Plant / Lab</option>
+                      <option value="Hybrid">Hybrid</option>
+                      <option value="Remote">Remote</option>
+                    </select>
+                  </div>
+
+                  {/* Filter: Location */}
+                  <div className="si-filter-col">
+                    <label className="si-filter-label" htmlFor="si-f-loc">Location</label>
+                    <select
+                      id="si-f-loc"
+                      className="si-filter-select"
+                      value={selectedLocation}
+                      onChange={(e) => setSelectedLocation(e.target.value)}
+                    >
+                      <option value="all">All Locations</option>
+                      <option value="Pune">Pune</option>
+                      <option value="Bengaluru">Bengaluru</option>
+                      <option value="Mumbai">Mumbai</option>
+                      <option value="Chennai">Chennai</option>
+                      <option value="Gujarat">Gujarat (Jamnagar/Vapi/Vadodara)</option>
+                      <option value="Hyderabad">Hyderabad</option>
+                      <option value="Remote">Remote India</option>
+                    </select>
+                  </div>
+
+                  {/* Filter: Deadline */}
+                  <div className="si-filter-col">
+                    <label className="si-filter-label" htmlFor="si-f-deadline">Deadline</label>
+                    <select
+                      id="si-f-deadline"
+                      className="si-filter-select"
+                      value={selectedDeadline}
+                      onChange={(e) => setSelectedDeadline(e.target.value)}
+                    >
+                      <option value="all">All Deadlines</option>
+                      <option value="urgent">Closing Soon (&lt; 15 Days)</option>
+                      <option value="15days">Within 15 Days</option>
+                    </select>
+                  </div>
+                </div>
+              </section>
+
+              {/* TABS & SORT BAR */}
+              <div className="si-sub-bar">
+                <div className="si-tabs-row" role="tablist">
                   <button
                     type="button"
-                    className={`si-filter-toggle-btn ${isFilterDrawerOpen ? 'active' : ''}`}
-                    onClick={() => setIsFilterDrawerOpen((prev) => !prev)}
-                    title="Toggle multi-filter options"
+                    role="tab"
+                    aria-selected={activeTab === 'all'}
+                    className={`si-tab-btn ${activeTab === 'all' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('all')}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                    All Opportunities
+                    <span className="si-tab-count">{INITIAL_INTERNSHIPS.length}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'on-site'}
+                    className={`si-tab-btn ${activeTab === 'on-site' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('on-site')}
+                  >
+                    On-site / Lab
+                    <span className="si-tab-count">
+                      {INITIAL_INTERNSHIPS.filter((i) => i.type === 'On-site').length}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'hybrid'}
+                    className={`si-tab-btn ${activeTab === 'hybrid' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('hybrid')}
+                  >
+                    Hybrid
+                    <span className="si-tab-count">
+                      {INITIAL_INTERNSHIPS.filter((i) => i.type === 'Hybrid').length}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'remote'}
+                    className={`si-tab-btn ${activeTab === 'remote' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('remote')}
+                  >
+                    Remote
+                    <span className="si-tab-count">
+                      {INITIAL_INTERNSHIPS.filter((i) => i.type === 'Remote').length}
+                    </span>
+                  </button>
+                </div>
+
+                <div className="si-sort-wrap">
+                  <label htmlFor="si-sort-select" className="si-sort-label">Sort by:</label>
+                  <select
+                    id="si-sort-select"
+                    className="si-sort-select"
+                    value={sortOption}
+                    onChange={(e) => setSortOption(e.target.value)}
+                  >
+                    <option value="latest">Latest Posted</option>
+                    <option value="stipend_high">Highest Stipend</option>
+                    <option value="deadline_soon">Deadline (Soonest)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* COMPACT HORIZONTAL OPPORTUNITY LISTINGS (PROTOTYPE LAYOUT) */}
+              <div className="si-listings-container">
+                {filteredInternships.length === 0 ? (
+                  <div className="si-empty-state">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.8">
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
                     </svg>
-                    <span>Filters {hasActiveFilters && '●'}</span>
-                  </button>
-
-                  {hasActiveFilters && (
-                    <button
-                      type="button"
-                      className="si-filter-reset-btn"
-                      onClick={handleResetFilters}
-                      title="Clear all filters"
-                    >
-                      Reset Filters
+                    <h3>No internships found matching your filters</h3>
+                    <p>Try switching the academic department, clearing your search keywords, or resetting filters.</p>
+                    <button type="button" className="si-btn-secondary" onClick={handleResetFilters}>
+                      Reset All Filters
                     </button>
-                  )}
-                </div>
-              </div>
+                  </div>
+                ) : (
+                  filteredInternships.map((item) => {
+                    const alreadyApplied = isApplied(item.id)
+                    const isSaved = savedIds.includes(item.id)
 
-              {/* Collapsible/Expandable 8-Attribute Multi-Filter Controls */}
-              <div className={`si-filters-grid ${isFilterDrawerOpen ? 'is-open' : ''}`}>
-                {/* Filter 1: Role */}
-                <div className="si-filter-col">
-                  <label className="si-filter-label" htmlFor="si-f-role">Role</label>
-                  <select
-                    id="si-f-role"
-                    className="si-filter-select"
-                    value={selectedRole}
-                    onChange={(e) => setSelectedRole(e.target.value)}
-                  >
-                    <option value="all">All Roles</option>
-                    <option value="Software">Software Engineering</option>
-                    <option value="Machine Learning">AI & Machine Learning</option>
-                    <option value="Full Stack">Full Stack Web</option>
-                    <option value="DevOps">Cloud & DevOps</option>
-                    <option value="Design">UI/UX & Product Design</option>
-                    <option value="Embedded">Embedded & IoT</option>
-                    <option value="Cybersecurity">Cybersecurity</option>
-                    <option value="Data Science">Data Science</option>
-                  </select>
-                </div>
-
-                {/* Filter 2: Skills */}
-                <div className="si-filter-col">
-                  <label className="si-filter-label" htmlFor="si-f-skills">Required Skill</label>
-                  <select
-                    id="si-f-skills"
-                    className="si-filter-select"
-                    value={selectedSkill}
-                    onChange={(e) => setSelectedSkill(e.target.value)}
-                  >
-                    <option value="all">All Skills</option>
-                    <option value="React">React</option>
-                    <option value="Python">Python</option>
-                    <option value="Node.js">Node.js</option>
-                    <option value="AWS">AWS</option>
-                    <option value="Docker">Docker</option>
-                    <option value="Figma">Figma</option>
-                    <option value="PyTorch">PyTorch</option>
-                    <option value="Embedded C">Embedded C</option>
-                    <option value="Linux">Linux</option>
-                    <option value="SQL">SQL</option>
-                  </select>
-                </div>
-
-                {/* Filter 3: Duration */}
-                <div className="si-filter-col">
-                  <label className="si-filter-label" htmlFor="si-f-duration">Duration</label>
-                  <select
-                    id="si-f-duration"
-                    className="si-filter-select"
-                    value={selectedDuration}
-                    onChange={(e) => setSelectedDuration(e.target.value)}
-                  >
-                    <option value="all">Any Duration</option>
-                    <option value="2">2 Months (Summer Sprint)</option>
-                    <option value="3">3 Months (Standard)</option>
-                    <option value="6">6 Months (Semester Long)</option>
-                  </select>
-                </div>
-
-                {/* Filter 4: Stipend */}
-                <div className="si-filter-col">
-                  <label className="si-filter-label" htmlFor="si-f-stipend">Min. Stipend</label>
-                  <select
-                    id="si-f-stipend"
-                    className="si-filter-select"
-                    value={selectedStipend}
-                    onChange={(e) => setSelectedStipend(e.target.value)}
-                  >
-                    <option value="all">All Stipends</option>
-                    <option value="25000">₹25,000+ / mo</option>
-                    <option value="35000">₹35,000+ / mo</option>
-                    <option value="50000">₹50,000+ / mo</option>
-                    <option value="80000">₹80,000+ / mo</option>
-                  </select>
-                </div>
-
-                {/* Filter 5: Type */}
-                <div className="si-filter-col">
-                  <label className="si-filter-label" htmlFor="si-f-type">Work Type</label>
-                  <select
-                    id="si-f-type"
-                    className="si-filter-select"
-                    value={selectedType}
-                    onChange={(e) => setSelectedType(e.target.value)}
-                  >
-                    <option value="all">All Types</option>
-                    <option value="Remote">Remote</option>
-                    <option value="Hybrid">Hybrid</option>
-                    <option value="On-site">On-site / In-office</option>
-                  </select>
-                </div>
-
-                {/* Filter 6: Location */}
-                <div className="si-filter-col">
-                  <label className="si-filter-label" htmlFor="si-f-loc">Location</label>
-                  <select
-                    id="si-f-loc"
-                    className="si-filter-select"
-                    value={selectedLocation}
-                    onChange={(e) => setSelectedLocation(e.target.value)}
-                  >
-                    <option value="all">All Locations</option>
-                    <option value="Bengaluru">Bengaluru</option>
-                    <option value="Hyderabad">Hyderabad</option>
-                    <option value="Pune">Pune</option>
-                    <option value="Gurugram">Gurugram</option>
-                    <option value="Remote">Remote India</option>
-                  </select>
-                </div>
-
-                {/* Filter 7: Posted Date */}
-                <div className="si-filter-col">
-                  <label className="si-filter-label" htmlFor="si-f-posted">Posted Date</label>
-                  <select
-                    id="si-f-posted"
-                    className="si-filter-select"
-                    value={selectedPostedDate}
-                    onChange={(e) => setSelectedPostedDate(e.target.value)}
-                  >
-                    <option value="all">Anytime</option>
-                    <option value="1">Last 24 Hours</option>
-                    <option value="3">Last 3 Days</option>
-                    <option value="7">Last 7 Days</option>
-                  </select>
-                </div>
-
-                {/* Filter 8: Application Deadline */}
-                <div className="si-filter-col">
-                  <label className="si-filter-label" htmlFor="si-f-deadline">Deadline</label>
-                  <select
-                    id="si-f-deadline"
-                    className="si-filter-select"
-                    value={selectedDeadline}
-                    onChange={(e) => setSelectedDeadline(e.target.value)}
-                  >
-                    <option value="all">All Deadlines</option>
-                    <option value="urgent">Closing Soon (&lt; 15 Days)</option>
-                    <option value="15days">Within 15 Days</option>
-                  </select>
-                </div>
-              </div>
-            </section>
-
-            {/* 3. CATEGORIES/TABS & SORTING BAR */}
-            <div className="si-sub-bar">
-              {/* Category Tabs */}
-              <div className="si-tabs-row" role="tablist">
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeTab === 'all'}
-                  className={`si-tab-btn ${activeTab === 'all' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('all')}
-                >
-                  All Internships
-                  <span className="si-tab-count">
-                    {INITIAL_INTERNSHIPS.length}
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeTab === 'remote'}
-                  className={`si-tab-btn ${activeTab === 'remote' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('remote')}
-                >
-                  Remote
-                  <span className="si-tab-count">
-                    {INITIAL_INTERNSHIPS.filter((i) => i.type === 'Remote').length}
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeTab === 'on-site'}
-                  className={`si-tab-btn ${activeTab === 'on-site' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('on-site')}
-                >
-                  On-site
-                  <span className="si-tab-count">
-                    {INITIAL_INTERNSHIPS.filter((i) => i.type === 'On-site').length}
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeTab === 'hybrid'}
-                  className={`si-tab-btn ${activeTab === 'hybrid' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('hybrid')}
-                >
-                  Hybrid
-                  <span className="si-tab-count">
-                    {INITIAL_INTERNSHIPS.filter((i) => i.type === 'Hybrid').length}
-                  </span>
-                </button>
-              </div>
-
-              {/* Sort Dropdown */}
-              <div className="si-sort-wrap">
-                <label htmlFor="si-sort-select" className="si-sort-label">Sort by:</label>
-                <select
-                  id="si-sort-select"
-                  className="si-sort-select"
-                  value={sortOption}
-                  onChange={(e) => setSortOption(e.target.value)}
-                >
-                  <option value="latest">Latest Posted</option>
-                  <option value="stipend_high">Highest Stipend</option>
-                  <option value="deadline_soon">Deadline (Soonest)</option>
-                </select>
-              </div>
-            </div>
-
-            {/* 4. INTERNSHIP LISTING CARDS (Full Desktop Width Grid) */}
-            <div className="si-cards-grid">
-              {filteredInternships.length === 0 ? (
-                <div className="si-empty-state">
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.8">
-                    <circle cx="11" cy="11" r="8" />
-                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  </svg>
-                  <h3>No matching internships found</h3>
-                  <p>Try adjusting your search query, clearing filters, or switching category tabs.</p>
-                  <button type="button" className="si-btn-secondary" onClick={handleResetFilters}>
-                    Reset All Filters
-                  </button>
-                </div>
-              ) : (
-                filteredInternships.map((item) => {
-                  const alreadyApplied = isApplied(item.id)
-                  const isSaved = savedIds.includes(item.id)
-
-                  return (
-                    <article key={item.id} className="si-job-card">
-                      {/* Card Header: Company, Verified Badge, Bookmark */}
-                      <div className="si-job-header">
-                        <div className="si-comp-info">
-                          <div
-                            className="si-comp-avatar"
-                            style={{ backgroundColor: item.companyLogoBg }}
-                            aria-hidden="true"
-                          >
-                            {item.companyLogoText}
-                          </div>
-                          <div>
-                            <div className="si-comp-name-row">
-                              <span className="si-comp-name">{item.company}</span>
-                              {item.verifiedCompany && (
-                                <span className="si-verified-pill" title="Verified Institutional Recruiter Partner">
-                                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                                  </svg>
-                                  Verified
-                                </span>
-                              )}
+                    return (
+                      <article key={item.id} className="si-listing-row">
+                        {/* Main Content Area */}
+                        <div className="si-row-main">
+                          {/* Row Header: Company Logo, Name, Verified, Department, Bookmark */}
+                          <div className="si-row-header">
+                            <div className="si-row-comp-wrap">
+                              <div
+                                className="si-comp-avatar"
+                                style={{ backgroundColor: item.companyLogoBg }}
+                                aria-hidden="true"
+                              >
+                                {item.companyLogoText}
+                              </div>
+                              <div className="si-comp-titles">
+                                <div className="si-row-comp-names">
+                                  <span className="si-comp-name">{item.company}</span>
+                                  {item.verifiedCompany && (
+                                    <span className="si-verified-pill" title="Verified Institutional Recruiter Partner">
+                                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                                      </svg>
+                                      Verified
+                                    </span>
+                                  )}
+                                  <span className={`si-dept-badge ${getDepartmentClass(item.department)}`}>
+                                    {item.department}
+                                  </span>
+                                </div>
+                                <h3 className="si-row-title">{item.role}</h3>
+                              </div>
                             </div>
-                            <span className="si-comp-dept">{item.department}</span>
+
+                            {/* Bookmark button */}
+                            <button
+                              type="button"
+                              className={`si-bookmark-btn ${isSaved ? 'is-saved' : ''}`}
+                              onClick={(e) => handleToggleSave(e, item.id)}
+                              title={isSaved ? 'Remove from saved' : 'Save internship'}
+                              aria-label={isSaved ? 'Remove from saved' : 'Save internship'}
+                            >
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                              </svg>
+                            </button>
+                          </div>
+
+                          {/* Specification Pills Row */}
+                          <div className="si-row-specs">
+                            <span className="si-spec-item duration" title="Duration">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                              </svg>
+                              {item.duration}
+                            </span>
+
+                            <span className="si-spec-item stipend" title="Monthly Stipend">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                <line x1="12" y1="1" x2="12" y2="23" />
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                              </svg>
+                              {item.stipend}
+                            </span>
+
+                            <span className={`si-spec-item type ${item.type.toLowerCase().replace(/[^a-z0-9]/g, '-')}`} title="Work Mode">
+                              {item.type}
+                            </span>
+
+                            <span className="si-spec-item location" title="Location">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                <circle cx="12" cy="10" r="3" />
+                              </svg>
+                              {item.location}
+                            </span>
+
+                            <span className={`si-spec-item deadline ${item.isUrgent ? 'urgent' : ''}`} title="Application Deadline">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                              </svg>
+                              Closes: {item.displayDeadline} {item.isUrgent && '⚠️ Closing soon'}
+                            </span>
+                          </div>
+
+                          {/* Skills List */}
+                          <div className="si-row-skills">
+                            <span className="si-skills-label">Skills:</span>
+                            {item.requiredSkills.map((sk) => (
+                              <span key={sk} className="si-skill-tag">
+                                {sk}
+                              </span>
+                            ))}
                           </div>
                         </div>
 
-                        {/* Bookmark button */}
-                        <button
-                          type="button"
-                          className={`si-bookmark-btn ${isSaved ? 'is-saved' : ''}`}
-                          onClick={(e) => handleToggleSave(e, item.id)}
-                          title={isSaved ? 'Remove from saved' : 'Save internship'}
-                          aria-label={isSaved ? 'Remove from saved' : 'Save internship'}
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
-                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                          </svg>
-                        </button>
-                      </div>
-
-                      {/* Job Title */}
-                      <h3 className="si-job-title">{item.role}</h3>
-
-                      {/* Core Highlights Pills: Duration, Stipend, Work Type, Location */}
-                      <div className="si-job-badges-wrap">
-                        <span className="si-pill duration" title="Duration">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                            <circle cx="12" cy="12" r="10" />
-                            <polyline points="12 6 12 12 16 14" />
-                          </svg>
-                          {item.duration}
-                        </span>
-
-                        <span className="si-pill stipend" title="Monthly Stipend">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                            <line x1="12" y1="1" x2="12" y2="23" />
-                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                          </svg>
-                          {item.stipend}
-                        </span>
-
-                        <span className={`si-pill type ${item.type.toLowerCase()}`} title="Work Mode">
-                          {item.type}
-                        </span>
-
-                        <span className="si-pill location" title="Location">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                            <circle cx="12" cy="10" r="3" />
-                          </svg>
-                          {item.location}
-                        </span>
-                      </div>
-
-                      {/* Required Skills Chips */}
-                      <div className="si-skills-row">
-                        {item.requiredSkills.map((sk) => (
-                          <span key={sk} className="si-skill-tag">
-                            {sk}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* Short Description */}
-                      <p className="si-job-desc">{item.overview}</p>
-
-                      {/* Footer: Deadline & Action Buttons */}
-                      <div className="si-job-footer">
-                        <div className="si-deadline-info">
-                          <span className="si-deadline-label">Deadline:</span>
-                          <span className={`si-deadline-date ${item.isUrgent ? 'urgent' : ''}`}>
-                            {item.displayDeadline} {item.isUrgent && '⚠️ Closing soon'}
-                          </span>
-                        </div>
-
-                        <div className="si-job-actions">
+                        {/* Action Buttons Column */}
+                        <div className="si-row-actions">
                           <button
                             type="button"
                             className="si-btn-view"
@@ -1201,7 +1563,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
                               className="si-btn-applied"
                               disabled
                             >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8">
                                 <polyline points="20 6 9 17 4 12" />
                               </svg>
                               Applied
@@ -1216,58 +1578,164 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
                             </button>
                           )}
                         </div>
-                      </div>
-                    </article>
-                  )
-                })
-              )}
+                      </article>
+                    )
+                  })
+                )}
+              </div>
             </div>
 
-            {/* 8. HELPFUL APPLICATION TIPS SECTION */}
-            <section className="si-tips-card">
-              <div className="si-tips-header">
-                <div className="si-tips-title-wrap">
-                  <div className="si-tips-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b3881e" strokeWidth="2.4">
+            {/* RIGHT COLUMN: PROTOTYPE-STYLE SIDEBAR (STATUS & TIPS) */}
+            <aside className="si-sidebar" aria-label="Internship Tracker and Tips">
+              {/* 1. MY INTERNSHIP STATUS WIDGET */}
+              <div className="si-side-panel status-panel">
+                <div className="si-side-header">
+                  <div className="si-side-title-row">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b3881e" strokeWidth="2.4">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                      <line x1="16" y1="13" x2="8" y2="13" />
+                      <line x1="16" y1="17" x2="8" y2="17" />
+                    </svg>
+                    <h3 className="si-side-title">My Internship Status</h3>
+                  </div>
+                  <button
+                    type="button"
+                    className="si-side-link-btn"
+                    onClick={() => setActiveTab('status')}
+                  >
+                    View All
+                  </button>
+                </div>
+
+                <div className="si-status-vertical-list">
+                  {/* Status Item 1: Applied */}
+                  <div
+                    className="si-status-row"
+                    onClick={() => setActiveTab('status')}
+                    title="View Applied Internships"
+                  >
+                    <div className="si-status-mini-icon applied">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                      </svg>
+                    </div>
+                    <div className="si-status-text">
+                      <span className="si-status-name">Applied</span>
+                      <span className="si-status-subtext">Under review by coordinators</span>
+                    </div>
+                    <div className="si-status-badge applied">{metrics.applied}</div>
+                  </div>
+
+                  {/* Status Item 2: Shortlisted */}
+                  <div
+                    className="si-status-row"
+                    onClick={() => setActiveTab('status')}
+                    title="View Shortlisted Applications"
+                  >
+                    <div className="si-status-mini-icon shortlisted">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                      </svg>
+                    </div>
+                    <div className="si-status-text">
+                      <span className="si-status-name">Shortlisted</span>
+                      <span className="si-status-subtext">Active interview rounds</span>
+                    </div>
+                    <div className="si-status-badge shortlisted">{metrics.shortlisted}</div>
+                  </div>
+
+                  {/* Status Item 3: Selected */}
+                  <div
+                    className="si-status-row"
+                    onClick={() => setActiveTab('status')}
+                    title="View Selected Applications"
+                  >
+                    <div className="si-status-mini-icon selected">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                      </svg>
+                    </div>
+                    <div className="si-status-text">
+                      <span className="si-status-name">Selected</span>
+                      <span className="si-status-subtext">Recruiter confirmed</span>
+                    </div>
+                    <div className="si-status-badge selected">{metrics.selected}</div>
+                  </div>
+
+                  {/* Status Item 4: Offer Letters */}
+                  <div
+                    className="si-status-row"
+                    onClick={() => setActiveTab('status')}
+                    title="View Offer Letters"
+                  >
+                    <div className="si-status-mini-icon offer">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                      </svg>
+                    </div>
+                    <div className="si-status-text">
+                      <span className="si-status-name">Offer Letters</span>
+                      <span className="si-status-subtext">Institutional NOC ready</span>
+                    </div>
+                    <div className="si-status-badge offer">{metrics.offers}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. APPLICATION TIPS WIDGET (Moved Upward alongside listings) */}
+              <div className="si-side-panel tips-panel">
+                <div className="si-side-header">
+                  <div className="si-side-title-row">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b3881e" strokeWidth="2.4">
                       <circle cx="12" cy="12" r="10" />
                       <line x1="12" y1="16" x2="12" y2="12" />
                       <line x1="12" y1="8" x2="12.01" y2="8" />
                     </svg>
+                    <h3 className="si-side-title">Application Tips</h3>
                   </div>
-                  <div>
-                    <h3 className="si-tips-title">Institutional Application Tips</h3>
-                    <p className="si-tips-sub">Maximizing your candidate score across partner recruitment drives</p>
+                </div>
+
+                <div className="si-side-tips-list">
+                  <div className="si-side-tip-item">
+                    <span className="si-tip-bubble">1</span>
+                    <div>
+                      <strong className="si-tip-heading">Verified Profile Priority</strong>
+                      <p className="si-tip-desc">Recruiters screen verified CGPA, institutional records, and faculty-approved capstone projects first.</p>
+                    </div>
+                  </div>
+
+                  <div className="si-side-tip-item">
+                    <span className="si-tip-bubble">2</span>
+                    <div>
+                      <strong className="si-tip-heading">No CV Upload Needed</strong>
+                      <p className="si-tip-desc">Your verified portal credentials and academic transcripts are transmitted directly with one click.</p>
+                    </div>
+                  </div>
+
+                  <div className="si-side-tip-item">
+                    <span className="si-tip-bubble">3</span>
+                    <div>
+                      <strong className="si-tip-heading">All Academic Disciplines</strong>
+                      <p className="si-tip-desc">Opportunities support Mechanical, Civil, Chemical, Electrical, Biotech, Automobile, Instrumentation &amp; CS/IT.</p>
+                    </div>
+                  </div>
+
+                  <div className="si-side-tip-item">
+                    <span className="si-tip-bubble">4</span>
+                    <div>
+                      <strong className="si-tip-heading">Institutional NOC &amp; Credits</strong>
+                      <p className="si-tip-desc">Verified internships qualify for official semester credits upon departmental coordinator sign-off.</p>
+                    </div>
                   </div>
                 </div>
               </div>
-
-              <div className="si-tips-grid">
-                <div className="si-tip-item">
-                  <span className="si-tip-num">1</span>
-                  <div>
-                    <strong>Verified Profile Priority</strong>
-                    <p>Recruiters automatically filter candidates by Portal-Admin verified skills and approved capstone projects.</p>
-                  </div>
-                </div>
-
-                <div className="si-tip-item">
-                  <span className="si-tip-num">2</span>
-                  <div>
-                    <strong>No Resume Upload Required</strong>
-                    <p>Your institutional transcript, verified CGPA, and audited credentials serve as your official digital portfolio.</p>
-                  </div>
-                </div>
-
-                <div className="si-tip-item">
-                  <span className="si-tip-num">3</span>
-                  <div>
-                    <strong>Academic Credits &amp; NOC</strong>
-                    <p>Selected internships are eligible for institutional credits upon coordinator sign-off and completion review.</p>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </>
+            </aside>
+          </div>
         )}
       </main>
 
@@ -1293,9 +1761,12 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
                         Verified Partner
                       </span>
                     )}
+                    <span className={`si-dept-badge ${getDepartmentClass(detailsModalItem.department)}`}>
+                      {detailsModalItem.department}
+                    </span>
                   </div>
                   <span className="si-modal-sub">
-                    {detailsModalItem.company} • {detailsModalItem.department}
+                    {detailsModalItem.company} • Department: {detailsModalItem.department}
                   </span>
                 </div>
               </div>
@@ -1363,7 +1834,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
                 </div>
               </div>
 
-              {/* Section: Eligibility Criteria */}
+              {/* Section: Academic Eligibility */}
               <div className="si-detail-section">
                 <h4 className="si-ds-title">Academic Eligibility</h4>
                 <p className="si-ds-text">{detailsModalItem.eligibility}</p>
@@ -1371,7 +1842,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
 
               {/* Section: Perks & Mentorship */}
               <div className="si-detail-section">
-                <h4 className="si-ds-title">Mentorship &amp; Benefits</h4>
+                <h4 className="si-ds-title">Mentorship &amp; Institutional Perks</h4>
                 <ul className="si-ds-list">
                   {detailsModalItem.perks.map((p, i) => (
                     <li key={i}>{p}</li>
@@ -1438,7 +1909,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
                   Apply to {applyModalItem.company}
                 </h2>
                 <span className="si-modal-sub">
-                  Role: <strong>{applyModalItem.role}</strong> • {applyModalItem.stipend}
+                  Role: <strong>{applyModalItem.role}</strong> ({applyModalItem.department}) • {applyModalItem.stipend}
                 </span>
               </div>
 
@@ -1447,7 +1918,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
                 className="si-modal-close-btn"
                 onClick={() => !isApplying && setApplyModalItem(null)}
                 disabled={isApplying}
-                aria-label="Close"
+                aria-label="Close modal"
               >
                 ✕
               </button>
@@ -1499,23 +1970,23 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
                     <span className="si-pp-val">
                       {verifiedSkills.length > 0
                         ? verifiedSkills.map((s) => s.name).slice(0, 5).join(', ')
-                        : 'React, Python, Node.js, Cloud Fundamentals'}
+                        : 'Institutional Technical Skill Badges Included'}
                     </span>
                   </div>
                   <div className="si-pp-row">
                     <span className="si-pp-label">Audited Projects:</span>
                     <span className="si-pp-val">
                       {verifiedProjects.length > 0
-                        ? `${verifiedProjects.length} Verified Capstone Projects`
-                        : 'Institutional Capstone Projects Included'}
+                        ? `${verifiedProjects.length} Verified Projects Included`
+                        : 'Faculty-Approved Capstone Records Transmitted'}
                     </span>
                   </div>
                   <div className="si-pp-row">
-                    <span className="si-pp-label">Prior Experience:</span>
+                    <span className="si-pp-label">Prior Training:</span>
                     <span className="si-pp-val">
                       {verifiedInternships.length > 0
-                        ? `${verifiedInternships.length} Verified Prior Experiences`
-                        : 'Institutional Training Credentials'}
+                        ? `${verifiedInternships.length} Prior Verified Experiences`
+                        : 'Institutional Practical Training Credentials'}
                     </span>
                   </div>
                 </div>
@@ -1530,7 +2001,7 @@ export default function StudentInternships({ student = {}, onBack, onNavigateHom
                   id="si-cover-note"
                   className="si-form-textarea"
                   rows={3}
-                  placeholder="Mention any specific interest in this team, availability dates, or relevant project milestones..."
+                  placeholder="Mention your departmental focus, project milestones, or availability dates..."
                   value={applicationNote}
                   onChange={(e) => setApplicationNote(e.target.value)}
                   disabled={isApplying}
