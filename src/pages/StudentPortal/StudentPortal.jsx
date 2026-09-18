@@ -15,7 +15,17 @@ function StudentPortal({
       (window.location.hash.includes('demo') ||
         new URLSearchParams(window.location.search).get('demo') === 'true'))
 
-  const [demoStep, setDemoStep] = useState(1)
+  const [demoStep, setDemoStep] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search)
+      const s = parseInt(params.get('step'), 10)
+      if (s >= 1 && s <= 5) return s
+      if (params.get('view') === 'achievements_experience' || window.location.hash.includes('achievements')) {
+        return 5
+      }
+    } catch {}
+    return 1
+  })
   // Retrieve active student or fallback to empty real record
   const student =
     studentData ||
@@ -130,8 +140,25 @@ function StudentPortal({
   })
 
   // View state: 'auto' | 'edit_form' | 'diff_view' | 'achievements_experience'
-  const [activeView, setActiveView] = useState('auto')
-  const [achievementsTab, setAchievementsTab] = useState('skills')
+  const [activeView, setActiveView] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('view') === 'achievements_experience' || window.location.hash.includes('achievements')) {
+        return 'achievements_experience'
+      }
+    } catch {}
+    return 'auto'
+  })
+  const [achievementsTab, setAchievementsTab] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search)
+      const tab = params.get('tab')
+      if (['skills', 'projects', 'experience'].includes(tab)) {
+        return tab
+      }
+    } catch {}
+    return 'skills'
+  })
 
   // Helper to persist verification state changes
   const updateVerificationStatus = (newStatus) => {

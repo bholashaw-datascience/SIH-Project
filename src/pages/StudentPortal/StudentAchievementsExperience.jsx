@@ -977,12 +977,12 @@ export default function StudentAchievementsExperience({
           box-sizing: border-box;
         }
 
-        /* Top Header */
+        /* Top Header: Full available width with balanced margins */
         .sae-header {
           background-color: #0f1f2e;
           color: #ffffff;
           border-bottom: 3px solid #b38e44;
-          padding: 8px 24px;
+          padding: 10px 32px;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -990,6 +990,8 @@ export default function StudentAchievementsExperience({
           top: 0;
           z-index: 100;
           box-shadow: 0 4px 16px rgba(15, 31, 46, 0.18);
+          box-sizing: border-box;
+          width: 100%;
         }
 
         .sae-header-left {
@@ -1091,29 +1093,30 @@ export default function StudentAchievementsExperience({
           color: #94a3b8;
         }
 
-        /* Main Container */
+        /* Main Container: Full available width with minimal, balanced left/right margins */
         .sae-main-container {
-          max-width: 1240px;
           width: 100%;
-          margin: 0 auto;
-          padding: 8px 20px 14px;
+          max-width: 100%;
+          margin: 0;
+          padding: 16px 32px 24px;
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          flex: 1;
+          gap: 14px;
         }
 
         /* Page Title & Inline Verification Notice */
         .sae-page-header {
-          margin-bottom: -2px;
+          margin-bottom: 0px;
         }
 
         .sae-page-title-wrap {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 10px;
+          flex-wrap: nowrap;
+          gap: 12px;
         }
 
         .sae-page-title {
@@ -1122,13 +1125,16 @@ export default function StudentAchievementsExperience({
           color: #0f1f2e;
           margin: 0;
           letter-spacing: -0.015em;
+          line-height: 1.2;
+          white-space: nowrap;
         }
 
         .sae-verify-badge-wrap {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
+          gap: 8px;
           position: relative;
+          flex-shrink: 0;
         }
 
         .sae-verify-badge {
@@ -1136,17 +1142,19 @@ export default function StudentAchievementsExperience({
           align-items: center;
           gap: 6px;
           background: #f0fdf4;
-          color: #166534;
+          color: #15803d;
           border: 1px solid #bbf7d0;
           border-radius: 9999px;
-          padding: 3px 10px;
-          font-size: 0.77rem;
+          padding: 3.5px 12px;
+          font-size: 0.76rem;
           font-weight: 600;
-          line-height: 1.3;
+          line-height: 1.2;
+          white-space: nowrap;
         }
 
         .sae-verify-shield {
-          font-size: 0.82rem;
+          display: inline-flex;
+          align-items: center;
           line-height: 1;
         }
 
@@ -1157,8 +1165,8 @@ export default function StudentAchievementsExperience({
         }
 
         .sae-info-btn {
-          width: 22px;
-          height: 22px;
+          width: 20px;
+          height: 20px;
           border-radius: 50%;
           background: #e2e8f0;
           color: #475569;
@@ -1225,75 +1233,55 @@ export default function StudentAchievementsExperience({
           margin: 0;
         }
 
-        @media (max-width: 640px) {
-          .sae-page-title-wrap {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 8px;
-          }
-          .sae-policy-popover {
-            right: auto;
-            left: 0;
-            max-width: calc(100vw - 40px);
-          }
-        }
-
-        /* Compact Metrics Summary Bar */
+        /* Professional Executive Metrics Summary: 4 evenly sized in 1 row */
         .sae-metrics-grid {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 8px;
-        }
-
-        @media (max-width: 960px) {
-          .sae-metrics-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-
-        @media (max-width: 540px) {
-          .sae-metrics-grid {
-            grid-template-columns: 1fr;
-          }
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 12px;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         .sae-metric-card {
           background: #ffffff;
           border: 1px solid #ded9cc;
-          border-radius: 6px;
-          padding: 6px 10px;
-          box-shadow: 0 1px 3px rgba(15, 31, 46, 0.03);
+          border-radius: 8px;
+          padding: 12px 14px;
+          box-shadow: 0 1px 3px rgba(15, 31, 46, 0.04);
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 10px;
           min-width: 0;
-          transition: border-color 0.15s ease, box-shadow 0.15s ease;
+          height: 74px;
+          box-sizing: border-box;
+          transition: all 0.2s ease;
         }
 
         .sae-metric-card:hover {
-          box-shadow: 0 2px 8px rgba(15, 31, 46, 0.06);
+          box-shadow: 0 4px 12px rgba(15, 31, 46, 0.08);
+          transform: translateY(-1px);
         }
 
         .sae-metric-card.is-verified {
-          border-left: 3px solid #16a34a;
+          border-left: 4px solid #16a34a;
         }
 
         .sae-metric-card.is-pending {
-          border-left: 3px solid #d97706;
+          border-left: 4px solid #d97706;
         }
 
         .sae-metric-card.is-unverified {
-          border-left: 3px solid #64748b;
+          border-left: 4px solid #64748b;
         }
 
         .sae-metric-card.is-projects {
-          border-left: 3px solid #0284c7;
+          border-left: 4px solid #0284c7;
         }
 
         .sae-metric-icon {
-          width: 28px;
-          height: 28px;
-          border-radius: 6px;
+          width: 40px;
+          height: 40px;
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1303,6 +1291,7 @@ export default function StudentAchievementsExperience({
         .sae-metric-info {
           display: flex;
           flex-direction: column;
+          justify-content: center;
           min-width: 0;
           flex: 1;
         }
@@ -1310,63 +1299,99 @@ export default function StudentAchievementsExperience({
         .sae-metric-top {
           display: flex;
           align-items: baseline;
-          gap: 7px;
+          gap: 6px;
           min-width: 0;
         }
 
         .sae-metric-val {
-          font-size: 1.15rem;
+          font-size: 1.42rem;
           font-weight: 800;
           line-height: 1;
           color: #0f1f2e;
-          letter-spacing: -0.02em;
+          letter-spacing: -0.025em;
         }
 
         .sae-metric-label {
-          font-size: 0.77rem;
+          font-size: 0.84rem;
           font-weight: 700;
-          color: #334155;
+          color: #1e293b;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
 
         .sae-metric-sub {
-          font-size: 0.68rem;
+          font-size: 0.72rem;
           color: #64748b;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          margin-top: 1px;
-          line-height: 1.2;
+          margin-top: 3px;
+          line-height: 1.25;
         }
 
-        /* Tabs Navigation */
+        @media (max-width: 1120px) {
+          .sae-metrics-grid {
+            gap: 8px;
+          }
+          .sae-metric-card {
+            padding: 10px 8px;
+            gap: 8px;
+          }
+          .sae-metric-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+          }
+          .sae-metric-val {
+            font-size: 1.30rem;
+          }
+          .sae-metric-label {
+            font-size: 0.78rem;
+          }
+          .sae-metric-sub {
+            font-size: 0.68rem;
+          }
+          .sae-main-container {
+            padding: 14px 20px 20px;
+          }
+          .sae-header {
+            padding: 10px 20px;
+          }
+        }
+
+        /* Tabs Navigation: 3 evenly balanced columns */
         .sae-tabs-nav {
-          display: flex;
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
           background: #ffffff;
           border: 1px solid #ded9cc;
           border-radius: 8px;
-          padding: 3px;
-          gap: 3px;
-          box-shadow: 0 2px 6px rgba(15, 31, 46, 0.04);
+          padding: 4px;
+          gap: 8px;
+          box-shadow: 0 1px 3px rgba(15, 31, 46, 0.03);
+          box-sizing: border-box;
+          width: 100%;
         }
 
         .sae-tab-btn {
-          flex: 1;
+          width: 100%;
           background: transparent;
           border: none;
-          padding: 6px 12px;
+          padding: 0 16px;
+          height: 40px;
           border-radius: 6px;
-          font-size: 0.86rem;
+          font-size: 0.88rem;
           font-weight: 600;
           color: #475569;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 6px;
+          gap: 8px;
+          white-space: nowrap;
           transition: all 0.15s ease;
+          box-sizing: border-box;
         }
 
         .sae-tab-btn:hover {
@@ -1377,12 +1402,12 @@ export default function StudentAchievementsExperience({
         .sae-tab-btn.active {
           background: #0f1f2e;
           color: #ffffff;
-          box-shadow: 0 2px 6px rgba(15, 31, 46, 0.2);
+          box-shadow: 0 2px 5px rgba(15, 31, 46, 0.18);
         }
 
         .sae-tab-badge {
-          font-size: 0.72rem;
-          padding: 2px 7px;
+          font-size: 0.74rem;
+          padding: 2px 8px;
           border-radius: 9999px;
           font-weight: 700;
         }
@@ -1402,29 +1427,38 @@ export default function StudentAchievementsExperience({
           background: #ecfdf5;
           border: 1px solid #a7f3d0;
           color: #065f46;
-          border-radius: 8px;
-          padding: 12px 18px;
-          font-size: 0.88rem;
+          border-radius: 6px;
+          padding: 10px 16px;
+          font-size: 0.84rem;
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
           animation: saeFadeIn 0.2s ease-out;
         }
 
-        /* Toolbar: Filter & Add Action */
+        /* Toolbar: Filter & Add Action in ONE clean row */
         .sae-toolbar {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 8px;
+          flex-wrap: nowrap;
+          gap: 14px;
+          width: 100%;
+          box-sizing: border-box;
+          height: 36px;
         }
 
         .sae-filter-chips {
           display: flex;
           align-items: center;
-          gap: 8px;
-          flex-wrap: wrap;
+          gap: 6px;
+          flex-wrap: nowrap;
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+
+        .sae-filter-chips::-webkit-scrollbar {
+          display: none;
         }
 
         .sae-chip {
@@ -1432,14 +1466,18 @@ export default function StudentAchievementsExperience({
           background: #ffffff;
           color: #475569;
           border-radius: 9999px;
-          padding: 6px 14px;
-          font-size: 0.8rem;
+          padding: 0 14px;
+          height: 34px;
+          font-size: 0.80rem;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.15s ease;
-          display: flex;
+          display: inline-flex;
           align-items: center;
           gap: 6px;
+          white-space: nowrap;
+          flex-shrink: 0;
+          box-sizing: border-box;
         }
 
         .sae-chip:hover {
@@ -1454,10 +1492,10 @@ export default function StudentAchievementsExperience({
         }
 
         .sae-chip-count {
-          background: rgba(0, 0, 0, 0.08);
+          background: rgba(0, 0, 0, 0.07);
           padding: 1px 6px;
           border-radius: 9999px;
-          font-size: 0.72rem;
+          font-size: 0.70rem;
         }
 
         .sae-chip.active .sae-chip-count {
@@ -1469,16 +1507,21 @@ export default function StudentAchievementsExperience({
           display: flex;
           align-items: center;
           gap: 10px;
+          flex-shrink: 0;
         }
 
         .sae-search-input {
-          padding: 8px 14px;
+          padding: 0 12px;
           border: 1px solid #cbd5e1;
           border-radius: 6px;
           font-size: 0.84rem;
           background: #ffffff;
           outline: none;
-          min-width: 240px;
+          width: 260px;
+          min-width: 150px;
+          height: 34px;
+          box-sizing: border-box;
+          transition: all 0.15s ease;
         }
 
         .sae-search-input:focus {
@@ -1491,14 +1534,18 @@ export default function StudentAchievementsExperience({
           color: #ffffff;
           border: none;
           border-radius: 6px;
-          padding: 9px 16px;
-          font-size: 0.86rem;
+          padding: 0 16px;
+          height: 34px;
+          font-size: 0.84rem;
           font-weight: 700;
           cursor: pointer;
-          display: flex;
+          display: inline-flex;
           align-items: center;
-          gap: 8px;
+          justify-content: center;
+          gap: 6px;
+          white-space: nowrap;
           transition: background 0.15s ease;
+          box-sizing: border-box;
         }
 
         .sae-btn-add:hover {
@@ -2438,28 +2485,66 @@ export default function StudentAchievementsExperience({
           border-left: 3px solid #ef4444;
         }
 
-        /* Empty State */
+        /* Empty State: Flexibly uses available vertical space without huge blank void */
         .sae-empty-state {
           background: #ffffff;
-          border: 1px dashed #cbd5e1;
+          border: 1.5px dashed #cbd5e1;
           border-radius: 8px;
-          padding: 16px 16px;
+          padding: 32px 24px;
           text-align: center;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 6px;
+          justify-content: center;
+          gap: 10px;
+          box-sizing: border-box;
+          flex: 1;
+          min-height: 260px;
         }
 
         .sae-empty-icon {
-          width: 38px;
-          height: 38px;
+          width: 52px;
+          height: 52px;
           border-radius: 50%;
           background: #f1f5f9;
           color: #64748b;
           display: flex;
           align-items: center;
           justify-content: center;
+          margin-bottom: 6px;
+        }
+
+        .sae-empty-title {
+          font-weight: 700;
+          font-size: 1.15rem;
+          color: #0f1f2e;
+          margin: 0;
+        }
+
+        .sae-empty-desc {
+          font-size: 0.86rem;
+          color: #64748b;
+          max-width: 500px;
+          margin: 0;
+          line-height: 1.5;
+        }
+
+        .sae-empty-state .sae-btn-add {
+          margin-top: 8px;
+          height: 38px;
+          font-size: 0.88rem;
+          font-weight: 700;
+          padding: 0 20px;
+          border-radius: 6px;
+        }
+
+        .sae-empty-state .sae-btn-cancel {
+          margin-top: 8px;
+          height: 38px;
+          font-size: 0.88rem;
+          font-weight: 600;
+          padding: 0 20px;
+          border-radius: 6px;
         }
 
         /* Placeholder Content for Future Tabs */
@@ -2563,8 +2648,12 @@ export default function StudentAchievementsExperience({
             <h1 className="sae-page-title">Achievements & Experience</h1>
             <div className="sae-verify-badge-wrap">
               <span className="sae-verify-badge">
-                <span className="sae-verify-shield">🛡</span>
-                Only verified achievements appear on your official profile.
+                <span className="sae-verify-shield">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                </span>
+                <span>Only admin-verified achievements appear in your official profile</span>
               </span>
               <div className="sae-info-tooltip-wrap">
                 <button
@@ -2609,7 +2698,7 @@ export default function StudentAchievementsExperience({
           {/* Card 1: Official Verified Items */}
           <div className="sae-metric-card is-verified">
             <div className="sae-metric-icon" style={{ background: '#dcfce7', color: '#166534' }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                 <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
@@ -2640,7 +2729,7 @@ export default function StudentAchievementsExperience({
           {/* Card 2: Pending Admin Review */}
           <div className="sae-metric-card is-pending">
             <div className="sae-metric-icon" style={{ background: '#fef3c7', color: '#92400e' }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg>
@@ -2663,7 +2752,7 @@ export default function StudentAchievementsExperience({
           {/* Card 3: Not Verified / Action Needed */}
           <div className="sae-metric-card is-unverified">
             <div className="sae-metric-icon" style={{ background: '#f1f5f9', color: '#475569' }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="12" />
                 <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -2687,7 +2776,7 @@ export default function StudentAchievementsExperience({
           {/* Card 4: Total Portfolio Submissions */}
           <div className="sae-metric-card is-projects">
             <div className="sae-metric-icon" style={{ background: '#e0f2fe', color: '#0369a1' }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
               </svg>
@@ -3131,20 +3220,19 @@ export default function StudentAchievementsExperience({
               !isAddFormOpen ? (
                 <div className="sae-empty-state">
                   <div className="sae-empty-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                     </svg>
                   </div>
-                  <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0f1f2e' }}>
+                  <h3 className="sae-empty-title">
                     No skills submitted yet
-                  </div>
-                  <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: 460, margin: 0 }}>
+                  </h3>
+                  <p className="sae-empty-desc">
                     Add and document your academic, technical, managerial, or professional capabilities to submit them for Portal Admin verification.
                   </p>
                   <button
                     type="button"
                     className="sae-btn-add"
-                    style={{ marginTop: 4 }}
                     onClick={() => {
                       setIsAddFormOpen(true)
                       setTimeout(() => {
@@ -3161,21 +3249,20 @@ export default function StudentAchievementsExperience({
                 {filteredSkills.length === 0 ? (
                   <div className="sae-empty-state">
                     <div className="sae-empty-icon">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <circle cx="11" cy="11" r="8" />
                         <line x1="21" y1="21" x2="16.65" y2="16.65" />
                       </svg>
                     </div>
-                    <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0f1f2e' }}>
+                    <h3 className="sae-empty-title">
                       No skills match the selected filter
-                    </div>
-                    <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: 460, margin: 0 }}>
+                    </h3>
+                    <p className="sae-empty-desc">
                       Try clearing your search query or selecting a different status filter.
                     </p>
                     <button
                       type="button"
                       className="sae-btn-cancel"
-                      style={{ marginTop: 4 }}
                       onClick={() => {
                         setSkillFilter('all')
                         setSearchQuery('')
@@ -3887,20 +3974,19 @@ export default function StudentAchievementsExperience({
               !isAddProjectFormOpen ? (
                 <div className="sae-empty-state">
                   <div className="sae-empty-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
                     </svg>
                   </div>
-                  <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0f1f2e' }}>
+                  <h3 className="sae-empty-title">
                     No projects submitted yet
-                  </div>
-                  <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: 460, margin: 0 }}>
+                  </h3>
+                  <p className="sae-empty-desc">
                     Document your academic, capstone, innovation, or research projects and submit them for Portal Admin verification.
                   </p>
                   <button
                     type="button"
                     className="sae-btn-add"
-                    style={{ marginTop: 4 }}
                     onClick={() => {
                       setIsAddProjectFormOpen(true)
                       setTimeout(() => {
@@ -3917,21 +4003,20 @@ export default function StudentAchievementsExperience({
                 {filteredProjects.length === 0 ? (
                   <div className="sae-empty-state">
                     <div className="sae-empty-icon">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <circle cx="11" cy="11" r="8" />
                         <line x1="21" y1="21" x2="16.65" y2="16.65" />
                       </svg>
                     </div>
-                    <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0f1f2e' }}>
+                    <h3 className="sae-empty-title">
                       No projects match the selected filter
-                    </div>
-                    <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: 460, margin: 0 }}>
+                    </h3>
+                    <p className="sae-empty-desc">
                       Try clearing your search query or selecting a different status filter.
                     </p>
                     <button
                       type="button"
                       className="sae-btn-cancel"
-                      style={{ marginTop: 4 }}
                       onClick={() => {
                         setProjectFilter('all')
                         setProjectSearchQuery('')
@@ -4536,21 +4621,20 @@ export default function StudentAchievementsExperience({
               !isAddInternshipFormOpen ? (
                 <div className="sae-empty-state">
                   <div className="sae-empty-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
                       <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
                     </svg>
                   </div>
-                  <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0f1f2e' }}>
+                  <h3 className="sae-empty-title">
                     No internships submitted yet
-                  </div>
-                  <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: 460, margin: 0 }}>
+                  </h3>
+                  <p className="sae-empty-desc">
                     Log your industrial training, company roles, research fellowships, or clinic tenures and submit them for Portal Admin verification.
                   </p>
                   <button
                     type="button"
                     className="sae-btn-add"
-                    style={{ marginTop: 4 }}
                     onClick={() => {
                       setIsAddInternshipFormOpen(true)
                       setTimeout(() => {
@@ -4567,21 +4651,20 @@ export default function StudentAchievementsExperience({
                 {filteredInternships.length === 0 ? (
                   <div className="sae-empty-state">
                     <div className="sae-empty-icon">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <circle cx="11" cy="11" r="8" />
                         <line x1="21" y1="21" x2="16.65" y2="16.65" />
                       </svg>
                     </div>
-                    <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0f1f2e' }}>
+                    <h3 className="sae-empty-title">
                       No internships match the selected filter
-                    </div>
-                    <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: 460, margin: 0 }}>
+                    </h3>
+                    <p className="sae-empty-desc">
                       Try clearing your search query or selecting a different status filter.
                     </p>
                     <button
                       type="button"
                       className="sae-btn-cancel"
-                      style={{ marginTop: 4 }}
                       onClick={() => {
                         setInternshipFilter('all')
                         setInternshipSearchQuery('')
