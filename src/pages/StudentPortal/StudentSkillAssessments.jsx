@@ -555,6 +555,8 @@ export default function StudentSkillAssessments({
   student = {},
   onBack,
   onNavigateHome,
+  onOpenAchievementsExperience,
+  _onOpenDashboard,
 }) {
   // Student Profile Data matching StudentPlacements
   const s = student || {}
@@ -606,6 +608,116 @@ export default function StudentSkillAssessments({
   const [statusCategoryTab, setStatusCategoryTab] = useState('upcoming') // 'upcoming' | 'taken' | 'results' | 'certificates'
   const [selectedCertificateModal, setSelectedCertificateModal] = useState(null)
   const [toastMessage, setToastMessage] = useState('')
+
+  // Selected assessment & result detail states for direct page navigation
+  const [highlightedAssessmentId, setHighlightedAssessmentId] = useState(null)
+  const [expandedAssessmentId, setExpandedAssessmentId] = useState(null)
+  const [selectedResultDetail, setSelectedResultDetail] = useState(null)
+
+  // Direct navigation handlers from "My Assessment Status & Activity Overview"
+  const resetAllFilters = () => {
+    setSearchQuery('')
+    setSelectedDepartment('All Departments')
+    setSelectedCompany('All Companies')
+    setSelectedSkill('All Skills')
+    setSelectedTestType('All Test Types')
+    setSelectedMode('All Modes')
+    setSelectedFeeType('All Fee Types')
+    setSelectedDate('All Dates')
+    setSelectedTime('All Slots')
+    setSelectedCbtCentre('All Centres / Online')
+  }
+
+  // 1. Upcoming Tests -> Direct navigation to Skill Assessments page & assessment detail
+  const handleNavigateToUpcomingDetail = (item) => {
+    setIsStatusModalOpen(false)
+    resetAllFilters()
+    setActiveTab('all')
+    const targetId = item.refId || item.id
+    const match = INITIAL_ASSESSMENTS.find(
+      (a) => a.id === targetId || a.testName === item.testName
+    ) || item
+    setHighlightedAssessmentId(match.id)
+    setExpandedAssessmentId(match.id)
+    setTimeout(() => {
+      const el = document.getElementById(`assessment-card-${match.id}`)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }, 120)
+  }
+
+  // 2. Tests Taken -> Direct navigation to relevant Skill Assessments / result / detail flow
+  const handleNavigateToTakenDetail = (item) => {
+    setIsStatusModalOpen(false)
+    resetAllFilters()
+    const targetId = item.refId || item.id
+    const match = INITIAL_ASSESSMENTS.find(
+      (a) => a.id === targetId || a.testName === (item.testName || item.name)
+    )
+    if (takenTestIds.includes(targetId)) {
+      setActiveTab('status')
+    } else {
+      setActiveTab('all')
+    }
+    if (match) {
+      setHighlightedAssessmentId(match.id)
+      setExpandedAssessmentId(match.id)
+      setTimeout(() => {
+        const el = document.getElementById(`assessment-card-${match.id}`)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 120)
+    } else {
+      setSelectedResultDetail(item)
+      setTimeout(() => {
+        const el = document.getElementById('sa-recent-results-widget')
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 120)
+    }
+  }
+
+  // 3. Results Available -> Direct navigation to relevant result/assessment detail
+  const handleNavigateToResultDetail = (item) => {
+    setIsStatusModalOpen(false)
+    resetAllFilters()
+    setActiveTab('all')
+    setSelectedResultDetail(item)
+    const targetId = item.refId || item.id
+    const match = INITIAL_ASSESSMENTS.find(
+      (a) => a.id === targetId || a.testName === (item.testName || item.name)
+    )
+    if (match) {
+      setHighlightedAssessmentId(match.id)
+      setExpandedAssessmentId(match.id)
+      setTimeout(() => {
+        const el = document.getElementById(`assessment-card-${match.id}`)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 120)
+    } else {
+      setTimeout(() => {
+        const el = document.getElementById('sa-recent-results-widget')
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 120)
+    }
+  }
+
+  // 4. Certificates -> Direct navigation to existing certificate/credential destination in Student Portal
+  const handleNavigateToCertificates = () => {
+    setIsStatusModalOpen(false)
+    if (onOpenAchievementsExperience) {
+      onOpenAchievementsExperience('skills')
+    } else if (onBack) {
+      onBack()
+    }
+  }
 
   // Toast auto-hide
   useEffect(() => {
@@ -780,10 +892,16 @@ export default function StudentSkillAssessments({
   const renderAssessmentCard = (item) => {
     const isTaken = takenTestIds.includes(item.id)
     const isSaved = savedIds.includes(item.id)
+    const isHighlighted = highlightedAssessmentId === item.id
+    const isExpanded = expandedAssessmentId === item.id || isHighlighted
 
     return (
       /* STRICT RULE: Assessment cards themselves do NOT act as clickable navigation wrappers */
-      <article key={item.id} className="sa-assessment-card">
+      <article
+        key={item.id}
+        id={`assessment-card-${item.id}`}
+        className={`sa-assessment-card ${isHighlighted ? 'is-highlighted' : ''}`}
+      >
         <div className="sa-card-main-row">
           {/* Company Logo */}
           <div
@@ -956,10 +1074,13 @@ export default function StudentSkillAssessments({
             <button
               type="button"
               className="sa-btn-view"
-              onClick={() => setDetailsModalItem(item)}
+              onClick={() => {
+                setExpandedAssessmentId(expandedAssessmentId === item.id ? null : item.id)
+                setHighlightedAssessmentId(item.id)
+              }}
               title="View full assessment details & syllabus"
             >
-              View Details
+              {expandedAssessmentId === item.id ? 'Hide Details' : 'View Details'}
             </button>
 
             {isTaken ? (
@@ -986,6 +1107,63 @@ export default function StudentSkillAssessments({
             )}
           </div>
         </div>
+
+        {/* Full Details Section when Selected / Navigated from Status Overview */}
+        {isExpanded && (
+          <div
+            style={{
+              marginTop: 14,
+              paddingTop: 14,
+              borderTop: '1px solid #e2e8f0',
+              background: '#f8fafc',
+              borderRadius: 8,
+              padding: '14px 16px',
+              animation: 'saFadeIn 0.2s ease-out',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#0284c7', background: '#e0f2fe', padding: '3px 8px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                ★ Complete Assessment &amp; Syllabus Details
+              </span>
+              <button
+                type="button"
+                style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', padding: '2px 6px' }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setHighlightedAssessmentId(null)
+                  setExpandedAssessmentId(null)
+                }}
+              >
+                ✕ Collapse
+              </button>
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <strong style={{ fontSize: '0.8rem', color: '#0f1d2f', display: 'block', marginBottom: 4 }}>
+                Assessment Overview:
+              </strong>
+              <p style={{ fontSize: '0.82rem', color: '#475569', margin: 0, lineHeight: 1.5 }}>
+                {item.overview}
+              </p>
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <strong style={{ fontSize: '0.8rem', color: '#0f1d2f', display: 'block', marginBottom: 4 }}>
+                Technical Syllabus &amp; Subject Areas:
+              </strong>
+              <p style={{ fontSize: '0.82rem', color: '#334155', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: 6, padding: '8px 12px', margin: 0, lineHeight: 1.5 }}>
+                {item.syllabus}
+              </p>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10, fontSize: '0.78rem', color: '#475569', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 6, padding: '10px 12px' }}>
+              <div>Testing Facility / Centre: <strong style={{ color: '#0f1d2f' }}>{item.cbtCentre}</strong></div>
+              <div>Passing Benchmark: <strong style={{ color: '#166534' }}>{item.passingScore}</strong></div>
+              <div>Academic Department: <strong style={{ color: '#0f1d2f' }}>{item.department}</strong></div>
+              <div>Evaluation Mode: <strong style={{ color: '#0f1d2f' }}>{item.mode}</strong></div>
+            </div>
+          </div>
+        )}
       </article>
     )
   }
@@ -1332,6 +1510,57 @@ export default function StudentSkillAssessments({
               </div>
             </section>
 
+            {/* Direct Result / Scorecard Detail Banner if Navigated from Status Overview */}
+            {selectedResultDetail && (
+              <div
+                style={{
+                  background: 'linear-gradient(135deg, #0f1d2f, #1e3a5f)',
+                  color: '#ffffff',
+                  borderRadius: 8,
+                  padding: '16px 20px',
+                  marginBottom: 16,
+                  border: '1px solid #b3881e',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 16,
+                  flexWrap: 'wrap',
+                  boxShadow: '0 4px 14px rgba(15, 29, 47, 0.15)',
+                  animation: 'saFadeIn 0.2s ease-out',
+                }}
+              >
+                <div style={{ flex: 1, minWidth: 260 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span style={{ background: '#b3881e', color: '#ffffff', fontSize: '0.7rem', fontWeight: 800, padding: '2px 8px', borderRadius: 4, textTransform: 'uppercase' }}>
+                      Verified Assessment Scorecard
+                    </span>
+                    <span style={{ fontSize: '0.74rem', color: '#93c5fd' }}>
+                      {selectedResultDetail.company}
+                    </span>
+                  </div>
+                  <h3 style={{ margin: '0 0 4px', fontSize: '1.02rem', fontWeight: 800, color: '#ffffff' }}>
+                    {selectedResultDetail.name || selectedResultDetail.testName}
+                  </h3>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, fontSize: '0.78rem', color: '#cbd5e1' }}>
+                    <span>Score: <strong style={{ color: '#4ade80' }}>{selectedResultDetail.score}</strong></span>
+                    <span>Percentile: <strong style={{ color: '#ffffff' }}>{selectedResultDetail.percentile}</strong></span>
+                    <span>Completed: <strong>{selectedResultDetail.date}</strong></span>
+                    <span>Credential ID: <strong style={{ color: '#93c5fd' }}>{selectedResultDetail.certId || 'IAS-VERIFIED'}</strong></span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <button
+                    type="button"
+                    className="sa-btn-view"
+                    style={{ fontSize: '0.76rem', padding: '6px 14px', background: 'rgba(255,255,255,0.12)', color: '#ffffff', borderColor: 'rgba(255,255,255,0.25)' }}
+                    onClick={() => setSelectedResultDetail(null)}
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* AVAILABLE ASSESSMENTS CARDS LIST */}
             {filteredAssessments.length === 0 ? (
               <div className="sa-empty-state">
@@ -1455,7 +1684,7 @@ export default function StudentSkillAssessments({
             </div>
 
             {/* 2. RECENT RESULTS WIDGET */}
-            <div className="sa-side-card">
+            <div className="sa-side-card" id="sa-recent-results-widget">
               <div className="sa-side-header">
                 <div className="sa-side-title-group">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0284c7" strokeWidth="2.4">
@@ -1879,7 +2108,7 @@ export default function StudentSkillAssessments({
                             style={{ padding: '6px 12px', fontSize: '0.78rem' }}
                             onClick={(e) => {
                               e.stopPropagation()
-                              setDetailsModalItem(test)
+                              handleNavigateToUpcomingDetail(test)
                             }}
                           >
                             View Details
@@ -1953,7 +2182,7 @@ export default function StudentSkillAssessments({
                             style={{ padding: '6px 12px', fontSize: '0.78rem' }}
                             onClick={(e) => {
                               e.stopPropagation()
-                              setDetailsModalItem(res)
+                              handleNavigateToTakenDetail(res)
                             }}
                           >
                             View Details
@@ -2003,7 +2232,7 @@ export default function StudentSkillAssessments({
                               style={{ padding: '6px 12px', fontSize: '0.78rem' }}
                               onClick={(e) => {
                                 e.stopPropagation()
-                                setDetailsModalItem(match)
+                                handleNavigateToTakenDetail(match)
                               }}
                             >
                               View Details
@@ -2079,7 +2308,7 @@ export default function StudentSkillAssessments({
                             style={{ padding: '6px 12px', fontSize: '0.78rem' }}
                             onClick={(e) => {
                               e.stopPropagation()
-                              setDetailsModalItem(res)
+                              handleNavigateToResultDetail(res)
                             }}
                           >
                             View Details
@@ -2154,7 +2383,7 @@ export default function StudentSkillAssessments({
                             style={{ padding: '6px 12px', fontSize: '0.78rem' }}
                             onClick={(e) => {
                               e.stopPropagation()
-                              setDetailsModalItem(res)
+                              handleNavigateToCertificates()
                             }}
                           >
                             View Details
@@ -2165,7 +2394,7 @@ export default function StudentSkillAssessments({
                             style={{ padding: '6px 12px', fontSize: '0.78rem' }}
                             onClick={(e) => {
                               e.stopPropagation()
-                              setSelectedCertificateModal(res)
+                              handleNavigateToCertificates()
                             }}
                           >
                             View Certificate ↗

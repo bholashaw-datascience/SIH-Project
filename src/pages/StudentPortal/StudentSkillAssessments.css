@@ -1235,3 +1235,17 @@
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Highlighted Assessment Card (Navigated from Status Overview) */
+.sa-assessment-card.is-highlighted {
+  border-color: #0284c7 !important;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.28), 0 8px 24px rgba(15, 29, 47, 0.14) !important;
+  animation: saCardPulse 1.2s ease-in-out 1;
+}
+
+@keyframes saCardPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.012); }
+  100% { transform: scale(1); }
+}
+
