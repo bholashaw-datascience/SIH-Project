@@ -1579,21 +1579,20 @@ export default function StudentDashboard({
                 </button>
               </li>
 
-              {/* 2. My Profile */}
+              {/* 2. Projects & Experience */}
               <li>
                 <button
                   type="button"
                   className="sd-nav-item-btn"
                   onClick={() => {
                     setIsMobileSidebarOpen(false)
-                    if (onEditProfile) onEditProfile()
+                    navigateToAchievements('skills')
                   }}
                 >
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                   </svg>
-                  <span>My Profile</span>
+                  <span>Projects & Experience</span>
                 </button>
               </li>
 
@@ -1652,24 +1651,7 @@ export default function StudentDashboard({
                 </button>
               </li>
 
-              {/* 6. Projects & Experience */}
-              <li>
-                <button
-                  type="button"
-                  className="sd-nav-item-btn"
-                  onClick={() => {
-                    setIsMobileSidebarOpen(false)
-                    navigateToAchievements('skills')
-                  }}
-                >
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                  </svg>
-                  <span>Projects & Experience</span>
-                </button>
-              </li>
-
-              {/* 7. Public Posts */}
+              {/* 6. Public Posts */}
               <li>
                 <button
                   type="button"
@@ -1685,6 +1667,24 @@ export default function StudentDashboard({
                     <line x1="12" y1="2" x2="12" y2="15" />
                   </svg>
                   <span>Public Posts</span>
+                </button>
+              </li>
+
+              {/* 7. My Profile */}
+              <li>
+                <button
+                  type="button"
+                  className="sd-nav-item-btn"
+                  onClick={() => {
+                    setIsMobileSidebarOpen(false)
+                    if (onEditProfile) onEditProfile()
+                  }}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <span>My Profile</span>
                 </button>
               </li>
             </ul>
