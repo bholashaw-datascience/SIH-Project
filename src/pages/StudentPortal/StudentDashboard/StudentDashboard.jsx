@@ -1088,7 +1088,6 @@ export default function StudentDashboard({
           align-items: center;
           justify-content: space-between;
           gap: 16px;
-          cursor: pointer;
           transition: all 0.15s ease;
           box-shadow: 0 2px 8px rgba(15, 29, 47, 0.04);
         }
@@ -1617,16 +1616,7 @@ export default function StudentDashboard({
         {/* SECTION 4: INTERNSHIPS & PLACEMENTS + SKILL ASSESSMENTS (Requirements 7 & 8) */}
         <section className="sd-gateways-grid">
           {/* Card: Internships & Placements */}
-          <div
-            className="sd-gateway-card featured"
-            onClick={() => {
-              if (onOpenInternships) {
-                onOpenInternships()
-              } else {
-                setIsInternshipsModalOpen(true)
-              }
-            }}
-          >
+          <div className="sd-gateway-card featured">
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <div className="sd-gw-icon" style={{ background: '#fdfbf7', color: '#b3881e' }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1645,8 +1635,7 @@ export default function StudentDashboard({
               type="button"
               className="sd-btn-secondary"
               style={{ flexShrink: 0 }}
-              onClick={(e) => {
-                e.stopPropagation()
+              onClick={() => {
                 if (onOpenInternships) {
                   onOpenInternships()
                 } else {
@@ -1659,14 +1648,7 @@ export default function StudentDashboard({
           </div>
 
           {/* Card: Placements */}
-          <div
-            className="sd-gateway-card featured"
-            onClick={() => {
-              if (onOpenPlacements) {
-                onOpenPlacements()
-              }
-            }}
-          >
+          <div className="sd-gateway-card featured">
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <div className="sd-gw-icon" style={{ background: '#f0fdf4', color: '#166534' }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1686,8 +1668,7 @@ export default function StudentDashboard({
               type="button"
               className="sd-btn-secondary"
               style={{ flexShrink: 0 }}
-              onClick={(e) => {
-                e.stopPropagation()
+              onClick={() => {
                 if (onOpenPlacements) {
                   onOpenPlacements()
                 }
@@ -1698,7 +1679,7 @@ export default function StudentDashboard({
           </div>
 
           {/* Card: Skill Assessments */}
-          <div className="sd-gateway-card" onClick={() => setIsAssessmentsModalOpen(true)}>
+          <div className="sd-gateway-card">
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <div className="sd-gw-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1712,7 +1693,12 @@ export default function StudentDashboard({
                 </p>
               </div>
             </div>
-            <button type="button" className="sd-btn-secondary" style={{ flexShrink: 0 }}>
+            <button
+              type="button"
+              className="sd-btn-secondary"
+              style={{ flexShrink: 0 }}
+              onClick={() => setIsAssessmentsModalOpen(true)}
+            >
               View Tests →
             </button>
           </div>

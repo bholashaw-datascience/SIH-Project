@@ -1427,11 +1427,7 @@ ${company}
                 </div>
 
                 <div className="sp-status-list">
-                  <div
-                    className="sp-status-row"
-                    onClick={() => setActiveTab('status')}
-                    title="View Applied Placement Drives"
-                  >
+                  <div className="sp-status-row">
                     <div className="sp-status-left">
                       <div className="sp-status-icon-box applied">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
@@ -1446,11 +1442,7 @@ ${company}
                     <span className="sp-status-count applied">{metrics.applied}</span>
                   </div>
 
-                  <div
-                    className="sp-status-row"
-                    onClick={() => setActiveTab('status')}
-                    title="View Shortlisted & Tests"
-                  >
+                  <div className="sp-status-row">
                     <div className="sp-status-left">
                       <div className="sp-status-icon-box shortlisted">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
@@ -1465,11 +1457,7 @@ ${company}
                     <span className="sp-status-count shortlisted">{metrics.shortlisted}</span>
                   </div>
 
-                  <div
-                    className="sp-status-row"
-                    onClick={() => setActiveTab('status')}
-                    title="View Technical Interviews"
-                  >
+                  <div className="sp-status-row">
                     <div className="sp-status-left">
                       <div className="sp-status-icon-box interview">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
@@ -1487,11 +1475,7 @@ ${company}
                     <span className="sp-status-count interview">{metrics.interviews}</span>
                   </div>
 
-                  <div
-                    className={`sp-status-row ${approvedOffers.length > 0 ? 'has-offers' : ''}`}
-                    onClick={() => setActiveTab('status')}
-                    title={approvedOffers.length > 0 ? 'View Approved Offer Letters' : 'No Offer Letters Issued Yet'}
-                  >
+                  <div className={`sp-status-row ${approvedOffers.length > 0 ? 'has-offers' : ''}`}>
                     <div className="sp-status-left">
                       <div className="sp-status-icon-box offers">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">

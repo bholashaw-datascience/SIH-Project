@@ -1223,11 +1223,7 @@ export default function PublicPost({
                 return (
                   <div key={post.id} className="pp-recent-card">
                     {/* Thumbnail Row */}
-                    <div
-                      className="pp-recent-thumb-row"
-                      onClick={() => firstMedia && setLightboxMedia(firstMedia)}
-                      style={{ cursor: firstMedia ? 'pointer' : 'default' }}
-                    >
+                    <div className="pp-recent-thumb-row">
                       {firstMedia ? (
                         firstMedia.type === 'video' ? (
                           <>

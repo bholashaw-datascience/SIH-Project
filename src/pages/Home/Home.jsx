@@ -249,7 +249,6 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
           flex-direction: column;
           align-items: center;
           text-align: center;
-          cursor: pointer;
           transition: all 0.2s ease-in-out;
           box-sizing: border-box;
           position: relative;
@@ -300,7 +299,6 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
           transition: all 0.2s ease;
           position: relative;
           z-index: 1;
-          pointer-events: none;
         }
 
         .stakeholder-tile:hover .tile-icon-box {
@@ -323,7 +321,6 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
           line-height: 1.3;
           position: relative;
           z-index: 1;
-          pointer-events: none;
         }
 
         .tile-desc {
@@ -334,7 +331,6 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
           flex-grow: 1;
           position: relative;
           z-index: 1;
-          pointer-events: none;
         }
 
         .tile-action-button {
@@ -356,7 +352,6 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
           position: relative;
           z-index: 2;
           flex-shrink: 0;
-          pointer-events: auto;
         }
 
         .stakeholder-tile:hover .tile-action-button {
@@ -400,7 +395,6 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
           position: relative;
           z-index: 2;
           flex-shrink: 0;
-          pointer-events: auto;
           font-family: inherit;
         }
 
@@ -2231,7 +2225,6 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
                 <div
                   key={role.id}
                   className={`stakeholder-tile ${selectedRole === role.id ? 'tile-selected' : ''}`}
-                  onClick={() => handleRoleClick(role.id)}
                 >
                   <span className="tile-category-tag">{role.category}</span>
                   <div className="tile-icon-box">{role.icon}</div>
@@ -2240,10 +2233,7 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
                   <button
                     type="button"
                     className="tile-action-button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleRoleClick(role.id)
-                    }}
+                    onClick={() => handleRoleClick(role.id)}
                   >
                     <span>{role.actionLabel}</span>
                     <span className="btn-arrow-icon">→</span>

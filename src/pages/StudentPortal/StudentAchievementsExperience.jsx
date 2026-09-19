@@ -2257,9 +2257,19 @@ export default function StudentAchievementsExperience({
           color: #0369a1;
           background: #e0f2fe;
           padding: 2px 6px;
+          border: none;
           border-radius: 4px;
           font-weight: 600;
           flex-shrink: 0;
+          cursor: pointer;
+          font-family: inherit;
+          display: inline-flex;
+          align-items: center;
+          transition: background-color 0.15s ease;
+        }
+
+        .sae-project-doc-badge:hover {
+          background: #bae6fd;
         }
 
         @media (max-width: 480px) {
@@ -3353,16 +3363,7 @@ export default function StudentAchievementsExperience({
                           {/* Certificate & Credential Details (Department-Neutral) */}
                           {(item.credentialName || item.issuingOrg || item.credentialUrl || item.certificateFile) ? (
                             <div className="sae-cred-box">
-                              <div
-                                className="sae-cred-header"
-                                style={item.certificateFile ? { cursor: 'pointer' } : {}}
-                                onClick={() => {
-                                  if (item.certificateFile) {
-                                    handleOpenImageModal(item.certificateUrl || '', item.certificateFile)
-                                  }
-                                }}
-                                title={item.certificateFile ? 'Click to view certificate' : ''}
-                              >
+                              <div className="sae-cred-header">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b38e44" strokeWidth="2">
                                   <circle cx="12" cy="8" r="6" />
                                   <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
@@ -3898,12 +3899,7 @@ export default function StudentAchievementsExperience({
                       </div>
                     ) : (
                       <div className="sae-file-card">
-                        <div
-                          className="sae-file-info"
-                          onClick={handleViewProjectDoc}
-                          style={{ cursor: 'pointer' }}
-                          title="Click to view project documentation"
-                        >
+                        <div className="sae-file-info">
                           <div className="sae-file-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -4140,12 +4136,7 @@ export default function StudentAchievementsExperience({
                           )}
 
                           {/* Project Documentation */}
-                          <div
-                            className="sae-project-doc-box"
-                            onClick={() => handleOpenImageModal(item.documentationUrl || '', item.documentationFile || item.documentFile || 'Project Documentation')}
-                            style={{ cursor: 'pointer' }}
-                            title="Click to view project documentation"
-                          >
+                          <div className="sae-project-doc-box">
                             <div className="sae-project-doc-header">
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0284c7" strokeWidth="2.2">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -4155,7 +4146,14 @@ export default function StudentAchievementsExperience({
                                 {item.documentationFile || item.documentFile || 'Project Documentation'}
                               </span>
                             </div>
-                            <span className="sae-project-doc-badge">View Document ↗</span>
+                            <button
+                              type="button"
+                              className="sae-project-doc-badge"
+                              onClick={() => handleOpenImageModal(item.documentationUrl || '', item.documentationFile || item.documentFile || 'Project Documentation')}
+                              title="Click to view project documentation"
+                            >
+                              View Document ↗
+                            </button>
                           </div>
 
                           {/* Project Link if available */}
@@ -4535,17 +4533,10 @@ export default function StudentAchievementsExperience({
                             <img
                               src={internshipCertPreviewUrl}
                               alt="Certificate preview"
-                              style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 4, border: '1px solid #cbd5e1', cursor: 'pointer', flexShrink: 0 }}
-                              onClick={handleViewInternshipCert}
-                              title="Click to view certificate"
+                              style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 4, border: '1px solid #cbd5e1', flexShrink: 0 }}
                             />
                           ) : (
-                            <div
-                              className="sae-file-icon"
-                              style={{ cursor: 'pointer' }}
-                              onClick={handleViewInternshipCert}
-                              title="Click to view certificate"
-                            >
+                            <div className="sae-file-icon">
                               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                                 <polyline points="14 2 14 8 20 8" />
@@ -4556,8 +4547,6 @@ export default function StudentAchievementsExperience({
                             <span
                               className="sae-file-name"
                               title={internshipCertFile.name}
-                              style={{ cursor: 'pointer' }}
-                              onClick={handleViewInternshipCert}
                             >
                               {internshipCertFile.name}
                             </span>
@@ -4735,12 +4724,7 @@ export default function StudentAchievementsExperience({
                           </div>
 
                           {/* Certificate Document */}
-                          <div
-                            className="sae-project-doc-box"
-                            onClick={() => handleOpenImageModal(item.certificateUrl || '', item.certificateFile || item.documentFile || 'Internship Certificate')}
-                            style={{ cursor: 'pointer' }}
-                            title="Click to view internship certificate"
-                          >
+                          <div className="sae-project-doc-box">
                             <div className="sae-project-doc-header">
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0284c7" strokeWidth="2.2">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -4750,7 +4734,14 @@ export default function StudentAchievementsExperience({
                                 {item.certificateFile || item.documentFile || 'Internship Certificate'}
                               </span>
                             </div>
-                            <span className="sae-project-doc-badge">View Certificate ↗</span>
+                            <button
+                              type="button"
+                              className="sae-project-doc-badge"
+                              onClick={() => handleOpenImageModal(item.certificateUrl || '', item.certificateFile || item.documentFile || 'Internship Certificate')}
+                              title="Click to view internship certificate"
+                            >
+                              View Certificate ↗
+                            </button>
                           </div>
 
                           {/* Certificate Link */}

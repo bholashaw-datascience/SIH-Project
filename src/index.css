@@ -66,11 +66,9 @@ summary,
 [role="link"],
 [role="tab"],
 .clickable,
-.stakeholder-tile,
 .tile-action-button,
 .btn,
 .nav-link,
-.card-clickable,
 [onclick] {
   cursor: var(--cursor-pointer) !important;
 }
@@ -84,11 +82,9 @@ summary *,
 [role="link"] *,
 [role="tab"] *,
 .clickable *,
-.stakeholder-tile *,
 .tile-action-button *,
 .btn *,
 .nav-link *,
-.card-clickable *,
 [onclick] * {
   cursor: inherit !important;
 }

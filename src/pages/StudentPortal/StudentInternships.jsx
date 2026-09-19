@@ -1886,11 +1886,7 @@ ${company}
 
                 <div className="si-status-vertical-list">
                   {/* Status Item 1: Applied */}
-                  <div
-                    className="si-status-row"
-                    onClick={() => setActiveTab('status')}
-                    title="View Applied Internships"
-                  >
+                  <div className="si-status-row">
                     <div className="si-status-mini-icon applied">
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
                         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
@@ -1904,11 +1900,7 @@ ${company}
                   </div>
 
                   {/* Status Item 2: Shortlisted */}
-                  <div
-                    className="si-status-row"
-                    onClick={() => setActiveTab('status')}
-                    title="View Shortlisted Applications"
-                  >
+                  <div className="si-status-row">
                     <div className="si-status-mini-icon shortlisted">
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -1922,11 +1914,7 @@ ${company}
                   </div>
 
                   {/* Status Item 3: Selected */}
-                  <div
-                    className="si-status-row"
-                    onClick={() => setActiveTab('status')}
-                    title="View Selected Applications"
-                  >
+                  <div className="si-status-row">
                     <div className="si-status-mini-icon selected">
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
@@ -1941,11 +1929,7 @@ ${company}
                   </div>
 
                   {/* Status Item 4: Offer Letters */}
-                  <div
-                    className={`si-status-row ${approvedOffers.length > 0 ? 'has-offers' : ''}`}
-                    onClick={() => setActiveTab('status')}
-                    title={approvedOffers.length > 0 ? 'View Approved Offer Letters' : 'No Offer Letters Issued Yet'}
-                  >
+                  <div className={`si-status-row ${approvedOffers.length > 0 ? 'has-offers' : ''}`}>
                     <div className="si-status-mini-icon offer">
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
