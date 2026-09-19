@@ -791,100 +791,70 @@ export default function PublicPost({
             </div>
 
             {/* --------------------------------------------------------------
-                SECTION 4: WRITE DESCRIPTION
+                SECTION 3: CAPTION
                 -------------------------------------------------------------- */}
             <div className="pp-card">
               <div className="pp-card-header">
                 <div className="pp-card-title-group">
                   <span className="pp-card-step-badge">3</span>
+                  <h2 className="pp-card-title">Caption</h2>
+                </div>
+                <span className="pp-card-badge">Optional Headline</span>
+              </div>
+
+              <div className="pp-caption-row">
+                <label htmlFor="pp-caption-input" className="pp-caption-label">
+                  Caption
+                </label>
+                <input
+                  type="text"
+                  id="pp-caption-input"
+                  className="pp-caption-input"
+                  placeholder="Write a caption for your post (e.g. 1st Place at National Smart Mobility Hackathon)..."
+                  value={caption}
+                  onChange={(e) => setCaption(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* --------------------------------------------------------------
+                SECTION 4: WRITE DESCRIPTION
+                -------------------------------------------------------------- */}
+            <div className="pp-card">
+              <div className="pp-card-header">
+                <div className="pp-card-title-group">
+                  <span className="pp-card-step-badge">4</span>
                   <h2 className="pp-card-title">Write Description</h2>
                 </div>
                 <span className="pp-required-tag">* Required</span>
               </div>
 
-              <div className="pp-description-group">
-                {/* Caption Field */}
-                <div className="pp-caption-row">
-                  <label htmlFor="pp-caption-input" className="pp-caption-label">
-                    Caption
-                  </label>
-                  <input
-                    type="text"
-                    id="pp-caption-input"
-                    className="pp-caption-input"
-                    placeholder="Write a caption for your post (e.g. 1st Place at National Smart Mobility Hackathon)..."
-                    value={caption}
-                    onChange={(e) => setCaption(e.target.value)}
-                  />
+              <div className="pp-textarea-wrap">
+                <textarea
+                  id="pp-description-textarea"
+                  className={`pp-textarea ${validationError && !description.trim() ? 'is-invalid' : ''}`}
+                  placeholder="Write a clear description about this public post. Highlight the methodology, findings, honors received, or collaborative contributions..."
+                  value={description}
+                  onChange={(e) => {
+                    setDescription(e.target.value)
+                    if (validationError && e.target.value.trim()) {
+                      setValidationError('')
+                    }
+                  }}
+                  maxLength={1200}
+                  rows={4}
+                />
+
+                <div className="pp-textarea-footer">
+                  <span>
+                    {validationError && !description.trim() ? (
+                      <span style={{ color: '#dc2626', fontWeight: 600 }}>Description is required</span>
+                    ) : (
+                      'Provide meaningful academic context'
+                    )}
+                  </span>
+                  <span>{description.length} / 1200 characters</span>
                 </div>
-
-                {/* Textarea & Counter */}
-                <div className="pp-textarea-wrap">
-                  <textarea
-                    id="pp-description-textarea"
-                    className={`pp-textarea ${validationError && !description.trim() ? 'is-invalid' : ''}`}
-                    placeholder="Write a clear description about this public post. Highlight the methodology, findings, honors received, or collaborative contributions..."
-                    value={description}
-                    onChange={(e) => {
-                      setDescription(e.target.value)
-                      if (validationError && e.target.value.trim()) {
-                        setValidationError('')
-                      }
-                    }}
-                    maxLength={1200}
-                    rows={4}
-                  />
-
-                  <div className="pp-textarea-footer">
-                    <span>
-                      {validationError && !description.trim() ? (
-                        <span style={{ color: '#dc2626', fontWeight: 600 }}>Description is required</span>
-                      ) : (
-                        'Provide meaningful academic context'
-                      )}
-                    </span>
-                    <span>{description.length} / 1200 characters</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* --------------------------------------------------------------
-                SECTION 5: SUBMIT POST
-                -------------------------------------------------------------- */}
-            <div className="pp-submit-section">
-              <div className="pp-submit-action-row">
-                <button
-                  type="button"
-                  id="pp-submit-btn"
-                  className="pp-btn-submit"
-                  onClick={handleSubmitPost}
-                >
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <line x1="22" y1="2" x2="11" y2="13" />
-                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                  </svg>
-                  Submit for Admin Verification
-                </button>
-
-                <button
-                  type="button"
-                  className="pp-btn-cancel"
-                  onClick={onBack}
-                >
-                  Cancel
-                </button>
-              </div>
-
-              <div className="pp-submit-note">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b3881e" strokeWidth="2.4">
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="16" x2="12" y2="12" />
-                  <line x1="12" y1="8" x2="12.01" y2="8" />
-                </svg>
-                <span>
-                  <strong>Admin Verification Standard:</strong> Your post will become publicly visible across the institutional network only after formal review and approval by the Portal Admin.
-                </span>
               </div>
             </div>
           </div>
@@ -1131,6 +1101,45 @@ export default function PublicPost({
                     Just now • Institutional Public Feed
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* --------------------------------------------------------------
+                SECTION 7: PREVIEW / SUBMIT ACTIONS
+                -------------------------------------------------------------- */}
+            <div className="pp-submit-section">
+              <div className="pp-submit-action-row">
+                <button
+                  type="button"
+                  id="pp-submit-btn"
+                  className="pp-btn-submit"
+                  onClick={handleSubmitPost}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                  </svg>
+                  Submit for Admin Verification
+                </button>
+
+                <button
+                  type="button"
+                  className="pp-btn-cancel"
+                  onClick={onBack}
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <div className="pp-submit-note">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b3881e" strokeWidth="2.4">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="16" x2="12" y2="12" />
+                  <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg>
+                <span>
+                  <strong>Admin Verification Standard:</strong> Your post will become publicly visible across the institutional network only after formal review and approval by the Portal Admin.
+                </span>
               </div>
             </div>
           </div>
