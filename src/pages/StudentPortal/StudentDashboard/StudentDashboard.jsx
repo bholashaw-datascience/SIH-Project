@@ -60,6 +60,12 @@ export default function StudentDashboard({
   const [isAssessmentsModalOpen, setIsAssessmentsModalOpen] = useState(false)
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false)
 
+  // Mobile sidebar toggle state
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+
+  // Search filter query
+  const [searchQuery, setSearchQuery] = useState('')
+
   // Profile dropdown menu state
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
   const profileMenuRef = useRef(null)
@@ -143,6 +149,25 @@ export default function StudentDashboard({
     }
   })
 
+  // Read application counts from actual application state
+  const appliedInternshipsCount = (() => {
+    try {
+      const list = JSON.parse(localStorage.getItem('udaan_student_internship_applications') || '[]')
+      return Array.isArray(list) ? list.length : 0
+    } catch {
+      return 0
+    }
+  })()
+
+  const appliedPlacementsCount = (() => {
+    try {
+      const list = JSON.parse(localStorage.getItem('udaan_student_placement_applications') || '[]')
+      return Array.isArray(list) ? list.length : 0
+    } catch {
+      return 0
+    }
+  })()
+
   // Sync to localStorage
   useEffect(() => {
     try {
@@ -180,7 +205,7 @@ export default function StudentDashboard({
       id: `n_${Date.now()}`,
       type: 'success',
       title: 'Security Alert: Password Changed',
-      message: 'Your password was changed successfully just now.',
+      message: 'Your password was changed successfully.',
       timestamp: 'Just now',
       read: false,
     }
@@ -200,7 +225,6 @@ export default function StudentDashboard({
     }
     setSkills((prev) => [item, ...prev])
 
-    // Add notification
     const notif = {
       id: `n_${Date.now()}`,
       type: 'info',
@@ -345,947 +369,1169 @@ export default function StudentDashboard({
     setNotifications((prev) => [notif, ...prev])
   }
 
-
   const unreadNotifsCount = notifications.filter((n) => !n.read).length
   const verifiedSkillsCount = skills.filter((sItem) => sItem.verified).length
-  const verifiedProjectsCount = projects.filter((pItem) => pItem.verified).length
-  const verifiedInternshipsCount = internships.filter((iItem) => iItem.verified).length
 
   const openSkillsTab = (tab) => {
     setSkillsInitialTab(tab)
     setIsSkillsModalOpen(true)
   }
 
+  // Profile Completion Percentage Calculation
+  const profileStats = (() => {
+    const personalComplete = Boolean(s.name && s.email && s.phone)
+    const academicComplete = Boolean(s.institution && s.course && (s.year || s.semester))
+    const verificationComplete = Boolean(verificationStatus === 'approved' || verificationStatus === 'verified')
+    const skillsComplete = Boolean(skills.length > 0 || projects.length > 0 || internships.length > 0)
+
+    let score = 0
+    if (personalComplete) score += 25
+    if (academicComplete) score += 25
+    if (verificationComplete) score += 25
+    if (skillsComplete) score += 25
+
+    return {
+      percentage: score,
+      personalComplete,
+      academicComplete,
+      verificationComplete,
+      skillsComplete,
+    }
+  })()
+
+  // Navigation handlers for sidebar & overview cards
+  const navigateToInternships = () => {
+    if (onOpenInternships) {
+      onOpenInternships()
+    } else {
+      setIsInternshipsModalOpen(true)
+    }
+  }
+
+  const navigateToPlacements = () => {
+    if (onOpenPlacements) {
+      onOpenPlacements()
+    } else {
+      setIsInternshipsModalOpen(true)
+    }
+  }
+
+  const navigateToAchievements = (tab = 'skills') => {
+    if (onOpenAchievementsExperience) {
+      onOpenAchievementsExperience(tab)
+    } else {
+      openSkillsTab(tab)
+    }
+  }
+
+  const navigateToPublicPosts = () => {
+    if (onOpenPublicPost) {
+      onOpenPublicPost()
+    } else {
+      setIsPostModalOpen(true)
+    }
+  }
+
   return (
-    <div className="sd-page-wrapper">
+    <div className="sd-app-layout">
       <style>{`
-        .sd-page-wrapper {
+        /* Institutional Full-Page App Layout */
+        .sd-app-layout {
           min-height: 100vh;
-          background-color: #f7f5ef;
-          color: #112233;
-          font-family: inherit;
+          background-color: #f6f8fb;
+          color: #0f1d2f;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
           display: flex;
           flex-direction: column;
           box-sizing: border-box;
+          width: 100%;
         }
 
-        /* Top Header */
-        .sd-header {
-          background-color: #0f1f2e;
+        /* Top Bar Header */
+        .sd-topbar {
+          background-color: #0d1b2a;
           color: #ffffff;
-          border-bottom: 3px solid #b38e44;
-          padding: 12px 24px;
+          border-bottom: 2px solid #b3881e;
+          height: 60px;
           display: flex;
           align-items: center;
           justify-content: space-between;
+          padding: 0 24px;
           position: sticky;
           top: 0;
-          z-index: 1000;
-          box-shadow: 0 4px 16px rgba(10, 20, 30, 0.18);
+          z-index: 1050;
+          box-shadow: 0 2px 10px rgba(10, 20, 30, 0.2);
+          box-sizing: border-box;
         }
 
-        .sd-header-brand {
+        .sd-topbar-left {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+
+        .sd-mobile-menu-toggle {
+          display: none;
+          background: transparent;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: #ffffff;
+          border-radius: 4px;
+          padding: 6px;
+          cursor: pointer;
+        }
+
+        .sd-brand-identity {
           display: flex;
           align-items: center;
           gap: 12px;
           cursor: pointer;
         }
 
-        .sd-brand-logo {
-          width: 38px;
-          height: 38px;
+        .sd-brand-emblem {
+          width: 34px;
+          height: 34px;
           border-radius: 6px;
-          background: linear-gradient(135deg, #b38e44 0%, #8c681b 100%);
+          background: linear-gradient(135deg, #b3881e 0%, #8c681b 100%);
           display: flex;
           align-items: center;
           justify-content: center;
           font-weight: 800;
-          font-size: 1.15rem;
+          font-size: 0.88rem;
           color: #ffffff;
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          letter-spacing: 0.04em;
+          border: 1px solid rgba(255, 255, 255, 0.25);
+          flex-shrink: 0;
         }
 
-        .sd-brand-text {
+        .sd-brand-titles {
           display: flex;
           flex-direction: column;
         }
 
-        .sd-brand-title {
-          font-size: 1.05rem;
-          font-weight: 800;
-          letter-spacing: 0.04em;
+        .sd-brand-main {
+          font-size: 0.96rem;
+          font-weight: 700;
+          letter-spacing: 0.02em;
           color: #ffffff;
+          line-height: 1.2;
         }
 
         .sd-brand-sub {
-          font-size: 0.72rem;
-          color: #cbd5e1;
-          letter-spacing: 0.08em;
+          font-size: 0.68rem;
+          color: #94a3b8;
           text-transform: uppercase;
+          letter-spacing: 0.08em;
+          font-weight: 600;
         }
 
-        .sd-header-actions {
+        .sd-topbar-right {
           display: flex;
           align-items: center;
           gap: 14px;
         }
 
-        /* Profile Menu Trigger & Dropdown */
-        .sd-profile-menu-wrap {
+        /* Search input */
+        .sd-search-box {
           position: relative;
-          display: inline-flex;
-        }
-
-        .sd-user-badge-btn {
           display: flex;
           align-items: center;
-          gap: 9px;
+        }
+
+        .sd-search-input {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          border-radius: 6px;
+          padding: 6px 12px 6px 32px;
+          color: #ffffff;
+          font-size: 0.82rem;
+          width: 200px;
+          transition: all 0.2s ease;
+          outline: none;
+          font-family: inherit;
+        }
+
+        .sd-search-input:focus {
+          background: rgba(255, 255, 255, 0.14);
+          border-color: #b3881e;
+          width: 240px;
+        }
+
+        .sd-search-input::placeholder {
+          color: #94a3b8;
+        }
+
+        .sd-search-icon {
+          position: absolute;
+          left: 10px;
+          color: #94a3b8;
+          pointer-events: none;
+        }
+
+        /* Notification button */
+        .sd-icon-btn {
           background: rgba(255, 255, 255, 0.08);
           border: 1px solid rgba(255, 255, 255, 0.16);
-          padding: 4px 12px 4px 5px;
-          border-radius: 20px;
-          cursor: pointer;
-          color: #f1f5f9;
-          font-family: inherit;
-          font-size: 0.84rem;
-          font-weight: 600;
-          transition: all 0.15s ease;
-          user-select: none;
-        }
-
-        .sd-user-badge-btn:hover {
-          background: rgba(255, 255, 255, 0.16);
-          border-color: rgba(255, 255, 255, 0.32);
-          color: #ffffff;
-        }
-
-        .sd-user-badge-btn.is-active {
-          background: rgba(255, 255, 255, 0.2);
-          border-color: #b38e44;
-          box-shadow: 0 0 0 2px rgba(179, 142, 68, 0.25);
-        }
-
-        .sd-user-avatar {
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-          object-fit: cover;
-          border: 1px solid #b38e44;
-          background: #1e3a5f;
+          color: #e2e8f0;
+          border-radius: 6px;
+          width: 36px;
+          height: 36px;
           display: flex;
           align-items: center;
           justify-content: center;
+          cursor: pointer;
+          position: relative;
+          transition: all 0.15s ease;
+        }
+
+        .sd-icon-btn:hover {
+          background: rgba(255, 255, 255, 0.16);
           color: #ffffff;
-          font-weight: 700;
-          font-size: 0.8rem;
-          flex-shrink: 0;
+          border-color: #b3881e;
         }
 
-        .sd-user-name {
-          font-size: 0.84rem;
+        .sd-badge-counter {
+          position: absolute;
+          top: -4px;
+          right: -4px;
+          background-color: #dc2626;
+          color: #ffffff;
+          font-size: 0.65rem;
+          font-weight: 800;
+          border-radius: 10px;
+          padding: 1px 5px;
+          border: 1.5px solid #0d1b2a;
+          line-height: 1;
+        }
+
+        /* User Profile Pill */
+        .sd-user-dropdown-wrap {
+          position: relative;
+        }
+
+        .sd-user-pill-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          border-radius: 20px;
+          padding: 3px 12px 3px 4px;
+          color: #ffffff;
+          cursor: pointer;
+          font-size: 0.82rem;
           font-weight: 600;
-          color: #f1f5f9;
-          max-width: 140px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          transition: all 0.15s ease;
+          font-family: inherit;
         }
 
-        .sd-dropdown-chevron {
-          color: #cbd5e1;
-          transition: transform 0.18s ease;
+        .sd-user-pill-btn:hover,
+        .sd-user-pill-btn.is-active {
+          background: rgba(255, 255, 255, 0.14);
+          border-color: #b3881e;
+        }
+
+        .sd-pill-avatar {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          background: #1e3a5f;
+          color: #f1cf7c;
+          border: 1px solid #b3881e;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 0.78rem;
+          object-fit: cover;
           flex-shrink: 0;
         }
 
-        .sd-dropdown-chevron.is-open {
-          transform: rotate(180deg);
-          color: #f1cf7c;
-        }
-
-        /* Profile Dropdown Menu Card */
-        .sd-profile-dropdown-menu {
+        /* Profile Dropdown Menu */
+        .sd-dropdown-menu {
           position: absolute;
           top: calc(100% + 8px);
           right: 0;
-          min-width: 220px;
-          max-width: calc(100vw - 24px);
           background: #ffffff;
-          border: 1px solid #e2e8f0;
+          border: 1px solid #cbd5e1;
           border-radius: 8px;
-          box-shadow: 0 12px 28px -4px rgba(10, 20, 30, 0.22), 0 6px 12px -2px rgba(10, 20, 30, 0.12);
-          padding: 6px;
+          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+          width: 220px;
           z-index: 1200;
-          animation: sdDropdownSlide 0.14s cubic-bezier(0.16, 1, 0.3, 1);
-          box-sizing: border-box;
-        }
-
-        @keyframes sdDropdownSlide {
-          from {
-            opacity: 0;
-            transform: translateY(-6px) scale(0.98);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-
-        .sd-dropdown-header {
-          padding: 8px 10px 6px;
-        }
-
-        .sd-dropdown-user-name {
-          font-size: 0.86rem;
-          font-weight: 700;
-          color: #0f1f2e;
-          line-height: 1.3;
-          white-space: nowrap;
           overflow: hidden;
-          text-overflow: ellipsis;
+          animation: sdMenuIn 0.15s ease-out;
         }
 
-        .sd-dropdown-user-email {
-          font-size: 0.74rem;
+        @keyframes sdMenuIn {
+          from { opacity: 0; transform: translateY(-6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sd-menu-head {
+          padding: 12px 14px;
+          background: #f8fafc;
+          border-bottom: 1px solid #e2e8f0;
+        }
+
+        .sd-menu-user-name {
+          font-weight: 700;
+          font-size: 0.88rem;
+          color: #0f1d2f;
+        }
+
+        .sd-menu-user-sub {
+          font-size: 0.72rem;
           color: #64748b;
-          line-height: 1.3;
           margin-top: 2px;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
 
-        .sd-dropdown-user-role {
-          display: inline-block;
-          font-size: 0.68rem;
-          font-weight: 700;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-          color: #b38e44;
-          margin-top: 4px;
-        }
-
-        .sd-dropdown-divider {
-          height: 1px;
-          background: #f1f5f9;
-          margin: 4px 0;
-        }
-
-        .sd-dropdown-item {
+        .sd-menu-action {
           width: 100%;
           display: flex;
           align-items: center;
           gap: 10px;
-          padding: 8px 10px;
-          border: none;
+          padding: 10px 14px;
           background: transparent;
+          border: none;
           color: #334155;
           font-size: 0.82rem;
-          font-weight: 600;
-          font-family: inherit;
+          font-weight: 500;
           text-align: left;
-          border-radius: 5px;
           cursor: pointer;
-          transition: all 0.12s ease;
-          box-sizing: border-box;
+          transition: background 0.12s ease;
+          font-family: inherit;
         }
 
-        .sd-dropdown-item:hover,
-        .sd-dropdown-item:focus-visible {
-          background: #f8fafc;
-          color: #0f1f2e;
-          outline: none;
+        .sd-menu-action:hover {
+          background: #f1f5f9;
+          color: #0f1d2f;
         }
 
-        .sd-dropdown-item-logout {
+        .sd-menu-action.danger {
           color: #dc2626;
+          border-top: 1px solid #f1f5f9;
         }
 
-        .sd-dropdown-item-logout:hover,
-        .sd-dropdown-item-logout:focus-visible {
+        .sd-menu-action.danger:hover {
           background: #fef2f2;
-          color: #b91c1c;
         }
 
-        .sd-notif-btn {
-          position: relative;
-          background: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          color: #ffffff;
-          width: 38px;
-          height: 38px;
-          border-radius: 8px;
+        /* Main Workspace: Sidebar + Content Body */
+        .sd-body-container {
           display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.15s ease;
-        }
-
-        .sd-notif-btn:hover {
-          background: rgba(255, 255, 255, 0.16);
-          border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .sd-notif-badge {
-          position: absolute;
-          top: -4px;
-          right: -4px;
-          background-color: #dc2626;
-          color: #ffffff;
-          font-size: 0.68rem;
-          font-weight: 800;
-          min-width: 18px;
-          height: 18px;
-          border-radius: 9px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0 4px;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-          border: 2px solid #0f1f2e;
-        }
-
-        /* Container & Hierarchy */
-        .sd-container {
-          max-width: 1200px;
+          flex: 1;
           width: 100%;
-          margin: 0 auto;
-          padding: 24px 20px 48px;
+          min-height: calc(100vh - 60px);
           box-sizing: border-box;
+          position: relative;
+        }
+
+        /* Left Sidebar: Institutional Navy */
+        .sd-sidebar {
+          width: 240px;
+          background-color: #0d1b2a;
+          color: #cbd5e1;
           display: flex;
           flex-direction: column;
-          gap: 24px;
+          flex-shrink: 0;
+          border-right: 1px solid #1e2f42;
+          padding: 16px 12px;
+          box-sizing: border-box;
+          position: sticky;
+          top: 60px;
+          height: calc(100vh - 60px);
+          overflow-y: auto;
         }
 
-        /* Pending / Rejection Banners */
-        .sd-alert-banner {
-          background: #fffbeb;
-          border: 1px solid #fde68a;
-          border-left: 5px solid #d97706;
-          border-radius: 6px;
-          padding: 14px 18px;
+        .sd-sidebar-label {
+          font-size: 0.65rem;
+          font-weight: 700;
+          color: #64748b;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          padding: 8px 12px 6px;
+        }
+
+        .sd-nav-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+        }
+
+        .sd-nav-item-btn {
+          width: 100%;
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 12px;
-          box-shadow: 0 2px 6px rgba(217, 119, 6, 0.08);
-        }
-
-        .sd-alert-banner.rejected {
-          background: #fef2f2;
-          border-color: #fecaca;
-          border-left-color: #dc2626;
-        }
-
-        .sd-alert-btn {
-          background: #1e3a5f;
-          border: 1px solid #152942;
-          color: #ffffff;
-          font-size: 0.82rem;
-          font-weight: 600;
-          padding: 7px 14px;
+          gap: 11px;
+          padding: 9px 12px;
           border-radius: 6px;
+          background: transparent;
+          border: none;
+          color: #94a3b8;
+          font-size: 0.84rem;
+          font-weight: 600;
           cursor: pointer;
+          text-align: left;
+          transition: all 0.15s ease;
+          font-family: inherit;
+          box-sizing: border-box;
+        }
+
+        .sd-nav-item-btn:hover {
+          background: rgba(255, 255, 255, 0.06);
+          color: #f1f5f9;
+        }
+
+        /* Highlighted Dashboard Item */
+        .sd-nav-item-btn.is-active {
+          background: rgba(179, 136, 30, 0.16);
+          color: #f1cf7c;
+          font-weight: 700;
+          border-left: 3px solid #b3881e;
+        }
+
+        .sd-nav-item-btn svg {
+          flex-shrink: 0;
+        }
+
+        .sd-sidebar-footer {
+          margin-top: auto;
+          padding: 12px;
+          border-top: 1px solid #1e2f42;
+          font-size: 0.72rem;
+          color: #64748b;
+        }
+
+        .sd-sys-status-badge {
           display: inline-flex;
           align-items: center;
           gap: 6px;
+          color: #10b981;
+          font-weight: 600;
+          font-size: 0.72rem;
         }
 
-        .sd-alert-btn:hover {
-          background: #162c48;
+        .sd-sys-status-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background-color: #10b981;
+          box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
         }
 
-        /* Section 1: Dual Top Columns (Profile Overview + Academic Overview) */
-        .sd-top-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px;
-        }
-
-        @media (max-width: 900px) {
-          .sd-top-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        .sd-card {
-          background: #ffffff;
-          border: 1px solid #ded9cc;
-          border-radius: 8px;
-          box-shadow: 0 4px 14px rgba(15, 29, 47, 0.05);
-          overflow: hidden;
+        /* Main Content Viewport */
+        .sd-main-viewport {
+          flex: 1;
+          padding: 22px 28px 40px;
           display: flex;
           flex-direction: column;
+          gap: 18px;
+          box-sizing: border-box;
+          max-width: 1400px;
+          margin: 0 auto;
+          width: 100%;
         }
 
-        .sd-card-header {
-          padding: 14px 18px;
-          background: #f8f6f0;
-          border-bottom: 1px solid #e5dfd2;
+        /* Section 1: Welcome Header Banner */
+        .sd-welcome-card {
+          background: linear-gradient(135deg, #0d1b2a 0%, #15283c 100%);
+          color: #ffffff;
+          border-radius: 8px;
+          padding: 18px 24px;
           display: flex;
           align-items: center;
           justify-content: space-between;
+          border-left: 4px solid #b3881e;
+          box-shadow: 0 2px 8px rgba(13, 27, 42, 0.08);
+          box-sizing: border-box;
         }
 
-        .sd-card-title {
-          font-size: 0.92rem;
-          font-weight: 700;
-          color: #112233;
-          margin: 0;
+        .sd-welcome-title {
+          font-size: 1.25rem;
+          font-weight: 800;
+          color: #ffffff;
+          margin: 0 0 4px;
+          letter-spacing: -0.01em;
+        }
+
+        .sd-welcome-sub {
+          font-size: 0.82rem;
+          color: #94a3b8;
           display: flex;
           align-items: center;
           gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .sd-welcome-pill {
+          background: rgba(179, 136, 30, 0.2);
+          color: #f1cf7c;
+          border: 1px solid rgba(179, 136, 30, 0.4);
+          font-size: 0.7rem;
+          font-weight: 700;
+          padding: 2px 8px;
+          border-radius: 4px;
           text-transform: uppercase;
           letter-spacing: 0.04em;
         }
 
-        .sd-card-body {
-          padding: 18px;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
-        }
-
-        /* Profile Overview Specifics */
-        .sd-profile-head {
+        /* Alert Banners (Pending Changes & Rejection) */
+        .sd-notice-alert {
+          border-radius: 6px;
+          padding: 12px 16px;
           display: flex;
           align-items: center;
-          gap: 16px;
-          padding-bottom: 14px;
-          border-bottom: 1px solid #f1eeea;
+          justify-content: space-between;
+          gap: 12px;
+          font-size: 0.82rem;
+          box-sizing: border-box;
         }
 
-        .sd-avatar-box {
-          position: relative;
-          width: 72px;
-          height: 72px;
-          border-radius: 50%;
-          border: 2px solid #b38e44;
-          box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+        .sd-notice-alert.pending {
+          background-color: #fffbeb;
+          border: 1px solid #fde68a;
+          border-left: 4px solid #d97706;
+          color: #92400e;
+        }
+
+        .sd-notice-alert.rejected {
+          background-color: #fef2f2;
+          border: 1px solid #fecaca;
+          border-left: 4px solid #dc2626;
+          color: #991b1b;
+        }
+
+        .sd-notice-btn {
+          background: #ffffff;
+          border: 1px solid currentColor;
+          color: inherit;
+          padding: 5px 12px;
+          font-size: 0.78rem;
+          font-weight: 700;
+          border-radius: 4px;
           cursor: pointer;
-          overflow: hidden;
-          background: #1e3a5f;
-          flex-shrink: 0;
-          transition: transform 0.15s ease, box-shadow 0.15s ease;
+          white-space: nowrap;
+          font-family: inherit;
         }
 
-        .sd-avatar-box:hover {
-          transform: scale(1.03);
-          box-shadow: 0 4px 14px rgba(179, 142, 68, 0.35);
+        /* Section 2: Quick Overview Stats Grid */
+        .sd-stats-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
         }
 
-        .sd-avatar-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
+        /* Non-Clickable Card Container */
+        .sd-stat-card {
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 1px 3px rgba(15, 29, 47, 0.04);
+          box-sizing: border-box;
+          cursor: default;
+          user-select: none;
         }
 
-        .sd-avatar-initial {
-          width: 100%;
-          height: 100%;
+        .sd-stat-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 10px;
+        }
+
+        .sd-stat-icon-wrap {
+          width: 36px;
+          height: 36px;
+          border-radius: 6px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 1.7rem;
+          flex-shrink: 0;
+        }
+
+        .sd-stat-tag {
+          font-size: 0.68rem;
           font-weight: 700;
-          color: #ffffff;
+          padding: 2px 6px;
+          border-radius: 4px;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
         }
 
-        .sd-avatar-zoom-hint {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          background: rgba(15, 31, 46, 0.75);
-          color: #ffffff;
-          font-size: 0.6rem;
-          text-align: center;
-          padding: 2px 0;
-          font-weight: 600;
-          letter-spacing: 0.02em;
-        }
-
-        .sd-info-table {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 10px 14px;
-          font-size: 0.84rem;
-        }
-
-        @media (max-width: 500px) {
-          .sd-info-table {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        .sd-info-item {
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-
-        .sd-info-label {
-          font-size: 0.7rem;
+        .sd-stat-title {
+          font-size: 0.78rem;
           font-weight: 700;
           color: #64748b;
           text-transform: uppercase;
           letter-spacing: 0.04em;
+          margin: 0 0 4px;
         }
 
-        .sd-info-val {
-          font-size: 0.88rem;
-          font-weight: 600;
-          color: #112233;
-          word-break: break-word;
+        .sd-stat-count {
+          font-size: 1.35rem;
+          font-weight: 800;
+          color: #0f1d2f;
+          line-height: 1.1;
+          margin-bottom: 4px;
         }
 
-        .sd-card-actions {
+        .sd-stat-desc {
+          font-size: 0.75rem;
+          color: #64748b;
+          line-height: 1.35;
+          flex: 1;
+          margin-bottom: 12px;
+        }
+
+        /* Explicit Action Button Inside Stat Card */
+        .sd-stat-btn {
+          align-self: flex-start;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          font-size: 0.76rem;
+          font-weight: 700;
+          border-radius: 4px;
+          border: 1px solid #cbd5e1;
+          background: #f8fafc;
+          color: #1e293b;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          font-family: inherit;
+        }
+
+        .sd-stat-btn:hover {
+          background: #0d1b2a;
+          color: #ffffff;
+          border-color: #0d1b2a;
+        }
+
+        /* 2-Column Balanced Content Grids */
+        .sd-row-grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+        }
+
+        /* Standard Institutional Card */
+        .sd-card {
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+          padding: 18px 20px;
+          box-shadow: 0 1px 3px rgba(15, 29, 47, 0.04);
           display: flex;
-          gap: 10px;
-          margin-top: auto;
-          padding-top: 10px;
-          border-top: 1px solid #f1eeea;
+          flex-direction: column;
+          box-sizing: border-box;
+          cursor: default;
+        }
+
+        .sd-card-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 14px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid #f1f5f9;
+        }
+
+        .sd-card-heading {
+          font-size: 0.92rem;
+          font-weight: 800;
+          color: #0f1d2f;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin: 0;
+        }
+
+        .sd-card-badge {
+          font-size: 0.72rem;
+          font-weight: 700;
+          padding: 2px 8px;
+          border-radius: 12px;
+        }
+
+        /* Section 3: Profile Completion Styling */
+        .sd-progress-bar-wrap {
+          margin-bottom: 14px;
+        }
+
+        .sd-progress-meta {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.8rem;
+          font-weight: 700;
+          margin-bottom: 6px;
+          color: #334155;
+        }
+
+        .sd-progress-track {
+          height: 8px;
+          background: #e2e8f0;
+          border-radius: 4px;
+          overflow: hidden;
+        }
+
+        .sd-progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #b3881e 0%, #10b981 100%);
+          border-radius: 4px;
+          transition: width 0.3s ease;
+        }
+
+        .sd-checklist-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+          margin-bottom: 14px;
+        }
+
+        .sd-check-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.78rem;
+          color: #334155;
+          padding: 6px 8px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 4px;
+        }
+
+        .sd-check-dot {
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 9px;
+          font-weight: 800;
+          flex-shrink: 0;
+        }
+
+        .sd-check-dot.complete {
+          background: #dcfce7;
+          color: #166534;
+        }
+
+        .sd-check-dot.pending {
+          background: #fef3c7;
+          color: #92400e;
         }
 
         .sd-btn-primary {
-          background: #1e3a5f;
-          border: 1px solid #152942;
-          color: #ffffff;
-          font-size: 0.82rem;
-          font-weight: 600;
-          padding: 8px 16px;
-          border-radius: 6px;
-          cursor: pointer;
           display: inline-flex;
           align-items: center;
+          justify-content: center;
           gap: 6px;
-          transition: all 0.15s ease;
+          padding: 7px 14px;
+          background: #b3881e;
+          color: #ffffff;
+          border: 1px solid #997316;
+          border-radius: 5px;
+          font-size: 0.8rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: background 0.15s ease;
+          font-family: inherit;
         }
 
         .sd-btn-primary:hover {
-          background: #162c48;
+          background: #997316;
         }
 
-        .sd-btn-secondary {
-          background: #ffffff;
-          border: 1px solid #cbd5e1;
-          color: #334155;
-          font-size: 0.82rem;
-          font-weight: 600;
-          padding: 8px 14px;
-          border-radius: 6px;
-          cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          transition: all 0.15s ease;
-        }
-
-        .sd-btn-secondary:hover {
-          background: #f1f5f9;
-          border-color: #94a3b8;
-          color: #0f172a;
-        }
-
-        /* GPA Chips in Academic Overview */
-        .sd-gpa-chips {
+        /* Section 4: Academic Performance Summary */
+        .sd-acad-stats-row {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 10px;
-          background: #fdfbf7;
-          border: 1px solid #eadecb;
+          margin-bottom: 14px;
+        }
+
+        .sd-acad-stat-box {
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
           border-radius: 6px;
           padding: 10px;
           text-align: center;
         }
 
-        .sd-gpa-chip-item {
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-
-        .sd-gpa-chip-num {
-          font-size: 1.25rem;
-          font-weight: 800;
-          color: #1e3a5f;
-        }
-
-        .sd-gpa-chip-lbl {
-          font-size: 0.68rem;
-          font-weight: 700;
-          color: #64748b;
-          text-transform: uppercase;
-        }
-
-        /* Section 2: Verification Overview (One Unified Button & Card) */
-        .sd-verif-overview-card {
-          background: #ffffff;
-          border: 1px solid #ded9cc;
-          border-left: 4px solid #16a34a;
-          border-radius: 8px;
-          padding: 18px 22px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 18px;
-          box-shadow: 0 2px 8px rgba(15, 29, 47, 0.04);
-        }
-
-        @media (max-width: 768px) {
-          .sd-verif-overview-card {
-            flex-direction: column;
-            align-items: flex-start;
-          }
-        }
-
-        .sd-verif-overview-content {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-        }
-
-        .sd-verif-overview-icon {
-          width: 48px;
-          height: 48px;
-          border-radius: 8px;
-          background: #dcfce7;
-          color: #166534;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        }
-
-        .sd-verif-overview-title {
-          margin: 0;
-          font-size: 1.05rem;
-          font-weight: 700;
-          color: #0f1f2e;
-        }
-
-        .sd-verif-badge-pill {
-          font-size: 0.74rem;
-          font-weight: 700;
-          background: #dcfce7;
-          color: #166534;
-          border: 1px solid #86efac;
-          padding: 2px 9px;
-          border-radius: 9999px;
-        }
-
-        .sd-verif-overview-sub {
-          margin: 4px 0 0 0;
-          font-size: 0.82rem;
-          color: #64748b;
-          line-height: 1.4;
-        }
-
-        .sd-btn-verif-overview-cta {
-          background: #112233;
-          color: #ffffff;
-          border: 1px solid #b38e44;
-          border-radius: 6px;
-          padding: 10px 20px;
-          font-size: 0.9rem;
-          font-weight: 700;
-          cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          white-space: nowrap;
-          box-shadow: 0 2px 6px rgba(17, 34, 51, 0.2);
-          transition: all 0.15s ease;
-          flex-shrink: 0;
-        }
-
-        .sd-btn-verif-overview-cta:hover {
-          background: #1a3650;
-          border-color: #f1cf7c;
-          color: #f1cf7c;
-          transform: translateY(-1px);
-        }
-
-        /* Section 3: My Institution */
-        .sd-contacts-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 14px;
-        }
-
-        @media (max-width: 900px) {
-          .sd-contacts-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-
-        @media (max-width: 500px) {
-          .sd-contacts-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        .sd-contact-card {
-          background: #fbfaf8;
-          border: 1px solid #e6e2d8;
-          border-radius: 6px;
-          padding: 14px;
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .sd-contact-role {
+        .sd-acad-stat-label {
           font-size: 0.7rem;
-          font-weight: 800;
-          color: #b38e44;
-          text-transform: uppercase;
-          letter-spacing: 0.06em;
-        }
-
-        .sd-contact-name {
-          font-size: 0.92rem;
-          font-weight: 700;
-          color: #112233;
-        }
-
-        .sd-contact-detail {
-          font-size: 0.78rem;
           color: #64748b;
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+
+        .sd-acad-stat-val {
+          font-size: 1.18rem;
+          font-weight: 800;
+          color: #0f1d2f;
+          margin: 2px 0;
+        }
+
+        .sd-acad-stat-sub {
+          font-size: 0.65rem;
+          color: #94a3b8;
+        }
+
+        .sd-acad-meta-list {
           display: flex;
-          align-items: center;
+          flex-direction: column;
           gap: 6px;
+          font-size: 0.78rem;
+          margin-bottom: 14px;
         }
 
-        /* Section 4 & 5: Action Gateways & Detailed Cards */
-        .sd-gateways-grid {
+        .sd-acad-meta-item {
+          display: flex;
+          justify-content: space-between;
+          color: #475569;
+          padding-bottom: 4px;
+          border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .sd-acad-meta-item:last-child {
+          border-bottom: none;
+        }
+
+        .sd-acad-meta-item strong {
+          color: #0f1d2f;
+          font-weight: 600;
+        }
+
+        /* Section 5: Upcoming Deadlines & Events */
+        .sd-event-list {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .sd-empty-state-box {
+          padding: 24px 16px;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          background: #f8fafc;
+          border: 1px dashed #cbd5e1;
+          border-radius: 6px;
+          color: #64748b;
+        }
+
+        .sd-empty-title {
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: #334155;
+        }
+
+        .sd-empty-desc {
+          font-size: 0.75rem;
+          color: #64748b;
+          max-width: 320px;
+          line-height: 1.4;
+        }
+
+        /* Section 6: Recent Activity */
+        .sd-activity-list {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .sd-activity-row {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          padding: 8px 10px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 6px;
+          font-size: 0.78rem;
+        }
+
+        .sd-activity-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #b3881e;
+          margin-top: 5px;
+          flex-shrink: 0;
+        }
+
+        .sd-activity-title {
+          font-weight: 700;
+          color: #0f1d2f;
+          margin-bottom: 2px;
+        }
+
+        .sd-activity-meta {
+          font-size: 0.7rem;
+          color: #64748b;
+        }
+
+        /* Section 7: Quick Actions Grid */
+        .sd-actions-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 8px;
         }
 
-        @media (max-width: 1024px) {
-          .sd-gateways-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-
-        @media (max-width: 768px) {
-          .sd-gateways-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        .sd-gateway-card {
-          background: #ffffff;
-          border: 1px solid #ded9cc;
-          border-radius: 8px;
-          padding: 20px;
+        .sd-action-card-btn {
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          gap: 16px;
+          gap: 10px;
+          padding: 10px 14px;
+          background: #f8fafc;
+          border: 1px solid #cbd5e1;
+          border-radius: 6px;
+          color: #1e293b;
+          font-size: 0.8rem;
+          font-weight: 700;
+          cursor: pointer;
           transition: all 0.15s ease;
-          box-shadow: 0 2px 8px rgba(15, 29, 47, 0.04);
+          font-family: inherit;
+          text-align: left;
         }
 
-        .sd-gateway-card:hover {
-          border-color: #1e3a5f;
-          transform: translateY(-2px);
-          box-shadow: 0 6px 18px rgba(15, 29, 47, 0.08);
+        .sd-action-card-btn:hover {
+          background: #0d1b2a;
+          color: #f1cf7c;
+          border-color: #0d1b2a;
         }
 
-        .sd-gateway-card.featured {
-          border-left: 4px solid #b38e44;
+        .sd-action-card-btn svg {
+          flex-shrink: 0;
         }
 
-        .sd-gw-icon {
-          width: 48px;
-          height: 48px;
-          border-radius: 8px;
-          background: #f0f4f9;
-          color: #1e3a5f;
+        /* Section 8: Institutional Verification Area */
+        .sd-verify-box {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          background: #f0fdf4;
+          border: 1px solid #bbf7d0;
+          border-radius: 6px;
+          padding: 12px 16px;
+        }
+
+        .sd-seal-icon {
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          background: #166534;
+          color: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
         }
 
-        .sd-gw-title {
-          font-size: 1rem;
-          font-weight: 700;
-          color: #112233;
-          margin: 0 0 4px;
-        }
-
-        .sd-gw-desc {
-          font-size: 0.8rem;
-          color: #64748b;
-          margin: 0;
-          line-height: 1.4;
-        }
-
-        /* Single Action for Post */
-        .sd-post-action-card {
-          background: linear-gradient(135deg, #112233 0%, #1e3a5f 100%);
-          border-radius: 8px;
-          padding: 20px 24px;
-          color: #ffffff;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 16px;
-          box-shadow: 0 4px 16px rgba(15, 29, 47, 0.12);
-        }
-
-        .sd-post-action-btn {
-          background: #b38e44;
-          border: 1px solid #8c681b;
-          color: #ffffff;
+        .sd-verify-title {
           font-size: 0.86rem;
-          font-weight: 700;
-          padding: 10px 20px;
-          border-radius: 6px;
-          cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          transition: all 0.15s ease;
+          font-weight: 800;
+          color: #166534;
         }
 
-        .sd-post-action-btn:hover {
-          background: #a17c35;
+        .sd-verify-sub {
+          font-size: 0.75rem;
+          color: #15803d;
+          margin-top: 2px;
         }
 
-        /* Official Dashboard Footer */
-        .sd-footer {
-          margin-top: auto;
-          background: #0f1f2e;
-          border-top: 1px solid rgba(255, 255, 255, 0.08);
-          padding: 16px 28px;
-          color: #94a3b8;
-          font-size: 12.5px;
-          width: 100%;
-          box-sizing: border-box;
+        /* Responsive Breakpoints */
+        @media (max-width: 1080px) {
+          .sd-stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+          .sd-row-grid-2 {
+            grid-template-columns: 1fr;
+          }
         }
 
-        .sd-footer-inner {
-          max-width: 1200px;
-          margin: 0 auto;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 10px;
+        @media (max-width: 860px) {
+          .sd-sidebar {
+            position: fixed;
+            top: 60px;
+            left: -260px;
+            height: calc(100vh - 60px);
+            z-index: 1040;
+            transition: left 0.25s ease;
+            box-shadow: 4px 0 16px rgba(0, 0, 0, 0.3);
+          }
+
+          .sd-sidebar.is-open {
+            left: 0;
+          }
+
+          .sd-mobile-menu-toggle {
+            display: flex;
+          }
+
+          .sd-search-box {
+            display: none;
+          }
+
+          .sd-main-viewport {
+            padding: 16px;
+          }
         }
 
-        .sd-footer-brand {
-          font-weight: 700;
-          color: #f8fafc;
-        }
-
-        .sd-footer-attribution {
-          color: #cbd5e1;
-          font-weight: 600;
+        @media (max-width: 580px) {
+          .sd-stats-grid {
+            grid-template-columns: 1fr;
+          }
+          .sd-checklist-grid {
+            grid-template-columns: 1fr;
+          }
+          .sd-actions-grid {
+            grid-template-columns: 1fr;
+          }
+          .sd-acad-stats-row {
+            grid-template-columns: 1fr;
+          }
         }
       `}</style>
 
-      {/* 1. TOP HEADER (Requirement 2) */}
-      <header className="sd-header">
-        <div className="sd-header-brand" onClick={onNavigateHome} title="Return to Portal Home">
-          <div className="sd-brand-logo" style={{ fontSize: '0.85rem', letterSpacing: '0.02em' }}>IAS</div>
-          <div className="sd-brand-text">
-            <span className="sd-brand-title">IAS Collaboration Portal</span>
-            <span className="sd-brand-sub">Student Portal & Control Center</span>
+      {/* TOPBAR HEADER (Requirement 1) */}
+      <header className="sd-topbar">
+        <div className="sd-topbar-left">
+          {/* Mobile Menu Toggle Button */}
+          <button
+            type="button"
+            className="sd-mobile-menu-toggle"
+            onClick={() => setIsMobileSidebarOpen((prev) => !prev)}
+            aria-label="Toggle navigation menu"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+
+          {/* Institutional Brand Identity */}
+          <div className="sd-brand-identity" onClick={onNavigateHome} title="Return to Portal Home">
+            <div className="sd-brand-emblem">IAS</div>
+            <div className="sd-brand-titles">
+              <span className="sd-brand-main">IAS Collaboration Portal</span>
+              <span className="sd-brand-sub">Student Overview Dashboard</span>
+            </div>
           </div>
         </div>
 
-        <div className="sd-header-actions">
-          {/* Notifications Button */}
+        <div className="sd-topbar-right">
+          {/* Search Input Filter */}
+          <div className="sd-search-box">
+            <svg className="sd-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              className="sd-search-input"
+              placeholder="Search portal..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search portal"
+            />
+          </div>
+
+          {/* Notifications Trigger Button */}
           <button
-            className="sd-notif-btn"
+            type="button"
+            className="sd-icon-btn"
             onClick={() => setIsNotifOpen(true)}
             aria-label="View notifications"
-            title="Institutional Notifications & Verifications"
+            title="Institutional Notifications & Alerts"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
               <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
             {unreadNotifsCount > 0 && (
-              <span className="sd-notif-badge">{unreadNotifsCount}</span>
+              <span className="sd-badge-counter">{unreadNotifsCount}</span>
             )}
           </button>
 
-          {/* Profile Dropdown Menu Control */}
-          <div className="sd-profile-menu-wrap" ref={profileMenuRef}>
+          {/* Profile User Dropdown Pill */}
+          <div className="sd-user-dropdown-wrap" ref={profileMenuRef}>
             <button
               type="button"
-              className={`sd-user-badge-btn ${isProfileMenuOpen ? 'is-active' : ''}`}
+              className={`sd-user-pill-btn ${isProfileMenuOpen ? 'is-active' : ''}`}
               onClick={() => setIsProfileMenuOpen((prev) => !prev)}
               aria-expanded={isProfileMenuOpen}
               aria-haspopup="true"
               aria-label="User account menu"
             >
-              <div className="sd-user-avatar">
+              <div className="sd-pill-avatar" onClick={(e) => { e.stopPropagation(); setIsPhotoLightboxOpen(true); }} title="View Photo">
                 {s.profilePic ? (
-                  <img src={s.profilePic} alt={s.name || 'Student'} className="sd-avatar-img" />
+                  <img src={s.profilePic} alt={s.name || 'Student'} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                 ) : (
                   <span>{(s.name || 'S').charAt(0).toUpperCase()}</span>
                 )}
               </div>
-              <span className="sd-user-name">{s.name || 'Student'}</span>
-              <svg
-                className={`sd-dropdown-chevron ${isProfileMenuOpen ? 'is-open' : ''}`}
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
+              <span>{s.name || 'Student'}</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <polyline points="6 9 12 15 18 9" />
               </svg>
             </button>
 
             {isProfileMenuOpen && (
-              <div className="sd-profile-dropdown-menu" role="menu">
-                <div className="sd-dropdown-header">
-                  <div className="sd-dropdown-user-name">{s.name || 'Student Account'}</div>
-                  <div className="sd-dropdown-user-email">{s.email || 'No email registered'}</div>
-                  <div className="sd-dropdown-user-role">Student Account</div>
+              <div className="sd-dropdown-menu" role="menu">
+                <div className="sd-menu-head">
+                  <div className="sd-menu-user-name">{s.name || 'Student Account'}</div>
+                  <div className="sd-menu-user-sub">{s.email || 'student@ias.edu'}</div>
                 </div>
-                <div className="sd-dropdown-divider" />
 
-                {/* 1. Change Password Entry */}
                 <button
                   type="button"
-                  className="sd-dropdown-item"
+                  className="sd-menu-action"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsProfileMenuOpen(false)
+                    if (onEditProfile) onEditProfile()
+                  }}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <span>My Profile</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="sd-menu-action"
                   role="menuitem"
                   onClick={() => {
                     setIsProfileMenuOpen(false)
                     setIsChangePasswordOpen(true)
                   }}
                 >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                   </svg>
                   <span>Change Password</span>
                 </button>
 
-                <div className="sd-dropdown-divider" />
-
-                {/* 2. Logout Entry */}
                 <button
                   type="button"
-                  className="sd-dropdown-item sd-dropdown-item-logout"
+                  className="sd-menu-action danger"
                   role="menuitem"
                   onClick={() => {
                     setIsProfileMenuOpen(false)
@@ -1296,7 +1542,7 @@ export default function StudentDashboard({
                     }
                   }}
                 >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                     <polyline points="16 17 21 12 16 7" />
                     <line x1="21" y1="12" x2="9" y2="12" />
@@ -1309,520 +1555,703 @@ export default function StudentDashboard({
         </div>
       </header>
 
-      {/* MAIN CONTENT HIERARCHY (Requirement 14) */}
-      <main className="sd-container">
-        {/* PENDING CHANGES ALERT (Requirement 13) */}
-        {hasPendingChanges && (
-          <div className="sd-alert-banner">
+      {/* BODY: LEFT SIDEBAR + MAIN VIEWPORT */}
+      <div className="sd-body-container">
+        {/* Left Sidebar Navigation (Requirement 1) */}
+        <aside className={`sd-sidebar ${isMobileSidebarOpen ? 'is-open' : ''}`}>
+          <div className="sd-sidebar-label">Navigation Menu</div>
+          <nav>
+            <ul className="sd-nav-list">
+              {/* 1. Dashboard (Active & Highlighted) */}
+              <li>
+                <button
+                  type="button"
+                  className="sd-nav-item-btn is-active"
+                  onClick={() => setIsMobileSidebarOpen(false)}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                  </svg>
+                  <span>Dashboard</span>
+                </button>
+              </li>
+
+              {/* 2. My Profile */}
+              <li>
+                <button
+                  type="button"
+                  className="sd-nav-item-btn"
+                  onClick={() => {
+                    setIsMobileSidebarOpen(false)
+                    if (onEditProfile) onEditProfile()
+                  }}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <span>My Profile</span>
+                </button>
+              </li>
+
+              {/* 3. Internships */}
+              <li>
+                <button
+                  type="button"
+                  className="sd-nav-item-btn"
+                  onClick={() => {
+                    setIsMobileSidebarOpen(false)
+                    navigateToInternships()
+                  }}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                  </svg>
+                  <span>Internships</span>
+                </button>
+              </li>
+
+              {/* 4. Placements */}
+              <li>
+                <button
+                  type="button"
+                  className="sd-nav-item-btn"
+                  onClick={() => {
+                    setIsMobileSidebarOpen(false)
+                    navigateToPlacements()
+                  }}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                    <line x1="12" y1="11" x2="12" y2="17" />
+                    <line x1="9" y1="14" x2="15" y2="14" />
+                  </svg>
+                  <span>Placements</span>
+                </button>
+              </li>
+
+              {/* 5. Skill Assessments */}
+              <li>
+                <button
+                  type="button"
+                  className="sd-nav-item-btn"
+                  onClick={() => {
+                    setIsMobileSidebarOpen(false)
+                    setIsAssessmentsModalOpen(true)
+                  }}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 11l3 3L22 4" />
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                  </svg>
+                  <span>Skill Assessments</span>
+                </button>
+              </li>
+
+              {/* 6. Projects & Experience */}
+              <li>
+                <button
+                  type="button"
+                  className="sd-nav-item-btn"
+                  onClick={() => {
+                    setIsMobileSidebarOpen(false)
+                    navigateToAchievements('skills')
+                  }}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                  <span>Projects & Experience</span>
+                </button>
+              </li>
+
+              {/* 7. Public Posts */}
+              <li>
+                <button
+                  type="button"
+                  className="sd-nav-item-btn"
+                  onClick={() => {
+                    setIsMobileSidebarOpen(false)
+                    navigateToPublicPosts()
+                  }}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                    <polyline points="16 6 12 2 8 6" />
+                    <line x1="12" y1="2" x2="12" y2="15" />
+                  </svg>
+                  <span>Public Posts</span>
+                </button>
+              </li>
+            </ul>
+          </nav>
+
+          <div className="sd-sidebar-footer">
+            <div className="sd-sys-status-badge">
+              <span className="sd-sys-status-dot" />
+              <span>System Online</span>
+            </div>
+            <div style={{ marginTop: 4 }}>IAS Portal • v2.4.0</div>
+          </div>
+        </aside>
+
+        {/* Main Content Viewport */}
+        <main className="sd-main-viewport">
+          {/* SECTION 1: TOP HEADER & WELCOME STRIP */}
+          <div className="sd-welcome-card">
             <div>
-              <strong style={{ color: '#92400e', display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.92rem' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
-                </svg>
-                Profile Edits Awaiting Principal Verification
-              </strong>
-              <div style={{ fontSize: '0.8rem', color: '#78350f', marginTop: 3 }}>
-                You recently submitted changes to your profile. Your currently approved profile remains active until your Principal reviews and approves the updates.
+              <h1 className="sd-welcome-title">Welcome, {s.name || 'Student'}</h1>
+              <div className="sd-welcome-sub">
+                <span>{s.institution || 'Verified Educational Partner'}</span>
+                <span>•</span>
+                <span>{s.course || 'Degree Program'}</span>
+                <span>•</span>
+                <span className="sd-welcome-pill">AY 2025-26</span>
               </div>
             </div>
-            <button type="button" className="sd-alert-btn" onClick={onViewPendingDiff}>
-              View Pending Changes Diff →
-            </button>
-          </div>
-        )}
 
-        {/* REJECTION REASON BANNER IF PRINCIPAL REJECTED CHANGES (Requirement 13) */}
-        {verificationStatus === 'rejected' && rejectionReason && (
-          <div className="sd-alert-banner rejected">
-            <div>
-              <strong style={{ color: '#991b1b', display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.92rem' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                type="button"
+                className="sd-btn-primary"
+                onClick={() => {
+                  if (onEditProfile) onEditProfile()
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                <span>Edit Profile</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Pending Changes Alert if active */}
+          {hasPendingChanges && (
+            <div className="sd-notice-alert pending">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <span>Profile changes pending institutional review. Active records remain unchanged until approval.</span>
+              </div>
+              <button type="button" className="sd-notice-btn" onClick={onViewPendingDiff}>
+                View Diff
+              </button>
+            </div>
+          )}
+
+          {/* Rejection Alert if rejected */}
+          {verificationStatus === 'rejected' && rejectionReason && (
+            <div className="sd-notice-alert rejected">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="10" />
                   <line x1="15" y1="9" x2="9" y2="15" />
                   <line x1="9" y1="9" x2="15" y2="15" />
                 </svg>
-                Principal Verification Notice: Changes Rejected
-              </strong>
-              <div style={{ fontSize: '0.82rem', color: '#7f1d1d', marginTop: 4 }}>
-                <strong>Official Reason:</strong> &quot;{rejectionReason}&quot;
+                <span><strong>Principal Feedback:</strong> &quot;{rejectionReason}&quot;</span>
               </div>
-              <div style={{ fontSize: '0.76rem', color: '#991b1b', marginTop: 2 }}>
-                Your previously approved profile remains active as your official institutional record.
-              </div>
+              <button type="button" className="sd-notice-btn" onClick={onEditProfile}>
+                Update Profile
+              </button>
             </div>
-            <button type="button" className="sd-alert-btn" onClick={onEditProfile}>
-              Correct & Resubmit
-            </button>
-          </div>
-        )}
+          )}
 
-        {/* SECTION 1: PROFILE OVERVIEW + ACADEMIC OVERVIEW (Requirements 3 & 4) */}
-        <section className="sd-top-grid">
-          {/* PROFILE OVERVIEW (Requirement 3) */}
-          <div className="sd-card">
-            <div className="sd-card-header">
-              <h3 className="sd-card-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-                Profile Overview
-              </h3>
-              <span style={{ fontSize: '0.72rem', background: '#dcfce7', color: '#166534', border: '1px solid #86efac', padding: '3px 8px', borderRadius: 12, fontWeight: 700 }}>
-                ✓ Official Record
-              </span>
+          {/* SECTION 2: QUICK OVERVIEW STATS (4 Compact Non-Clickable Cards) */}
+          <section className="sd-stats-grid">
+            {/* Stat 1: Internships */}
+            <div className="sd-stat-card">
+              <div className="sd-stat-header">
+                <div className="sd-stat-icon-wrap" style={{ background: '#fef3c7', color: '#b45309' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                  </svg>
+                </div>
+                <span className="sd-stat-tag" style={{ background: '#fef3c7', color: '#92400e' }}>
+                  Active
+                </span>
+              </div>
+              <h3 className="sd-stat-title">Internships</h3>
+              <div className="sd-stat-count">{appliedInternshipsCount} Applied</div>
+              <div className="sd-stat-desc">Summer cohorts & recruitment drives</div>
+              <button
+                type="button"
+                className="sd-stat-btn"
+                onClick={navigateToInternships}
+              >
+                <span>View Details</span>
+                <span>→</span>
+              </button>
             </div>
 
-            <div className="sd-card-body">
-              <div className="sd-profile-head">
-                <div
-                  className="sd-avatar-box"
-                  onClick={() => setIsPhotoLightboxOpen(true)}
-                  title="Click to view enlarged profile picture (View Only)"
-                >
-                  {s.profilePic ? (
-                    <img src={s.profilePic} alt={s.name} className="sd-avatar-img" />
-                  ) : (
-                    <div className="sd-avatar-initial">{(s.name || 'S').charAt(0).toUpperCase()}</div>
-                  )}
-                  <div className="sd-avatar-zoom-hint">Enlarge</div>
+            {/* Stat 2: Placements */}
+            <div className="sd-stat-card">
+              <div className="sd-stat-header">
+                <div className="sd-stat-icon-wrap" style={{ background: '#f0fdf4', color: '#15803d' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                    <line x1="12" y1="11" x2="12" y2="17" />
+                    <line x1="9" y1="14" x2="15" y2="14" />
+                  </svg>
                 </div>
+                <span className="sd-stat-tag" style={{ background: '#f0fdf4', color: '#166534' }}>
+                  Campus
+                </span>
+              </div>
+              <h3 className="sd-stat-title">Placements</h3>
+              <div className="sd-stat-count">{appliedPlacementsCount} Drives</div>
+              <div className="sd-stat-desc">Placement opportunities & notices</div>
+              <button
+                type="button"
+                className="sd-stat-btn"
+                onClick={navigateToPlacements}
+              >
+                <span>View Details</span>
+                <span>→</span>
+              </button>
+            </div>
 
-                <div>
-                  <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', color: '#112233', fontWeight: 700 }}>
-                    {s.name || 'Student'}
-                  </h4>
-                  <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                    {s.email || 'No email address registered'}
-                  </div>
-                  <div style={{ fontSize: '0.78rem', color: '#1e3a5f', fontWeight: 600, marginTop: 2 }}>
-                    {s.course || 'Academic program not specified'}
-                  </div>
+            {/* Stat 3: Skill Assessments */}
+            <div className="sd-stat-card">
+              <div className="sd-stat-header">
+                <div className="sd-stat-icon-wrap" style={{ background: '#eff6ff', color: '#1d4ed8' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 11l3 3L22 4" />
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                  </svg>
+                </div>
+                <span className="sd-stat-tag" style={{ background: '#eff6ff', color: '#1e40af' }}>
+                  Verified
+                </span>
+              </div>
+              <h3 className="sd-stat-title">Skill Assessments</h3>
+              <div className="sd-stat-count">{verifiedSkillsCount} Verified</div>
+              <div className="sd-stat-desc">Standardized proctored benchmark tests</div>
+              <button
+                type="button"
+                className="sd-stat-btn"
+                onClick={() => setIsAssessmentsModalOpen(true)}
+              >
+                <span>View Details</span>
+                <span>→</span>
+              </button>
+            </div>
+
+            {/* Stat 4: Public Posts */}
+            <div className="sd-stat-card">
+              <div className="sd-stat-header">
+                <div className="sd-stat-icon-wrap" style={{ background: '#faf5ff', color: '#7e22ce' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                    <polyline points="16 6 12 2 8 6" />
+                    <line x1="12" y1="2" x2="12" y2="15" />
+                  </svg>
+                </div>
+                <span className="sd-stat-tag" style={{ background: '#faf5ff', color: '#6b21a8' }}>
+                  Published
+                </span>
+              </div>
+              <h3 className="sd-stat-title">Public Posts</h3>
+              <div className="sd-stat-count">{posts.length} Posts</div>
+              <div className="sd-stat-desc">Milestones & achievements broadcast</div>
+              <button
+                type="button"
+                className="sd-stat-btn"
+                onClick={navigateToPublicPosts}
+              >
+                <span>View Details</span>
+                <span>→</span>
+              </button>
+            </div>
+          </section>
+
+          {/* ROW 1: PROFILE COMPLETION & ACADEMIC PERFORMANCE (Requirements 3 & 4) */}
+          <div className="sd-row-grid-2">
+            {/* SECTION 3: PROFILE COMPLETION */}
+            <div className="sd-card">
+              <div className="sd-card-header">
+                <h2 className="sd-card-heading">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b3881e" strokeWidth="2.2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  Profile Completion
+                </h2>
+                <span className="sd-card-badge" style={{ background: '#fef3c7', color: '#92400e' }}>
+                  {profileStats.percentage}% Complete
+                </span>
+              </div>
+
+              <div className="sd-progress-bar-wrap">
+                <div className="sd-progress-meta">
+                  <span>Verification Readiness</span>
+                  <span>{profileStats.percentage}%</span>
+                </div>
+                <div className="sd-progress-track">
+                  <div className="sd-progress-fill" style={{ width: `${profileStats.percentage}%` }} />
                 </div>
               </div>
 
-              <div className="sd-info-table">
-                <div className="sd-info-item">
-                  <span className="sd-info-label">Mobile Number</span>
-                  <span className="sd-info-val">{s.phone || 'Not available yet'}</span>
-                </div>
-                <div className="sd-info-item">
-                  <span className="sd-info-label">Date of Birth & Gender</span>
-                  <span className="sd-info-val">
-                    {s.dob && s.gender ? `${s.dob} • ${s.gender}` : s.dob || s.gender || 'Not available yet'}
+              <div className="sd-checklist-grid">
+                <div className="sd-check-item">
+                  <span className={`sd-check-dot ${profileStats.personalComplete ? 'complete' : 'pending'}`}>
+                    {profileStats.personalComplete ? '✓' : '•'}
                   </span>
+                  <span>Personal Information</span>
                 </div>
-                <div className="sd-info-item" style={{ gridColumn: 'span 2' }}>
-                  <span className="sd-info-label">Present Address</span>
-                  <span className="sd-info-val">{s.presentAddress || 'No address added yet'}</span>
+                <div className="sd-check-item">
+                  <span className={`sd-check-dot ${profileStats.academicComplete ? 'complete' : 'pending'}`}>
+                    {profileStats.academicComplete ? '✓' : '•'}
+                  </span>
+                  <span>Academic Details</span>
                 </div>
-                <div className="sd-info-item" style={{ gridColumn: 'span 2' }}>
-                  <span className="sd-info-label">Permanent Address</span>
-                  <span className="sd-info-val">{s.permanentAddress || 'No address added yet'}</span>
+                <div className="sd-check-item">
+                  <span className={`sd-check-dot ${profileStats.verificationComplete ? 'complete' : 'pending'}`}>
+                    {profileStats.verificationComplete ? '✓' : '•'}
+                  </span>
+                  <span>Institutional Seal</span>
+                </div>
+                <div className="sd-check-item">
+                  <span className={`sd-check-dot ${profileStats.skillsComplete ? 'complete' : 'pending'}`}>
+                    {profileStats.skillsComplete ? '✓' : '•'}
+                  </span>
+                  <span>Skills & Projects</span>
                 </div>
               </div>
 
-              <div className="sd-card-actions">
+              <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'flex-start' }}>
                 <button
                   type="button"
                   className="sd-btn-primary"
-                  onClick={onEditProfile}
+                  onClick={() => {
+                    if (onEditProfile) onEditProfile()
+                  }}
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 20h9" />
-                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                  </svg>
-                  Edit Profile
+                  {profileStats.percentage === 100 ? 'Review Profile Details' : 'Complete Profile Now →'}
                 </button>
               </div>
             </div>
-          </div>
 
-          {/* ACADEMIC OVERVIEW (Requirement 4) */}
-          <div className="sd-card">
-            <div className="sd-card-header">
-              <h3 className="sd-card-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                  <path d="M6 12v5c3 3 9 3 12 0v-5" />
-                </svg>
-                Academic Information
-              </h3>
-              <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>
-                {s.year && s.semester ? `${s.year} • ${s.semester}` : s.year || s.semester || 'Academic Standing'}
-              </span>
-            </div>
+            {/* SECTION 4: ACADEMIC PERFORMANCE SUMMARY */}
+            <div className="sd-card">
+              <div className="sd-card-header">
+                <h2 className="sd-card-heading">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#166534" strokeWidth="2.2">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                  </svg>
+                  Academic Performance Summary
+                </h2>
+                <span className="sd-card-badge" style={{ background: '#dcfce7', color: '#166534' }}>
+                  Official Record
+                </span>
+              </div>
 
-            <div className="sd-card-body">
-              {/* Top GPA Chips */}
-              <div className="sd-gpa-chips">
-                <div className="sd-gpa-chip-item">
-                  <span className="sd-gpa-chip-num">{s.sgpa || '—'}</span>
-                  <span className="sd-gpa-chip-lbl">Latest SGPA</span>
+              <div className="sd-acad-stats-row">
+                <div className="sd-acad-stat-box">
+                  <div className="sd-acad-stat-label">SGPA</div>
+                  <div className="sd-acad-stat-val">{s.sgpa || '—'}</div>
+                  <div className="sd-acad-stat-sub">Latest Semester</div>
                 </div>
-                <div className="sd-gpa-chip-item">
-                  <span className="sd-gpa-chip-num">{s.ygpa || '—'}</span>
-                  <span className="sd-gpa-chip-lbl">Yearly YGPA</span>
+                <div className="sd-acad-stat-box">
+                  <div className="sd-acad-stat-label">YGPA</div>
+                  <div className="sd-acad-stat-val">{s.ygpa || '—'}</div>
+                  <div className="sd-acad-stat-sub">Academic Year</div>
                 </div>
-                <div className="sd-gpa-chip-item">
-                  <span className="sd-gpa-chip-num" style={{ color: '#b38e44' }}>{s.cgpa || '—'}</span>
-                  <span className="sd-gpa-chip-lbl">Cumulative CGPA</span>
+                <div className="sd-acad-stat-box">
+                  <div className="sd-acad-stat-label">CGPA</div>
+                  <div className="sd-acad-stat-val">{s.cgpa || '—'}</div>
+                  <div className="sd-acad-stat-sub">Cumulative Index</div>
                 </div>
               </div>
 
-              <div className="sd-info-table">
-                <div className="sd-info-item">
-                  <span className="sd-info-label">College / Institution</span>
-                  <span className="sd-info-val">{s.institution || 'Not available yet'}</span>
+              <div className="sd-acad-meta-list">
+                <div className="sd-acad-meta-item">
+                  <span>Institution:</span>
+                  <strong>{s.institution || 'Recognized Educational Partner'}</strong>
                 </div>
-                <div className="sd-info-item">
-                  <span className="sd-info-label">Course / Program</span>
-                  <span className="sd-info-val">{s.course || 'Not specified'}</span>
+                <div className="sd-acad-meta-item">
+                  <span>Program / Course:</span>
+                  <strong>{s.course || 'Undergraduate Curriculum'}</strong>
                 </div>
-                <div className="sd-info-item">
-                  <span className="sd-info-label">College Roll Number</span>
-                  <span className="sd-info-val">{s.collegeRollNo || 'Not available yet'}</span>
-                </div>
-                <div className="sd-info-item">
-                  <span className="sd-info-label">University Roll Number</span>
-                  <span className="sd-info-val">{s.universityRollNo || 'Not available yet'}</span>
-                </div>
-                <div className="sd-info-item">
-                  <span className="sd-info-label">Admission Year & Course</span>
-                  <span className="sd-info-val">
-                    {s.admissionYear && s.admissionCourse ? `${s.admissionYear} • ${s.admissionCourse}` : s.admissionYear || s.admissionCourse || 'Not available yet'}
-                  </span>
-                </div>
-                <div className="sd-info-item">
-                  <span className="sd-info-label">Expected Completion Year</span>
-                  <span className="sd-info-val">{s.completionYear || 'Not available yet'}</span>
+                <div className="sd-acad-meta-item">
+                  <span>Registration / Roll:</span>
+                  <strong>{s.universityRollNo || s.collegeRollNo || 'Registered Student'}</strong>
                 </div>
               </div>
 
-              <div className="sd-card-actions">
+              <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'flex-start' }}>
                 <button
                   type="button"
-                  className="sd-btn-primary"
+                  className="sd-stat-btn"
                   onClick={() => setIsAcadOpen(true)}
-                  style={{ width: '100%', justifyContent: 'center' }}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="8" y1="6" x2="21" y2="6" />
-                    <line x1="8" y1="12" x2="21" y2="12" />
-                    <line x1="8" y1="18" x2="21" y2="18" />
-                    <line x1="3" y1="6" x2="3.01" y2="6" />
-                    <line x1="3" y1="12" x2="3.01" y2="12" />
-                    <line x1="3" y1="18" x2="3.01" y2="18" />
+                    <path d="M11 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
                   </svg>
-                  View Details & Full Transcript
+                  <span>View Details</span>
                 </button>
               </div>
             </div>
           </div>
-        </section>
 
-        {/* SECTION 2: VERIFICATION OVERVIEW */}
-        <section className="sd-verif-overview-section">
-          <div className="sd-verif-overview-card">
-            <div className="sd-verif-overview-content">
-              <div className="sd-verif-overview-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                  <polyline points="22 4 12 14.01 9 11.01" />
-                </svg>
+          {/* ROW 2: DEADLINES & RECENT ACTIVITY (Requirements 5 & 6) */}
+          <div className="sd-row-grid-2">
+            {/* SECTION 5: UPCOMING DEADLINES / IMPORTANT EVENTS */}
+            <div className="sd-card">
+              <div className="sd-card-header">
+                <h2 className="sd-card-heading">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  Upcoming Deadlines & Events
+                </h2>
+                <span className="sd-card-badge" style={{ background: '#f8fafc', color: '#64748b' }}>
+                  Schedule
+                </span>
               </div>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                  <h3 className="sd-verif-overview-title">Student Achievements & Experience Verification</h3>
-                  <span className="sd-verif-badge-pill">
-                    {verifiedSkillsCount + verifiedProjectsCount + verifiedInternshipsCount} Officially Verified
-                  </span>
+
+              <div className="sd-event-list">
+                {/* Clean, institutional empty state when no pending dates exist */}
+                <div className="sd-empty-state-box">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.8">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 14 14" />
+                  </svg>
+                  <div className="sd-empty-title">No Immediate Deadlines</div>
+                  <div className="sd-empty-desc">
+                    All application registrations, proctored evaluations, and project milestones are currently up to date.
+                  </div>
+                  <button
+                    type="button"
+                    className="sd-stat-btn"
+                    style={{ marginTop: 8 }}
+                    onClick={navigateToInternships}
+                  >
+                    <span>Browse Opportunities</span>
+                    <span>→</span>
+                  </button>
                 </div>
-                <p className="sd-verif-overview-sub">
-                  Track and submit technical skills, academic projects, and industrial internships. Only Portal Admin verified items count towards official totals and transcripts.
-                </p>
               </div>
             </div>
 
-            <button
-              type="button"
-              className="sd-btn-verif-overview-cta"
-              onClick={() => onOpenAchievementsExperience ? onOpenAchievementsExperience('skills') : openSkillsTab('skills')}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M9 12l2 2 4-4" />
-                <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
-              </svg>
-              Verification Overview
-            </button>
-          </div>
-        </section>
+            {/* SECTION 6: RECENT ACTIVITY */}
+            <div className="sd-card">
+              <div className="sd-card-header">
+                <h2 className="sd-card-heading">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                  </svg>
+                  Recent Activity
+                </h2>
+                <span className="sd-card-badge" style={{ background: '#f8fafc', color: '#64748b' }}>
+                  Audit Trail
+                </span>
+              </div>
 
-        {/* SECTION 3: MY INSTITUTION (Requirement 6) */}
-        <section className="sd-card">
-          <div className="sd-card-header">
-            <h3 className="sd-card-title">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                <polyline points="9 22 9 12 15 12 15 22" />
-              </svg>
-              My Institution Contacts
-            </h3>
-            <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
-              Context: {s.institution || 'Institutional Office'} • {s.course || 'Program Office'}
-            </span>
-          </div>
-
-          <div className="sd-card-body">
-            <div className="sd-contacts-grid">
-              {(student?.institutionContacts && Array.isArray(student.institutionContacts) && student.institutionContacts.length > 0) ? (
-                student.institutionContacts.map((c, i) => (
-                  <div key={c.id || c.role || i} className="sd-contact-card">
-                    <span className="sd-contact-role">{c.role}</span>
-                    <span className="sd-contact-name">{c.name}</span>
-                    <span className="sd-contact-detail">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                      </svg>
-                      {c.phone}
-                    </span>
-                    <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>{c.dept}</span>
+              <div className="sd-activity-list">
+                {notifications.length > 0 ? (
+                  notifications.slice(0, 3).map((n) => (
+                    <div key={n.id} className="sd-activity-row">
+                      <span className="sd-activity-dot" />
+                      <div style={{ flex: 1 }}>
+                        <div className="sd-activity-title">{n.title}</div>
+                        <div className="sd-activity-meta">{n.message || n.timestamp}</div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="sd-empty-state-box">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.8">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    <div className="sd-empty-title">No Recent Activity Logged</div>
+                    <div className="sd-empty-desc">
+                      Activity log will record your internship applications, skill verifications, and post milestones.
+                    </div>
                   </div>
-                ))
-              ) : (
-                [
-                  { role: 'Principal / Director', dept: 'Office of the Principal' },
-                  { role: 'Head of Department (HOD)', dept: s.course ? `Dept of ${s.course}` : 'Department Office' },
-                  { role: 'Academic Advisor', dept: 'Batch Mentor & Faculty' },
-                  { role: 'Placement Cell Head', dept: 'Training & Placements Cell' },
-                ].map((slot) => (
-                  <div key={slot.role} className="sd-contact-card" style={{ background: '#fafbfc' }}>
-                    <span className="sd-contact-role">{slot.role}</span>
-                    <span className="sd-contact-name" style={{ color: '#64748b', fontSize: '0.88rem', fontWeight: 500 }}>
-                      Not available yet
-                    </span>
-                    <span className="sd-contact-detail" style={{ color: '#94a3b8', fontSize: '0.78rem' }}>
-                      Institution contact information will appear after verification
-                    </span>
-                    <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>{slot.dept}</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* ROW 3: QUICK ACTIONS & INSTITUTIONAL PROGRESS AREA (Requirements 7 & 8) */}
+          <div className="sd-row-grid-2">
+            {/* SECTION 7: QUICK ACTIONS */}
+            <div className="sd-card">
+              <div className="sd-card-header">
+                <h2 className="sd-card-heading">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f1d2f" strokeWidth="2.2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
+                  Quick Actions
+                </h2>
+                <span className="sd-card-badge" style={{ background: '#f1f5f9', color: '#475569' }}>
+                  Direct Tools
+                </span>
+              </div>
+
+              <div className="sd-actions-grid">
+                <button
+                  type="button"
+                  className="sd-action-card-btn"
+                  onClick={() => {
+                    if (onEditProfile) onEditProfile()
+                  }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b3881e" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <span>Update Profile</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="sd-action-card-btn"
+                  onClick={navigateToInternships}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b45309" strokeWidth="2">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                  </svg>
+                  <span>Explore Internships</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="sd-action-card-btn"
+                  onClick={navigateToPlacements}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15803d" strokeWidth="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                    <line x1="12" y1="11" x2="12" y2="17" />
+                  </svg>
+                  <span>Explore Placements</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="sd-action-card-btn"
+                  onClick={() => setIsAssessmentsModalOpen(true)}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="2">
+                    <path d="M9 11l3 3L22 4" />
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                  </svg>
+                  <span>Take Assessment</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="sd-action-card-btn"
+                  style={{ gridColumn: 'span 2' }}
+                  onClick={navigateToPublicPosts}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7e22ce" strokeWidth="2">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                    <polyline points="16 6 12 2 8 6" />
+                    <line x1="12" y1="2" x2="12" y2="15" />
+                  </svg>
+                  <span>Create Public Post</span>
+                </button>
+              </div>
+            </div>
+
+            {/* SECTION 8: VERIFICATION / PROGRESS AREA */}
+            <div className="sd-card">
+              <div className="sd-card-header">
+                <h2 className="sd-card-heading">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#166534" strokeWidth="2.2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                  Institutional Verification & Seal
+                </h2>
+                <span className="sd-card-badge" style={{ background: '#dcfce7', color: '#166534' }}>
+                  Authorized
+                </span>
+              </div>
+
+              <div className="sd-verify-box">
+                <div className="sd-seal-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="sd-verify-title">Verified Institutional Record</div>
+                  <div className="sd-verify-sub">
+                    Identity verified by {s.institution || 'Educational Authority'}. Profile is validated for academic placement drives.
                   </div>
-                ))
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 4: INTERNSHIPS & PLACEMENTS + SKILL ASSESSMENTS (Requirements 7 & 8) */}
-        <section className="sd-gateways-grid">
-          {/* Card: Internships & Placements */}
-          <div className="sd-gateway-card featured">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div className="sd-gw-icon" style={{ background: '#fdfbf7', color: '#b3881e' }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-                </svg>
+                </div>
               </div>
-              <div>
-                <h4 className="sd-gw-title">Internships</h4>
-                <p className="sd-gw-desc">
-                  Browse verified campus recruitment drives, summer internships, and active applications.
-                </p>
+
+              <div style={{ marginTop: 14, fontSize: '0.78rem', color: '#64748b', lineHeight: 1.4 }}>
+                Your credentials, examination grade points, and semester enrolments are continuously verified under the IAS Collaboration Framework.
+              </div>
+
+              <div style={{ marginTop: 'auto', paddingTop: 10, display: 'flex', justifyContent: 'flex-start' }}>
+                <button
+                  type="button"
+                  className="sd-stat-btn"
+                  onClick={() => {
+                    if (onEditProfile) onEditProfile()
+                  }}
+                >
+                  <span>Review Verification Status</span>
+                  <span>→</span>
+                </button>
               </div>
             </div>
-            <button
-              type="button"
-              className="sd-btn-secondary"
-              style={{ flexShrink: 0 }}
-              onClick={() => {
-                if (onOpenInternships) {
-                  onOpenInternships()
-                } else {
-                  setIsInternshipsModalOpen(true)
-                }
-              }}
-            >
-              Explore →
-            </button>
           </div>
+        </main>
+      </div>
 
-          {/* Card: Placements */}
-          <div className="sd-gateway-card featured">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div className="sd-gw-icon" style={{ background: '#f0fdf4', color: '#166534' }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                  <line x1="12" y1="11" x2="12" y2="17" />
-                  <line x1="9" y1="14" x2="15" y2="14" />
-                </svg>
-              </div>
-              <div>
-                <h4 className="sd-gw-title">Placements</h4>
-                <p className="sd-gw-desc">
-                  Explore full-time campus recruitment drives, CTC packages, and corporate schedules.
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              className="sd-btn-secondary"
-              style={{ flexShrink: 0 }}
-              onClick={() => {
-                if (onOpenPlacements) {
-                  onOpenPlacements()
-                }
-              }}
-            >
-              Explore →
-            </button>
-          </div>
-
-          {/* Card: Skill Assessments */}
-          <div className="sd-gateway-card">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div className="sd-gw-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                </svg>
-              </div>
-              <div>
-                <h4 className="sd-gw-title">Skill Assessments</h4>
-                <p className="sd-gw-desc">
-                  Institutional proctored tests, DSA benchmark evaluations, and accredited credential badges.
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              className="sd-btn-secondary"
-              style={{ flexShrink: 0 }}
-              onClick={() => setIsAssessmentsModalOpen(true)}
-            >
-              View Tests →
-            </button>
-          </div>
-        </section>
-
-        {/* SECTION 5: SKILLS, PROJECTS & INTERNSHIP EXPERIENCE (Requirements 9 & 10) */}
-        <section className="sd-card">
-          <div className="sd-card-header">
-            <h3 className="sd-card-title">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-              </svg>
-              Skills, Projects & Experience Hub
-            </h3>
-            <span style={{ fontSize: '0.74rem', color: '#166534', fontWeight: 600 }}>
-              Portal Admin Verification System Enforced
-            </span>
-          </div>
-
-          <div className="sd-card-body">
-            <p style={{ margin: '0 0 8px', fontSize: '0.86rem', color: '#475569', lineHeight: 1.5 }}>
-              Manage your technical competencies, code repositories, and work history. All entries require uploaded supporting documentation and must be reviewed by the <strong>Portal Admin</strong> before appearing as verified.
-            </p>
-
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-              <button
-                type="button"
-                className="sd-btn-primary"
-                onClick={() => onOpenAchievementsExperience ? onOpenAchievementsExperience('skills') : openSkillsTab('skills')}
-              >
-                Manage Technical Skills ({verifiedSkillsCount} Verified)
-              </button>
-              <button
-                type="button"
-                className="sd-btn-secondary"
-                onClick={() => onOpenAchievementsExperience ? onOpenAchievementsExperience('projects') : openSkillsTab('projects')}
-              >
-                Manage Projects ({verifiedProjectsCount} Verified)
-              </button>
-              <button
-                type="button"
-                className="sd-btn-secondary"
-                onClick={() => onOpenAchievementsExperience ? onOpenAchievementsExperience('experience') : openSkillsTab('experience')}
-              >
-                Manage Internships ({verifiedInternshipsCount} Verified)
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 6: CREATE PUBLIC POST (Requirement 11) */}
-        <section className="sd-post-action-card">
-          <div>
-            <h3 style={{ margin: '0 0 6px', fontSize: '1.1rem', fontWeight: 700 }}>
-              Create Public Post & Community Portfolio
-            </h3>
-            <p style={{ margin: 0, fontSize: '0.84rem', color: '#cbd5e1', maxWidth: 640, lineHeight: 1.4 }}>
-              Broadcast academic milestones, hackathon awards, and research papers. Submissions undergo review by Portal Admin before publication.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            className="sd-post-action-btn"
-            onClick={() => {
-              if (onOpenPublicPost) {
-                onOpenPublicPost()
-              } else {
-                setIsPostModalOpen(true)
-              }
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Create / View Public Posts ({posts.length})
-          </button>
-        </section>
-
-      </main>
-
-      {/* Official Dashboard Footer */}
-      <footer className="sd-footer">
-        <div className="sd-footer-inner">
-          <span className="sd-footer-brand">IAS Collaboration Portal</span>
-          <span className="sd-footer-attribution">Built by Team UDAAN</span>
-        </div>
-      </footer>
-
-      {/* MODALS */}
-      {/* View-Only Profile Photo Lightbox (Requirement 3) */}
+      {/* ALL REUSABLE MODALS PRESERVED AND CONNECTED */}
       <ProfilePhotoLightbox
         isOpen={isPhotoLightboxOpen}
-        onClose={() => setIsPhotoLightboxOpen(false)}
-        imageUrl={s.profilePic}
+        imageSrc={s.profilePic}
         studentName={s.name}
+        onClose={() => setIsPhotoLightboxOpen(false)}
       />
 
-      {/* Notifications Modal (Requirement 12) */}
       <NotificationsModal
         isOpen={isNotifOpen}
-        onClose={() => setIsNotifOpen(false)}
         notifications={notifications}
-        onMarkAllRead={() => {
-          setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
-        }}
-        onClearAll={() => {
-          setNotifications([])
+        onClose={() => setIsNotifOpen(false)}
+        onMarkAllRead={() => setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))}
+        onClearAll={() => setNotifications([])}
+        onNotificationClick={(notif) => {
+          setNotifications((prev) =>
+            prev.map((n) => (n.id === notif.id ? { ...n, read: true } : n))
+          )
         }}
       />
 
-      {/* Academic Information Modal (Requirement 4) */}
       <AcademicDetailsModal
         isOpen={isAcadOpen}
         onClose={() => setIsAcadOpen(false)}
         student={s}
       />
 
-      {/* Skills, Projects & Experience Modal (Requirements 5, 9, 10) */}
       <SkillsProjectsModal
         isOpen={isSkillsModalOpen}
-        onClose={() => setIsSkillsModalOpen(false)}
         initialTab={skillsInitialTab}
+        onClose={() => setIsSkillsModalOpen(false)}
         skills={skills}
         projects={projects}
         internships={internships}
@@ -1831,40 +2260,34 @@ export default function StudentDashboard({
         onAddInternship={handleAddInternship}
       />
 
-      {/* Public Post Modal (Requirement 11) */}
       <PublicPostModal
         isOpen={isPostModalOpen}
         onClose={() => setIsPostModalOpen(false)}
-        posts={posts}
-        student={s}
         onCreatePost={handleCreatePost}
         onUpdatePost={handleUpdatePost}
         onDeletePost={handleDeletePost}
         onSubmitDraft={handleSubmitPostDraft}
+        existingPosts={posts}
       />
 
-      {/* Internships & Placements Modal (Requirement 7) */}
       <InternshipsPlacementsModal
         isOpen={isInternshipsModalOpen}
         onClose={() => setIsInternshipsModalOpen(false)}
         student={s}
       />
 
-      {/* Skill Assessments Modal (Requirement 8) */}
       <SkillAssessmentsModal
         isOpen={isAssessmentsModalOpen}
         onClose={() => setIsAssessmentsModalOpen(false)}
+        student={s}
       />
 
-      {/* Change Password Modal */}
-      {isChangePasswordOpen && (
-        <ChangePasswordModal
-          isOpen={isChangePasswordOpen}
-          onClose={() => setIsChangePasswordOpen(false)}
-          student={s}
-          onPasswordChanged={handlePasswordChanged}
-        />
-      )}
+      <ChangePasswordModal
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+        onPasswordChanged={handlePasswordChanged}
+        student={s}
+      />
     </div>
   )
 }
