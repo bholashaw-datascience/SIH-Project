@@ -5,7 +5,7 @@ export default function AcademicDetailsModal({ isOpen, onClose, student }) {
   const semHistory = s.semesterHistory && Array.isArray(s.semesterHistory) ? s.semesterHistory : []
 
   return (
-    <div className="acad-modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="acad-modal-title">
+    <div className="acad-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="acad-modal-title">
       <style>{`
         .acad-modal-overlay {
           position: fixed;

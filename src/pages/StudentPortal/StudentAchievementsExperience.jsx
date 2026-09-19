@@ -4813,9 +4813,6 @@ export default function StudentAchievementsExperience({
       {viewingModalImage && (
         <div
           className="sae-img-modal-backdrop"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) handleCloseImageModal()
-          }}
           role="dialog"
           aria-modal="true"
           aria-label="Preview Modal"

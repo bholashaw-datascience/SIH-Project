@@ -270,8 +270,8 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-backdrop">
+      <div className="modal-card">
         <div className="modal-top-accent"></div>
 
         {/* Modal Header */}

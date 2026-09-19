@@ -89,7 +89,7 @@ export default function SkillsProjectsModal({
   }
 
   return (
-    <div className="sp-modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="sp-modal-title">
+    <div className="sp-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="sp-modal-title">
       <style>{`
         .sp-modal-overlay {
           position: fixed;

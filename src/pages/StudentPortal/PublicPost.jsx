@@ -1330,7 +1330,7 @@ export default function PublicPost({
           SUB-MODALS: CONFIRMATION STATE MODAL
           ==================================================================== */}
       {confirmationPost && (
-        <div className="pp-modal-overlay" onClick={() => setConfirmationPost(null)}>
+        <div className="pp-modal-overlay">
           <div className="pp-confirmation-card" onClick={(e) => e.stopPropagation()}>
             <div className="pp-confirmation-icon">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8">
@@ -1388,7 +1388,7 @@ export default function PublicPost({
           SUB-MODALS: FULLSCREEN MEDIA LIGHTBOX
           ==================================================================== */}
       {lightboxMedia && (
-        <div className="pp-modal-overlay" onClick={() => setLightboxMedia(null)}>
+        <div className="pp-modal-overlay">
           <div className="pp-lightbox-card" onClick={(e) => e.stopPropagation()}>
             <div className="pp-lightbox-header">
               <span>{lightboxMedia.name || 'Media Preview'}</span>

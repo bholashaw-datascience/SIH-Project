@@ -1610,7 +1610,7 @@ ${company}
 
       {/* MODAL 1: VIEW DETAILS MODAL */}
       {detailsModalItem && (
-        <div className="sp-modal-overlay" onClick={() => setDetailsModalItem(null)} role="dialog" aria-modal="true">
+        <div className="sp-modal-overlay" role="dialog" aria-modal="true">
           <div className="sp-modal-container" onClick={(e) => e.stopPropagation()}>
             <div className="sp-modal-header">
               <div className="sp-modal-header-info">
@@ -1756,7 +1756,7 @@ ${company}
 
       {/* MODAL 2: 1-CLICK VERIFIED APPLICATION MODAL (NO CV UPLOAD NEEDED) */}
       {applyModalItem && (
-        <div className="sp-modal-overlay" onClick={() => setApplyModalItem(null)} role="dialog" aria-modal="true">
+        <div className="sp-modal-overlay" role="dialog" aria-modal="true">
           <div className="sp-modal-container" style={{ maxWidth: 640 }} onClick={(e) => e.stopPropagation()}>
             <div className="sp-modal-header">
               <div>
@@ -1840,7 +1840,7 @@ ${company}
 
       {/* MODAL 3: OFFICIAL OFFER LETTER PREVIEW MODAL */}
       {viewingOfferLetter && (
-        <div className="sp-modal-overlay" onClick={() => setViewingOfferLetter(null)} role="dialog" aria-modal="true">
+        <div className="sp-modal-overlay" role="dialog" aria-modal="true">
           <div className="sp-modal-container" style={{ maxWidth: 700 }} onClick={(e) => e.stopPropagation()}>
             <div className="sp-modal-header">
               <div>

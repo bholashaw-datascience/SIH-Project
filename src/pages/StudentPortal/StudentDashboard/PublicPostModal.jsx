@@ -330,7 +330,6 @@ export default function PublicPostModal({
   return (
     <div
       className="sp-post-overlay"
-      onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="sp-post-dialog-title"
@@ -1821,10 +1820,7 @@ export default function PublicPostModal({
 
       {/* Media Lightbox Full Preview Modal */}
       {lightboxMedia && (
-        <div
-          className="sp-lightbox-overlay"
-          onClick={() => setLightboxMedia(null)}
-        >
+        <div className="sp-lightbox-overlay">
           <div
             className="sp-lightbox-card"
             onClick={(e) => e.stopPropagation()}

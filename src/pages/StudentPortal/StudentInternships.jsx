@@ -2059,7 +2059,7 @@ ${company}
           MODAL 1: INTERNSHIP DETAILS MODAL
           ==================================================================== */}
       {detailsModalItem && (
-        <div className="si-modal-overlay" onClick={() => setDetailsModalItem(null)} role="dialog" aria-modal="true">
+        <div className="si-modal-overlay" role="dialog" aria-modal="true">
           <div className="si-modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="si-modal-header">
               <div className="si-modal-comp">
@@ -2219,7 +2219,7 @@ ${company}
           MODAL 2: STUDENT DIRECT APPLICATION FLOW (NO CV UPLOAD)
           ==================================================================== */}
       {applyModalItem && (
-        <div className="si-modal-overlay" onClick={() => !isApplying && setApplyModalItem(null)} role="dialog" aria-modal="true">
+        <div className="si-modal-overlay" role="dialog" aria-modal="true">
           <div className="si-modal-card apply-modal" onClick={(e) => e.stopPropagation()}>
             <div className="si-modal-header">
               <div>
@@ -2365,7 +2365,7 @@ ${company}
           ==================================================================== */}
 
       {viewingOfferLetter && (
-        <div className="si-modal-overlay" onClick={() => setViewingOfferLetter(null)} role="dialog" aria-modal="true">
+        <div className="si-modal-overlay" role="dialog" aria-modal="true">
           <div className="si-modal-card si-offer-letter-modal" onClick={(e) => e.stopPropagation()}>
             <div className="si-modal-header" style={{ background: 'linear-gradient(135deg, #112233 0%, #1a3956 100%)' }}>
               <div>

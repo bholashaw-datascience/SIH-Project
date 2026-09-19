@@ -162,8 +162,8 @@ function ImageCropModal({
   }
 
   return (
-    <div className="crop-modal-overlay" onClick={onCancel}>
-      <div className="crop-modal-card" onClick={(e) => e.stopPropagation()}>
+    <div className="crop-modal-overlay">
+      <div className="crop-modal-card">
         <div className="crop-modal-top-accent"></div>
         <div className="crop-modal-header">
           <div>

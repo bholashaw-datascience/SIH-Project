@@ -18,7 +18,7 @@ export default function NotificationsModal({
   })
 
   return (
-    <div className="notif-modal-overlay" onClick={onClose}>
+    <div className="notif-modal-overlay">
       <style>{`
         .notif-modal-overlay {
           position: fixed;

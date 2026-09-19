@@ -265,7 +265,7 @@ export default function ChangePasswordModal({ isOpen, onClose, student, onPasswo
   }
 
   return (
-    <div className="cp-modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
+    <div className="cp-modal-overlay" role="dialog" aria-modal="true">
       <style>{`
         .cp-modal-overlay {
           position: fixed;

@@ -78,7 +78,7 @@ export default function InternshipsPlacementsModal({ isOpen, onClose, student })
   })
 
   return (
-    <div className="ip-modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="ip-modal-title">
+    <div className="ip-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="ip-modal-title">
       <style>{`
         .ip-modal-overlay {
           position: fixed;

@@ -2181,7 +2181,6 @@ export default function StudentProfileOnboarding({
       {previewDoc && (
         <div
           className="onb-preview-modal-overlay"
-          onClick={() => setPreviewDoc(null)}
           role="dialog"
           aria-modal="true"
           aria-label={`Preview of ${previewDoc.docName}`}

@@ -2,7 +2,7 @@ export default function ProfilePhotoLightbox({ isOpen, imageSrc, studentName, on
   if (!isOpen) return null
 
   return (
-    <div className="lightbox-overlay" onClick={onClose}>
+    <div className="lightbox-overlay">
       <style>{`
         .lightbox-overlay {
           position: fixed;

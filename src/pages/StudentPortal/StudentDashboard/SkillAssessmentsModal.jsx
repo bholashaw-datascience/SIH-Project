@@ -37,7 +37,7 @@ export default function SkillAssessmentsModal({ isOpen, onClose }) {
   })
 
   return (
-    <div className="sa-modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="sa-modal-title">
+    <div className="sa-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="sa-modal-title">
       <style>{`
         .sa-modal-overlay {
           position: fixed;
