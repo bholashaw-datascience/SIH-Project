@@ -6,6 +6,7 @@ import StudentAchievementsExperience from './StudentAchievementsExperience'
 import PublicPost from './PublicPost'
 import StudentInternships from './StudentInternships'
 import StudentPlacements from './StudentPlacements'
+import StudentSkillAssessments from './StudentSkillAssessments'
 import PortalFooter from '../../components/PortalFooter'
 
 function StudentPortal({
@@ -34,6 +35,9 @@ function StudentPortal({
         return 5
       }
       if (params.get('view') === 'placements' || window.location.hash.includes('placements')) {
+        return 5
+      }
+      if (params.get('view') === 'skill_assessments' || window.location.hash.includes('skill-assessments') || window.location.hash.includes('skill_assessments')) {
         return 5
       }
     } catch {}
@@ -168,6 +172,9 @@ function StudentPortal({
       if (params.get('view') === 'placements' || window.location.hash.includes('placements')) {
         return 'placements'
       }
+      if (params.get('view') === 'skill_assessments' || window.location.hash.includes('skill-assessments') || window.location.hash.includes('skill_assessments')) {
+        return 'skill_assessments'
+      }
     } catch {}
     return 'auto'
   })
@@ -248,10 +255,11 @@ function StudentPortal({
   const showPublicPost = activeView === 'public_post'
   const showInternships = activeView === 'internships'
   const showPlacements = activeView === 'placements'
-  const showDashboard = isProfileCompleted && verificationStatus === 'verified' && activeView !== 'diff_view' && activeView !== 'edit_form' && !showAchievementsExperience && !showPublicPost && !showInternships && !showPlacements
-  const showDiffView = (activeView === 'diff_view' || (isProfileCompleted && hasPendingChanges && activeView !== 'edit_form' && activeView !== 'auto_dashboard')) && !showAchievementsExperience && !showPublicPost && !showInternships && !showPlacements
-  const showEditForm = activeView === 'edit_form' && !showAchievementsExperience && !showPublicPost && !showInternships && !showPlacements
-  const showFirstTimeOnboarding = (!isProfileCompleted || verificationStatus === 'unverified' || verificationStatus === 'draft') && !showDashboard && !showDiffView && !showEditForm && !showAchievementsExperience && !showPublicPost && !showInternships && !showPlacements && !['pending', 'approved', 'rejected'].includes(verificationStatus)
+  const showSkillAssessments = activeView === 'skill_assessments'
+  const showDashboard = isProfileCompleted && verificationStatus === 'verified' && activeView !== 'diff_view' && activeView !== 'edit_form' && !showAchievementsExperience && !showPublicPost && !showInternships && !showPlacements && !showSkillAssessments
+  const showDiffView = (activeView === 'diff_view' || (isProfileCompleted && hasPendingChanges && activeView !== 'edit_form' && activeView !== 'auto_dashboard')) && !showAchievementsExperience && !showPublicPost && !showInternships && !showPlacements && !showSkillAssessments
+  const showEditForm = activeView === 'edit_form' && !showAchievementsExperience && !showPublicPost && !showInternships && !showPlacements && !showSkillAssessments
+  const showFirstTimeOnboarding = (!isProfileCompleted || verificationStatus === 'unverified' || verificationStatus === 'draft') && !showDashboard && !showDiffView && !showEditForm && !showAchievementsExperience && !showPublicPost && !showInternships && !showPlacements && !showSkillAssessments && !['pending', 'approved', 'rejected'].includes(verificationStatus)
 
   return (
     <div className="sp-canvas">
@@ -1378,6 +1386,21 @@ function StudentPortal({
                   onBack={() => setActiveView('auto')}
                   onNavigateHome={onNavigateHome}
                 />
+              ) : activeView === 'skill_assessments' ? (
+                <StudentSkillAssessments
+                  student={currentLive}
+                  onBack={() => setActiveView('auto')}
+                  onOpenDashboard={() => setActiveView('auto')}
+                  onOpenAchievementsExperience={(tab) => {
+                    setAchievementsTab(tab || 'skills')
+                    setActiveView('achievements_experience')
+                  }}
+                  onOpenInternships={() => setActiveView('internships')}
+                  onOpenPlacements={() => setActiveView('placements')}
+                  onOpenPublicPost={() => setActiveView('public_post')}
+                  onEditProfile={() => setDemoStep(2)}
+                  onNavigateHome={onNavigateHome}
+                />
               ) : (
                 <StudentDashboard
                   student={currentLive}
@@ -1392,6 +1415,7 @@ function StudentPortal({
                   onOpenPublicPost={() => setActiveView('public_post')}
                   onOpenInternships={() => setActiveView('internships')}
                   onOpenPlacements={() => setActiveView('placements')}
+                  onOpenSkillAssessments={() => setActiveView('skill_assessments')}
                   onNavigateHome={onNavigateHome}
                   onLogout={onNavigateHome}
                   verificationStatus="verified"
@@ -1615,6 +1639,7 @@ function StudentPortal({
               onOpenPublicPost={() => setActiveView('public_post')}
               onOpenInternships={() => setActiveView('internships')}
               onOpenPlacements={() => setActiveView('placements')}
+              onOpenSkillAssessments={() => setActiveView('skill_assessments')}
               onNavigateHome={onNavigateHome}
               onLogout={() => {
                 try {
@@ -1660,6 +1685,30 @@ function StudentPortal({
             <StudentPlacements
               student={currentLive}
               onBack={() => setActiveView('auto')}
+              onNavigateHome={onNavigateHome}
+            />
+          )}
+
+          {/* 10. DEDICATED SKILL ASSESSMENTS PAGE */}
+          {showSkillAssessments && (
+            <StudentSkillAssessments
+              student={currentLive}
+              onBack={() => setActiveView('auto')}
+              onOpenDashboard={() => setActiveView('auto')}
+              onOpenAchievementsExperience={(tab) => {
+                setAchievementsTab(tab || 'skills')
+                setActiveView('achievements_experience')
+              }}
+              onOpenInternships={() => setActiveView('internships')}
+              onOpenPlacements={() => setActiveView('placements')}
+              onOpenPublicPost={() => setActiveView('public_post')}
+              onEditProfile={() => {
+                if (hasPendingChanges) {
+                  setActiveView('diff_view')
+                } else {
+                  setActiveView('edit_form')
+                }
+              }}
               onNavigateHome={onNavigateHome}
             />
           )}

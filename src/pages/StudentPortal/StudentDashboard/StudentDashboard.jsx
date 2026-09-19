@@ -22,6 +22,7 @@ export default function StudentDashboard({
   onOpenPublicPost,
   onOpenInternships,
   onOpenPlacements,
+  onOpenSkillAssessments,
   verificationStatus = 'approved',
   rejectionReason = '',
 }) {
@@ -389,6 +390,14 @@ export default function StudentDashboard({
       onOpenPlacements()
     } else {
       setIsInternshipsModalOpen(true)
+    }
+  }
+
+  const navigateToSkillAssessments = () => {
+    if (onOpenSkillAssessments) {
+      onOpenSkillAssessments()
+    } else {
+      setIsAssessmentsModalOpen(true)
     }
   }
 
@@ -1489,7 +1498,7 @@ export default function StudentDashboard({
                   className="sd-nav-item-btn"
                   onClick={() => {
                     setIsMobileSidebarOpen(false)
-                    setIsAssessmentsModalOpen(true)
+                    navigateToSkillAssessments()
                   }}
                 >
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
