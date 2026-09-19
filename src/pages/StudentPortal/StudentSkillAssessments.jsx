@@ -555,7 +555,7 @@ export default function StudentSkillAssessments({
   student = {},
   onBack,
   onNavigateHome,
-  onOpenAchievementsExperience,
+  _onOpenAchievementsExperience,
   _onOpenDashboard,
 }) {
   // Student Profile Data matching StudentPlacements
@@ -605,8 +605,7 @@ export default function StudentSkillAssessments({
   const [takeTestModalItem, setTakeTestModalItem] = useState(null)
   const [isRecentResultsModalOpen, setIsRecentResultsModalOpen] = useState(false)
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false)
-  const [statusCategoryTab, setStatusCategoryTab] = useState('upcoming') // 'upcoming' | 'taken' | 'results' | 'certificates'
-  const [selectedCertificateModal, setSelectedCertificateModal] = useState(null)
+  const [statusCategoryTab, setStatusCategoryTab] = useState('upcoming') // 'upcoming' | 'taken'
   const [toastMessage, setToastMessage] = useState('')
 
   // Selected assessment & result detail states for direct page navigation
@@ -677,45 +676,6 @@ export default function StudentSkillAssessments({
           el.scrollIntoView({ behavior: 'smooth', block: 'center' })
         }
       }, 120)
-    }
-  }
-
-  // 3. Results Available -> Direct navigation to relevant result/assessment detail
-  const handleNavigateToResultDetail = (item) => {
-    setIsStatusModalOpen(false)
-    resetAllFilters()
-    setActiveTab('all')
-    setSelectedResultDetail(item)
-    const targetId = item.refId || item.id
-    const match = INITIAL_ASSESSMENTS.find(
-      (a) => a.id === targetId || a.testName === (item.testName || item.name)
-    )
-    if (match) {
-      setHighlightedAssessmentId(match.id)
-      setExpandedAssessmentId(match.id)
-      setTimeout(() => {
-        const el = document.getElementById(`assessment-card-${match.id}`)
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        }
-      }, 120)
-    } else {
-      setTimeout(() => {
-        const el = document.getElementById('sa-recent-results-widget')
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        }
-      }, 120)
-    }
-  }
-
-  // 4. Certificates -> Direct navigation to existing certificate/credential destination in Student Portal
-  const handleNavigateToCertificates = () => {
-    setIsStatusModalOpen(false)
-    if (onOpenAchievementsExperience) {
-      onOpenAchievementsExperience('skills')
-    } else if (onBack) {
-      onBack()
     }
   }
 
@@ -1644,42 +1604,6 @@ export default function StudentSkillAssessments({
                   </div>
                   <span className="sa-status-count">{3 + takenTestIds.length}</span>
                 </div>
-
-                {/* Results Available */}
-                <div className="sa-status-row">
-                  <div className="sa-status-left">
-                    <div className="sa-status-icon-box results">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14 2 14 8 20 8" />
-                        <line x1="16" y1="13" x2="8" y2="13" />
-                        <line x1="16" y1="17" x2="8" y2="17" />
-                      </svg>
-                    </div>
-                    <div className="sa-status-info">
-                      <span className="sa-status-title">Results Available</span>
-                      <span className="sa-status-subtitle">Published evaluations</span>
-                    </div>
-                  </div>
-                  <span className="sa-status-count">3</span>
-                </div>
-
-                {/* Certificates */}
-                <div className="sa-status-row">
-                  <div className="sa-status-left">
-                    <div className="sa-status-icon-box certificates">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
-                        <circle cx="12" cy="8" r="7" />
-                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
-                      </svg>
-                    </div>
-                    <div className="sa-status-info">
-                      <span className="sa-status-title">Certificates</span>
-                      <span className="sa-status-subtitle">Verified credentials</span>
-                    </div>
-                  </div>
-                  <span className="sa-status-count">3</span>
-                </div>
               </div>
             </div>
 
@@ -1998,7 +1922,7 @@ export default function StudentSkillAssessments({
               <div className="sa-modal-header-info">
                 <h2 className="sa-modal-title">My Assessment Status &amp; Activity Overview</h2>
                 <p className="sa-modal-subtitle">
-                  This section contains your complete assessment activity and status records across upcoming tests, completed submissions, published results, and certificates.
+                  This section contains your complete assessment activity and status records across upcoming tests and completed submissions.
                 </p>
               </div>
               <button
@@ -2011,13 +1935,11 @@ export default function StudentSkillAssessments({
               </button>
             </div>
 
-            {/* ONLY FOUR CATEGORY TABS (NO 'All Categories' TAB) */}
+            {/* TWO CATEGORY TABS: UPCOMING TESTS & TESTS TAKEN */}
             <div style={{ padding: '12px 20px 0', display: 'flex', gap: 8, flexWrap: 'wrap', borderBottom: '1px solid #e2e8f0', background: '#f8fafc' }}>
               {[
                 { id: 'upcoming', label: 'Upcoming Tests' },
                 { id: 'taken', label: 'Tests Taken' },
-                { id: 'results', label: 'Results Available' },
-                { id: 'certificates', label: 'Certificates' },
               ].map((tab) => {
                 const isActive = statusCategoryTab === tab.id
                 return (
@@ -2244,167 +2166,6 @@ export default function StudentSkillAssessments({
                   </div>
                 </div>
               )}
-
-              {/* CATEGORY 3: RESULTS AVAILABLE */}
-              {statusCategoryTab === 'results' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 6 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div className="sa-status-icon-box results" style={{ width: 28, height: 28 }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                          <polyline points="14 2 14 8 20 8" />
-                          <line x1="16" y1="13" x2="8" y2="13" />
-                          <line x1="16" y1="17" x2="8" y2="17" />
-                        </svg>
-                      </div>
-                      <h3 style={{ margin: 0, fontSize: '0.94rem', fontWeight: 800, color: '#0f1d2f' }}>
-                        Results Available
-                      </h3>
-                    </div>
-                    <span style={{ fontSize: '0.72rem', color: '#0369a1', background: '#e0f2fe', fontWeight: 700, padding: '2px 8px', borderRadius: 12 }}>
-                      {INITIAL_RECENT_RESULTS.length} Scorecards
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {INITIAL_RECENT_RESULTS.map((res) => (
-                      <div
-                        key={`result_${res.id}`}
-                        style={{
-                          background: '#ffffff',
-                          border: '1px solid #e2e8f0',
-                          borderRadius: 8,
-                          padding: '14px 16px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          gap: 14,
-                        }}
-                      >
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
-                            <span style={{ fontSize: '0.76rem', fontWeight: 700, color: '#475569' }}>
-                              {res.company}
-                            </span>
-                            <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#166534', background: '#dcfce7', padding: '2px 8px', borderRadius: 4 }}>
-                              ✓ Result Status: Verified &amp; Published
-                            </span>
-                          </div>
-                          <h4 style={{ margin: '0 0 6px', fontSize: '0.92rem', fontWeight: 800, color: '#0f1d2f' }}>
-                            {res.name}
-                          </h4>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, fontSize: '0.75rem', color: '#475569' }}>
-                            <span>📅 Completion Date: <strong>{res.date}</strong></span>
-                            <span style={{ color: '#0f1d2f', fontWeight: 700 }}>
-                              Score / Result: <strong style={{ color: '#166534' }}>{res.score}</strong> ({res.percentile})
-                            </span>
-                          </div>
-                        </div>
-                        <div style={{ flexShrink: 0 }}>
-                          <button
-                            type="button"
-                            className="sa-btn-view"
-                            style={{ padding: '6px 12px', fontSize: '0.78rem' }}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleNavigateToResultDetail(res)
-                            }}
-                          >
-                            View Details
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* CATEGORY 4: CERTIFICATES */}
-              {statusCategoryTab === 'certificates' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 6 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div className="sa-status-icon-box certificates" style={{ width: 28, height: 28 }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
-                          <circle cx="12" cy="8" r="7" />
-                          <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
-                        </svg>
-                      </div>
-                      <h3 style={{ margin: 0, fontSize: '0.94rem', fontWeight: 800, color: '#0f1d2f' }}>
-                        Certificates
-                      </h3>
-                    </div>
-                    <span style={{ fontSize: '0.72rem', color: '#854d0e', background: '#fef9c3', fontWeight: 700, padding: '2px 8px', borderRadius: 12 }}>
-                      {INITIAL_RECENT_RESULTS.length} Issued
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {INITIAL_RECENT_RESULTS.map((res) => (
-                      <div
-                        key={`cert_${res.id}`}
-                        style={{
-                          background: '#ffffff',
-                          border: '1px solid #e2e8f0',
-                          borderRadius: 8,
-                          padding: '14px 16px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          gap: 14,
-                        }}
-                      >
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
-                            <span style={{ fontSize: '0.76rem', fontWeight: 700, color: '#475569' }}>
-                              🏛️ Issuing Organization: <strong>{res.certIssuer}</strong>
-                            </span>
-                            <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#854d0e', background: '#fef9c3', padding: '2px 8px', borderRadius: 4 }}>
-                              ✓ Certificate Status: {res.certStatus}
-                            </span>
-                          </div>
-                          <h4 style={{ margin: '0 0 6px', fontSize: '0.92rem', fontWeight: 800, color: '#0f1d2f' }}>
-                            {res.certName || res.name}
-                          </h4>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, fontSize: '0.75rem', color: '#475569' }}>
-                            <span>Assessment: <strong>{res.name}</strong></span>
-                            <span>📅 Issue Date: <strong>{res.date}</strong></span>
-                            <span style={{ color: '#0369a1', fontWeight: 600 }}>
-                              Credential ID: <strong>{res.certId}</strong>
-                            </span>
-                            <span>Grade: <strong>{res.score}</strong></span>
-                          </div>
-                        </div>
-                        <div style={{ flexShrink: 0, display: 'flex', gap: 8 }}>
-                          <button
-                            type="button"
-                            className="sa-btn-view"
-                            style={{ padding: '6px 12px', fontSize: '0.78rem' }}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleNavigateToCertificates()
-                            }}
-                          >
-                            View Details
-                          </button>
-                          <button
-                            type="button"
-                            className="sa-btn-apply"
-                            style={{ padding: '6px 12px', fontSize: '0.78rem' }}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleNavigateToCertificates()
-                            }}
-                          >
-                            View Certificate ↗
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
             <div className="sa-modal-footer">
@@ -2414,65 +2175,6 @@ export default function StudentSkillAssessments({
                 onClick={() => setIsStatusModalOpen(false)}
               >
                 Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 5. VERIFIED ASSESSMENT CERTIFICATE MODAL */}
-      {selectedCertificateModal && (
-        <div className="sa-modal-overlay" role="dialog" aria-modal="true" onClick={() => setSelectedCertificateModal(null)}>
-          <div className="sa-modal-container" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 580 }}>
-            <div className="sa-modal-header">
-              <div className="sa-modal-header-info">
-                <h2 className="sa-modal-title">Verified Assessment Certificate</h2>
-                <p className="sa-modal-subtitle">Official Verified Credential &bull; IAS Collaboration Portal</p>
-              </div>
-              <button
-                type="button"
-                className="sa-modal-close-btn"
-                onClick={() => setSelectedCertificateModal(null)}
-                aria-label="Close modal"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="sa-modal-body" style={{ textAlign: 'center', padding: '24px 20px' }}>
-              <div style={{ border: '2px solid #b3881e', borderRadius: 8, padding: '20px 16px', background: '#fafaf9' }}>
-                <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#b3881e', fontWeight: 800 }}>
-                  IAS Collaboration Portal &bull; Verified Credential
-                </div>
-                <h3 style={{ margin: '10px 0 6px', fontSize: '1.15rem', color: '#0f1d2f' }}>
-                  {selectedCertificateModal.certName || selectedCertificateModal.name}
-                </h3>
-                <p style={{ fontSize: '0.82rem', color: '#475569', margin: '0 0 12px' }}>
-                  This certifies that <strong>{studentName}</strong> ({studentBranch}) has demonstrated verified technical competency in <strong>{selectedCertificateModal.name}</strong>.
-                </p>
-
-                <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 6, padding: '12px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, textAlign: 'left', fontSize: '0.78rem', color: '#334155' }}>
-                  <div><strong>Validated Score:</strong> {selectedCertificateModal.score} ({selectedCertificateModal.percentile})</div>
-                  <div><strong>Certificate Status:</strong> <span style={{ color: '#166534', fontWeight: 700 }}>✓ {selectedCertificateModal.certStatus}</span></div>
-                  <div><strong>Issue Date:</strong> {selectedCertificateModal.date}</div>
-                  <div><strong>Credential ID:</strong> <span style={{ color: '#0369a1', fontWeight: 700 }}>{selectedCertificateModal.certId}</span></div>
-                  <div style={{ gridColumn: 'span 2' }}><strong>Issuing Authority:</strong> {selectedCertificateModal.certIssuer}</div>
-                </div>
-
-                <div style={{ marginTop: 14, fontSize: '0.72rem', color: '#166534', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                  <span>🛡️</span>
-                  <span>Officially Verified &bull; Cryptographic Credential Active</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="sa-modal-footer">
-              <button
-                type="button"
-                className="sa-btn-view"
-                onClick={() => setSelectedCertificateModal(null)}
-              >
-                Close Certificate
               </button>
             </div>
           </div>
