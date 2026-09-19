@@ -705,19 +705,6 @@ export default function StudentSkillAssessments({
               Discover and take verified skill assessments, technical evaluations, and industry-standard certifications offered by institutions and partner corporations.
             </p>
           </div>
-
-          <div className="sa-header-badges">
-            <span className="sa-header-pill accent">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                <polyline points="22 4 12 14.01 9 11.01" />
-              </svg>
-              Direct 1-Click Verification • Proctored Evaluation
-            </span>
-            <span className="sa-header-pill">
-              All Academic Departments Supported
-            </span>
-          </div>
         </div>
 
         {/* WORKSPACE 2-COLUMN LAYOUT (Desktop: Feed + Right Sidebar Panel) */}
@@ -1322,20 +1309,6 @@ export default function StudentSkillAssessments({
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* 3. CERTIFICATION SECTION ("Get Certified. Get Noticed.") */}
-            <div className="sa-cert-banner">
-              <div className="sa-cert-badge">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-                Verified Badges
-              </div>
-              <h3 className="sa-cert-title">Get Certified. Get Noticed.</h3>
-              <p className="sa-cert-desc">
-                Verified assessment certificates and digital credentials directly support your institutional profile and help you showcase proven skills during campus recruitment drives.
-              </p>
             </div>
           </aside>
         </div>
