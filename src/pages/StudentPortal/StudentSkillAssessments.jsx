@@ -102,7 +102,8 @@ const INITIAL_ASSESSMENTS = [
     categoryTab: 'software',
     skills: ['Programming / Software Development', 'Data Structures & Algorithms', 'Database Management'],
     duration: '90 Mins',
-    questions: '45 Questions + 2 Coding Tasks',
+    questions: '45 Objective Technical Questions',
+    codingTasks: '2 Algorithmic Coding Tasks',
     mode: 'Online (Proctored Remote)',
     modeCategory: 'Online (Proctored Remote)',
     date: '24 Sep 2026',
@@ -119,6 +120,33 @@ const INITIAL_ASSESSMENTS = [
     passingScore: '70%',
   },
   {
+    id: 'sa_cloud_01',
+    company: 'Amazon Web Services (AWS)',
+    companyLogoBg: '#ff9900',
+    companyLogoText: 'AWS',
+    testName: 'AWS Certified Solutions Architect Associate (Academic Voucher)',
+    department: 'Computer Science / IT',
+    categoryTab: 'cert',
+    skills: ['Networking & Cloud', 'Database Management', 'Programming / Software Development'],
+    duration: '130 Mins',
+    questions: '65 Scenario Questions',
+    codingTasks: 'Architecture Design Simulation',
+    mode: 'Online (Proctored Remote)',
+    modeCategory: 'Online (Proctored Remote)',
+    date: '02 Oct 2026',
+    dateCategory: 'Upcoming (Next 15 Days)',
+    time: 'Flexible 24/7 (On-Demand)',
+    timeCategory: 'Flexible 24/7 (On-Demand)',
+    cbtCentre: 'Online / Remote Proctored',
+    feeType: 'Paid',
+    feeCategory: 'Paid',
+    lastRegDate: '30 Sep 2026',
+    testType: 'Technical Assessment',
+    overview: 'Official AWS academic voucher exam testing multi-tier architectures, VPC security, S3 storage tiers, and IAM access management.',
+    syllabus: 'High availability systems, cost optimization, AWS KMS encryption, Lambda serverless, and database caching with Redis.',
+    passingScore: '72%',
+  },
+  {
     id: 'sa_mech_01',
     company: 'Tata Motors',
     companyLogoBg: '#0f4c81',
@@ -129,6 +157,7 @@ const INITIAL_ASSESSMENTS = [
     skills: ['Mechanical Design', 'CAD / Design', 'Thermodynamics'],
     duration: '75 Mins',
     questions: '50 Domain Technical MCQs',
+    codingTasks: 'CAD Simulation Challenge',
     mode: 'Offline (CBT Centre)',
     modeCategory: 'Offline (CBT Centre)',
     date: '26 Sep 2026',
@@ -145,6 +174,33 @@ const INITIAL_ASSESSMENTS = [
     passingScore: '65%',
   },
   {
+    id: 'sa_cad_01',
+    company: 'Dassault Systèmes',
+    companyLogoBg: '#065f46',
+    companyLogoText: 'DS',
+    testName: 'Certified SolidWorks Mechanical Professional (CSWP Standard)',
+    department: 'Mechanical',
+    categoryTab: 'cert',
+    skills: ['CAD / Design', 'Mechanical Design', 'Manufacturing Technology'],
+    duration: '120 Mins',
+    questions: '35 Engineering Problems',
+    codingTasks: '3D Parametric Modeling Task',
+    mode: 'Offline (CBT Centre)',
+    modeCategory: 'Offline (CBT Centre)',
+    date: '03 Oct 2026',
+    dateCategory: 'Upcoming (Next 15 Days)',
+    time: '10:00 AM - 12:00 PM',
+    timeCategory: 'Morning (09:30 AM - 11:30 AM)',
+    cbtCentre: 'Bengaluru Central Testing Hub (Electronic City)',
+    feeType: 'Paid',
+    feeCategory: 'Paid',
+    lastRegDate: '01 Oct 2026',
+    testType: 'Core Engineering Evaluation',
+    overview: 'Industry gold standard CSWP credential validating parametric modeling, complex part configurations, assembly mates, and GD&T.',
+    syllabus: 'Solid modeling, equation-driven dimensions, assembly collision analysis, drawing projection standards, and mass properties.',
+    passingScore: '75%',
+  },
+  {
     id: 'sa_civil_01',
     company: 'Larsen & Toubro (L&T)',
     companyLogoBg: '#134e4a',
@@ -155,6 +211,7 @@ const INITIAL_ASSESSMENTS = [
     skills: ['Structural Engineering', 'Civil Design & AutoCAD', 'Surveying & Geotechnical'],
     duration: '90 Mins',
     questions: '60 Objective Technical Questions',
+    codingTasks: 'Structural Loading Model',
     mode: 'Offline (CBT Centre)',
     modeCategory: 'Offline (CBT Centre)',
     date: '28 Sep 2026',
@@ -181,6 +238,7 @@ const INITIAL_ASSESSMENTS = [
     skills: ['Electrical Systems', 'Electronics & Circuits', 'Manufacturing Technology'],
     duration: '80 Mins',
     questions: '40 Numerical & Technical Questions',
+    codingTasks: 'Power Grid Converter Simulation',
     mode: 'Online (Proctored Remote)',
     modeCategory: 'Online (Proctored Remote)',
     date: '25 Sep 2026',
@@ -206,7 +264,8 @@ const INITIAL_ASSESSMENTS = [
     categoryTab: 'core',
     skills: ['Embedded Systems', 'Electronics & Circuits', 'Programming / Software Development'],
     duration: '90 Mins',
-    questions: '45 Questions + Logic Debugging',
+    questions: '45 Questions',
+    codingTasks: 'Firmware Logic Debugging',
     mode: 'Online (Proctored Remote)',
     modeCategory: 'Online (Proctored Remote)',
     date: '27 Sep 2026',
@@ -233,6 +292,7 @@ const INITIAL_ASSESSMENTS = [
     skills: ['Chemical Process Engineering', 'Thermodynamics', 'Manufacturing Technology'],
     duration: '70 Mins',
     questions: '45 Multiple Choice Calculations',
+    codingTasks: 'P&ID Piping Calculation',
     mode: 'Offline (CBT Centre)',
     modeCategory: 'Offline (CBT Centre)',
     date: '29 Sep 2026',
@@ -259,6 +319,7 @@ const INITIAL_ASSESSMENTS = [
     skills: ['Biotechnology / Life Sciences', 'Chemical Process Engineering', 'Quantitative Ability'],
     duration: '75 Mins',
     questions: '50 Technical MCQs',
+    codingTasks: 'Bioreactor Kinetic Modeling',
     mode: 'Online (Proctored Remote)',
     modeCategory: 'Online (Proctored Remote)',
     date: '30 Sep 2026',
@@ -285,6 +346,7 @@ const INITIAL_ASSESSMENTS = [
     skills: ['Mechanical Design', 'Electrical Systems', 'Embedded Systems'],
     duration: '85 Mins',
     questions: '45 Technical Problem Scenarios',
+    codingTasks: 'CAN Bus Diagnostic Script',
     mode: 'Offline (CBT Centre)',
     modeCategory: 'Offline (CBT Centre)',
     date: '26 Sep 2026',
@@ -310,7 +372,8 @@ const INITIAL_ASSESSMENTS = [
     categoryTab: 'core',
     skills: ['Electronics & Circuits', 'Manufacturing Technology', 'Networking & Cloud'],
     duration: '80 Mins',
-    questions: '40 Diagnostic Questions + Ladder Logic',
+    questions: '40 Diagnostic Questions',
+    codingTasks: 'Ladder Logic Simulation',
     mode: 'Offline (CBT Centre)',
     modeCategory: 'Offline (CBT Centre)',
     date: '27 Sep 2026',
@@ -337,6 +400,7 @@ const INITIAL_ASSESSMENTS = [
     skills: ['Aptitude & Logical Reasoning', 'Quantitative Ability', 'Technical Communication'],
     duration: '60 Mins',
     questions: '50 Standardized Speed & Accuracy MCQs',
+    codingTasks: null,
     mode: 'Online (Proctored Remote)',
     modeCategory: 'Online (Proctored Remote)',
     date: '23 Sep 2026',
@@ -449,6 +513,7 @@ export default function StudentSkillAssessments({
   const [selectedDate, setSelectedDate] = useState('All Dates')
   const [selectedTime, setSelectedTime] = useState('All Slots')
   const [selectedCbtCentre, setSelectedCbtCentre] = useState('All Centres / Online')
+  const [sortOption, setSortOption] = useState('default')
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false)
 
   // Bookmarks / Saved assessments state
@@ -525,7 +590,8 @@ export default function StudentSkillAssessments({
     selectedFeeType !== 'All Fee Types' ||
     selectedDate !== 'All Dates' ||
     selectedTime !== 'All Slots' ||
-    selectedCbtCentre !== 'All Centres / Online'
+    selectedCbtCentre !== 'All Centres / Online' ||
+    sortOption !== 'default'
 
   // Reset Filters Handler
   const handleResetFilters = () => {
@@ -539,9 +605,10 @@ export default function StudentSkillAssessments({
     setSelectedDate('All Dates')
     setSelectedTime('All Slots')
     setSelectedCbtCentre('All Centres / Online')
+    setSortOption('default')
   }
 
-  // Filtered Assessments Calculation
+  // Filtered Assessments Calculation with Sorting
   const filteredAssessments = useMemo(() => {
     const q = searchQuery.toLowerCase().trim()
 
@@ -610,6 +677,23 @@ export default function StudentSkillAssessments({
       }
 
       return true
+    }).sort((a, b) => {
+      if (sortOption === 'company_az') {
+        return a.company.localeCompare(b.company)
+      }
+      if (sortOption === 'name_az') {
+        return a.testName.localeCompare(b.testName)
+      }
+      if (sortOption === 'duration') {
+        return parseInt(a.duration, 10) - parseInt(b.duration, 10)
+      }
+      if (sortOption === 'free_first') {
+        const aFree = a.feeType.toLowerCase().includes('free')
+        const bFree = b.feeType.toLowerCase().includes('free')
+        if (aFree && !bFree) return -1
+        if (!aFree && bFree) return 1
+      }
+      return 0
     })
   }, [
     activeTab,
@@ -623,6 +707,7 @@ export default function StudentSkillAssessments({
     selectedDate,
     selectedTime,
     selectedCbtCentre,
+    sortOption,
     takenTestIds,
   ])
 
@@ -757,6 +842,24 @@ export default function StudentSkillAssessments({
                         {dept === 'All Departments' ? 'All Academic Departments' : dept}
                       </option>
                     ))}
+                  </select>
+                </div>
+
+                {/* Sort Option Dropdown */}
+                <div className="sa-sort-select-wrap">
+                  <label htmlFor="sa-sort-select" className="sa-sr-only">Sort Assessments</label>
+                  <select
+                    id="sa-sort-select"
+                    className="sa-sort-select"
+                    value={sortOption}
+                    onChange={(e) => setSortOption(e.target.value)}
+                    title="Sort Assessments"
+                  >
+                    <option value="default">Sort: Default Order</option>
+                    <option value="company_az">Company (A-Z)</option>
+                    <option value="name_az">Test Name (A-Z)</option>
+                    <option value="duration">Duration (Shortest First)</option>
+                    <option value="free_first">Fee: Free First</option>
                   </select>
                 </div>
 
@@ -997,22 +1100,49 @@ export default function StudentSkillAssessments({
                               <span className="sa-drive-badge">{item.testType}</span>
                             </div>
 
-                            <button
-                              type="button"
-                              className={`sa-bookmark-btn ${isSaved ? 'is-saved' : ''}`}
-                              onClick={(e) => handleToggleSave(e, item.id)}
-                              title={isSaved ? 'Remove from saved' : 'Save assessment to bookmarks'}
-                              aria-label={isSaved ? 'Remove from saved' : 'Save assessment to bookmarks'}
-                            >
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
-                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                              </svg>
-                            </button>
+                            <div className="sa-card-top-right">
+                              {/* Distinct & Prominently Highlighted Free / Paid / Sponsored Indicator */}
+                              {item.feeType.toLowerCase().includes('free') ? (
+                                <span className="sa-fee-badge free" title="Registration Fee: 100% Free">
+                                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                    <polyline points="20 6 9 17 4 12" />
+                                  </svg>
+                                  FREE
+                                </span>
+                              ) : item.feeType.toLowerCase().includes('paid') ? (
+                                <span className="sa-fee-badge paid" title="Registration Fee: Paid Certification">
+                                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                                    <line x1="2" y1="10" x2="22" y2="10" />
+                                  </svg>
+                                  PAID
+                                </span>
+                              ) : (
+                                <span className="sa-fee-badge sponsored" title="Corporate Sponsored: Free for Students">
+                                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                  </svg>
+                                  SPONSORED
+                                </span>
+                              )}
+
+                              <button
+                                type="button"
+                                className={`sa-bookmark-btn ${isSaved ? 'is-saved' : ''}`}
+                                onClick={(e) => handleToggleSave(e, item.id)}
+                                title={isSaved ? 'Remove from saved' : 'Save assessment to bookmarks'}
+                                aria-label={isSaved ? 'Remove from saved' : 'Save assessment to bookmarks'}
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+                                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                                </svg>
+                              </button>
+                            </div>
                           </div>
 
                           <h3 className="sa-role-title">{item.testName}</h3>
 
-                          {/* Specification Pills Row */}
+                          {/* Complete Specification Pills Row with Full Information Density */}
                           <div className="sa-specs-row">
                             {/* Duration */}
                             <span className="sa-spec-pill" title="Test Duration">
@@ -1024,7 +1154,7 @@ export default function StudentSkillAssessments({
                             </span>
 
                             {/* Number of Questions */}
-                            <span className="sa-spec-pill" title="Question Count">
+                            <span className="sa-spec-pill" title="Number of Questions">
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                                 <polyline points="14 2 14 8 20 8" />
@@ -1034,8 +1164,24 @@ export default function StudentSkillAssessments({
                               {item.questions}
                             </span>
 
+                            {/* Coding Tasks, if applicable */}
+                            {item.codingTasks && (
+                              <span className="sa-spec-pill coding" title="Practical Coding / Simulation Tasks">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                  <polyline points="16 18 22 12 16 6" />
+                                  <polyline points="8 6 2 12 8 18" />
+                                </svg>
+                                {item.codingTasks}
+                              </span>
+                            )}
+
                             {/* Online / Offline Mode */}
-                            <span className="sa-spec-pill" title="Test Mode">
+                            <span className="sa-spec-pill" title="Delivery Mode">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                <line x1="8" y1="21" x2="16" y2="21" />
+                                <line x1="12" y1="17" x2="12" y2="21" />
+                              </svg>
                               {item.mode}
                             </span>
 
@@ -1060,7 +1206,7 @@ export default function StudentSkillAssessments({
                             </span>
 
                             {/* CBT Centre / Location */}
-                            <span className={`sa-spec-pill ${item.mode.includes('Offline') ? 'cbt' : ''}`} title="CBT Centre / Location">
+                            <span className={`sa-spec-pill ${item.mode.includes('Offline') ? 'cbt' : ''}`} title="CBT Centre / Examination Facility">
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                                 <circle cx="12" cy="10" r="3" />
@@ -1068,15 +1214,20 @@ export default function StudentSkillAssessments({
                               {item.cbtCentre}
                             </span>
 
-                            {/* Free / Paid Status */}
-                            <span className={`sa-spec-pill fee-${item.feeType.toLowerCase().includes('free') ? 'free' : 'sponsored'}`} title="Fee Type">
-                              {item.feeType}
-                            </span>
-
                             {/* Academic Department */}
                             <span className="sa-spec-pill dept" title="Academic Department">
                               {item.department}
                             </span>
+
+                            {/* Passing Standard */}
+                            {item.passingScore && (
+                              <span className="sa-spec-pill passing" title="Passing Benchmark Standard">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                </svg>
+                                Pass: {item.passingScore}
+                              </span>
+                            )}
 
                             {/* Last Registration Date */}
                             <span className="sa-spec-pill deadline" title="Registration Deadline">

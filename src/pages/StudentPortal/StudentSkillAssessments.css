@@ -314,6 +314,31 @@
   border-color: #112233;
 }
 
+.sa-sort-select-wrap {
+  min-width: 190px;
+}
+
+.sa-sort-select {
+  width: 100%;
+  padding: 9px 12px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: #1e293b;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.sa-sort-select:focus {
+  background: #ffffff;
+  border-color: #112233;
+}
+
 .sa-search-actions {
   display: flex;
   align-items: center;
@@ -569,6 +594,48 @@
   font-weight: 600;
 }
 
+.sa-card-top-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Prominent Free & Paid Badges in Card Header */
+.sa-fee-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.sa-fee-badge.free {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1.5px solid #16a34a;
+  box-shadow: 0 1px 2px rgba(22, 163, 74, 0.15);
+}
+
+.sa-fee-badge.paid {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1.5px solid #dc2626;
+  box-shadow: 0 1px 2px rgba(220, 38, 38, 0.15);
+}
+
+.sa-fee-badge.sponsored {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1.5px solid #d97706;
+  box-shadow: 0 1px 2px rgba(217, 119, 6, 0.15);
+}
+
 .sa-bookmark-btn {
   background: none;
   border: none;
@@ -657,6 +724,20 @@
   background: #eff6ff;
   border-color: #bfdbfe;
   color: #1d4ed8;
+}
+
+.sa-spec-pill.coding {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+.sa-spec-pill.passing {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
+  font-weight: 600;
 }
 
 /* Skills Covered Row */
