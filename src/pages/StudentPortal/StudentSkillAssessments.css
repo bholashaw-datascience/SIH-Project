@@ -868,115 +868,6 @@
 }
 
 /* --------------------------------------------------------------------------
-   Recommended Assessments Section (Within Left Feed)
-   -------------------------------------------------------------------------- */
-.sa-rec-section {
-  background: #ffffff;
-  border: 1px solid #ded9cc;
-  border-radius: 8px;
-  padding: 16px 18px;
-  box-shadow: 0 2px 6px rgba(15, 29, 47, 0.04);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.sa-rec-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.sa-rec-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.sa-rec-title {
-  margin: 0;
-  font-size: 0.96rem;
-  font-weight: 800;
-  color: #0f1d2f;
-}
-
-.sa-rec-sub {
-  font-size: 0.74rem;
-  color: #64748b;
-}
-
-.sa-rec-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-@media (max-width: 680px) {
-  .sa-rec-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.sa-rec-item {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.sa-rec-item-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-}
-
-.sa-rec-comp {
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: #475569;
-}
-
-.sa-rec-name {
-  margin: 0;
-  font-size: 0.88rem;
-  font-weight: 800;
-  color: #0f1d2f;
-  line-height: 1.3;
-}
-
-.sa-rec-meta {
-  font-size: 0.72rem;
-  color: #64748b;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.sa-rec-btn {
-  align-self: flex-start;
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  color: #112233;
-  border-radius: 4px;
-  padding: 4px 10px;
-  font-size: 0.74rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.12s ease;
-  margin-top: 2px;
-}
-
-.sa-rec-btn:hover {
-  background: #112233;
-  color: #ffffff;
-}
-
-/* --------------------------------------------------------------------------
    RIGHT SIDEBAR (Matches sp-sidebar in Placements & Internships)
    -------------------------------------------------------------------------- */
 .sa-sidebar {
@@ -1177,6 +1068,8 @@
   padding: 2px 7px;
   border-radius: 4px;
 }
+
+
 
 /* --------------------------------------------------------------------------
    Modals (Matches sp-modal in Placements)
