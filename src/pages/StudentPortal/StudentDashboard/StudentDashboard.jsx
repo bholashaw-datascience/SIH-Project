@@ -413,7 +413,8 @@ export default function StudentDashboard({
       <style>{`
         /* Institutional Full-Page App Layout */
         .sd-app-layout {
-          min-height: 100vh;
+          min-height: 0;
+          flex: 1;
           background-color: #f6f8fb;
           color: #0f1d2f;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -428,11 +429,11 @@ export default function StudentDashboard({
           background-color: #0d1b2a;
           color: #ffffff;
           border-bottom: 2px solid #b3881e;
-          height: 60px;
+          height: 52px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 24px;
+          padding: 0 20px;
           position: sticky;
           top: 0;
           z-index: 1050;
@@ -699,7 +700,7 @@ export default function StudentDashboard({
           display: flex;
           flex: 1;
           width: 100%;
-          min-height: calc(100vh - 60px);
+          min-height: 0;
           box-sizing: border-box;
           position: relative;
         }
@@ -713,11 +714,11 @@ export default function StudentDashboard({
           flex-direction: column;
           flex-shrink: 0;
           border-right: 1px solid #1e2f42;
-          padding: 16px 12px;
+          padding: 12px 10px;
           box-sizing: border-box;
           position: sticky;
-          top: 60px;
-          height: calc(100vh - 60px);
+          top: 52px;
+          min-height: 100%;
           overflow-y: auto;
         }
 
@@ -727,7 +728,7 @@ export default function StudentDashboard({
           color: #64748b;
           text-transform: uppercase;
           letter-spacing: 0.08em;
-          padding: 8px 12px 6px;
+          padding: 6px 10px 4px;
         }
 
         .sd-nav-list {
@@ -736,20 +737,20 @@ export default function StudentDashboard({
           padding: 0;
           display: flex;
           flex-direction: column;
-          gap: 3px;
+          gap: 2px;
         }
 
         .sd-nav-item-btn {
           width: 100%;
           display: flex;
           align-items: center;
-          gap: 11px;
-          padding: 9px 12px;
-          border-radius: 6px;
+          gap: 10px;
+          padding: 7px 10px;
+          border-radius: 5px;
           background: transparent;
           border: none;
           color: #94a3b8;
-          font-size: 0.84rem;
+          font-size: 0.82rem;
           font-weight: 600;
           cursor: pointer;
           text-align: left;
@@ -803,10 +804,10 @@ export default function StudentDashboard({
         /* Main Content Viewport */
         .sd-main-viewport {
           flex: 1;
-          padding: 22px 28px 40px;
+          padding: 14px 22px 16px;
           display: flex;
           flex-direction: column;
-          gap: 18px;
+          gap: 12px;
           box-sizing: border-box;
           max-width: 1400px;
           margin: 0 auto;
@@ -818,7 +819,7 @@ export default function StudentDashboard({
           background: linear-gradient(135deg, #0d1b2a 0%, #15283c 100%);
           color: #ffffff;
           border-radius: 8px;
-          padding: 18px 24px;
+          padding: 14px 20px;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -828,19 +829,19 @@ export default function StudentDashboard({
         }
 
         .sd-welcome-title {
-          font-size: 1.25rem;
+          font-size: 1.15rem;
           font-weight: 800;
           color: #ffffff;
-          margin: 0 0 4px;
+          margin: 0 0 3px;
           letter-spacing: -0.01em;
         }
 
         .sd-welcome-sub {
-          font-size: 0.82rem;
+          font-size: 0.78rem;
           color: #94a3b8;
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
           flex-wrap: wrap;
         }
 
@@ -848,9 +849,9 @@ export default function StudentDashboard({
           background: rgba(179, 136, 30, 0.2);
           color: #f1cf7c;
           border: 1px solid rgba(179, 136, 30, 0.4);
-          font-size: 0.7rem;
+          font-size: 0.68rem;
           font-weight: 700;
-          padding: 2px 8px;
+          padding: 2px 7px;
           border-radius: 4px;
           text-transform: uppercase;
           letter-spacing: 0.04em;
@@ -859,12 +860,12 @@ export default function StudentDashboard({
         /* Alert Banners (Pending Changes & Rejection) */
         .sd-notice-alert {
           border-radius: 6px;
-          padding: 12px 16px;
+          padding: 10px 14px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 12px;
-          font-size: 0.82rem;
+          gap: 10px;
+          font-size: 0.8rem;
           box-sizing: border-box;
         }
 
@@ -886,8 +887,8 @@ export default function StudentDashboard({
           background: #ffffff;
           border: 1px solid currentColor;
           color: inherit;
-          padding: 5px 12px;
-          font-size: 0.78rem;
+          padding: 4px 10px;
+          font-size: 0.76rem;
           font-weight: 700;
           border-radius: 4px;
           cursor: pointer;
@@ -899,7 +900,7 @@ export default function StudentDashboard({
         .sd-top-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 18px;
+          gap: 12px;
         }
 
         /* Standard Institutional Card */
@@ -916,7 +917,7 @@ export default function StudentDashboard({
         }
 
         .sd-card-header {
-          padding: 14px 18px;
+          padding: 9px 16px;
           background: #f8fafc;
           border-bottom: 1px solid #e2e8f0;
           display: flex;
@@ -926,7 +927,7 @@ export default function StudentDashboard({
         }
 
         .sd-card-heading {
-          font-size: 0.92rem;
+          font-size: 0.88rem;
           font-weight: 800;
           color: #0f1d2f;
           display: flex;
@@ -936,30 +937,30 @@ export default function StudentDashboard({
         }
 
         .sd-card-badge {
-          font-size: 0.72rem;
+          font-size: 0.7rem;
           font-weight: 700;
-          padding: 2px 8px;
+          padding: 2px 7px;
           border-radius: 12px;
         }
 
         .sd-card-body {
-          padding: 18px 20px;
+          padding: 12px 16px;
           display: flex;
           flex-direction: column;
           flex: 1;
-          gap: 14px;
+          gap: 10px;
         }
 
         /* Section 1: Profile Overview Styling */
         .sd-profile-head {
           display: flex;
           align-items: center;
-          gap: 18px;
+          gap: 14px;
         }
 
         .sd-avatar-box {
-          width: 84px;
-          height: 84px;
+          width: 70px;
+          height: 70px;
           border-radius: 8px;
           background: #0d1b2a;
           border: 2px solid #b3881e;
@@ -970,13 +971,13 @@ export default function StudentDashboard({
           overflow: hidden;
           cursor: pointer;
           flex-shrink: 0;
-          box-shadow: 0 4px 12px rgba(13, 27, 42, 0.12);
+          box-shadow: 0 3px 10px rgba(13, 27, 42, 0.12);
           transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
         .sd-avatar-box:hover {
           transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(179, 136, 30, 0.25);
+          box-shadow: 0 5px 14px rgba(179, 136, 30, 0.25);
         }
 
         .sd-avatar-img {
@@ -986,7 +987,7 @@ export default function StudentDashboard({
         }
 
         .sd-avatar-initial {
-          font-size: 2rem;
+          font-size: 1.7rem;
           font-weight: 800;
           color: #f1cf7c;
         }
@@ -998,7 +999,7 @@ export default function StudentDashboard({
           right: 0;
           background: rgba(13, 27, 42, 0.85);
           color: #ffffff;
-          font-size: 0.62rem;
+          font-size: 0.6rem;
           font-weight: 700;
           text-align: center;
           padding: 2px 0;
@@ -1019,7 +1020,7 @@ export default function StudentDashboard({
         }
 
         .sd-profile-name {
-          font-size: 1.15rem;
+          font-size: 1.05rem;
           font-weight: 800;
           color: #0f1d2f;
           margin: 0;
@@ -1027,36 +1028,36 @@ export default function StudentDashboard({
         }
 
         .sd-profile-email {
-          font-size: 0.82rem;
+          font-size: 0.8rem;
           color: #64748b;
         }
 
         .sd-profile-course {
-          font-size: 0.78rem;
+          font-size: 0.76rem;
           font-weight: 600;
           color: #b3881e;
-          margin-top: 2px;
+          margin-top: 1px;
         }
 
         /* 2-Column Info Table */
         .sd-info-table {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 12px;
+          gap: 8px 12px;
           background: #f8fafc;
           border: 1px solid #e2e8f0;
           border-radius: 6px;
-          padding: 12px 14px;
+          padding: 8px 12px;
         }
 
         .sd-info-item {
           display: flex;
           flex-direction: column;
-          gap: 2px;
+          gap: 1px;
         }
 
         .sd-info-label {
-          font-size: 0.68rem;
+          font-size: 0.65rem;
           font-weight: 700;
           color: #64748b;
           text-transform: uppercase;
@@ -1064,7 +1065,7 @@ export default function StudentDashboard({
         }
 
         .sd-info-val {
-          font-size: 0.82rem;
+          font-size: 0.8rem;
           font-weight: 600;
           color: #1e293b;
           word-break: break-word;
@@ -1072,7 +1073,7 @@ export default function StudentDashboard({
 
         .sd-card-footer-action {
           margin-top: auto;
-          padding-top: 6px;
+          padding-top: 4px;
           display: flex;
           justify-content: flex-start;
         }
@@ -1081,13 +1082,13 @@ export default function StudentDashboard({
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          gap: 6px;
-          padding: 7px 14px;
+          gap: 5px;
+          padding: 5px 12px;
           background: #b3881e;
           color: #ffffff;
           border: 1px solid #997316;
           border-radius: 5px;
-          font-size: 0.8rem;
+          font-size: 0.78rem;
           font-weight: 700;
           cursor: pointer;
           transition: background 0.15s ease;
@@ -1102,41 +1103,41 @@ export default function StudentDashboard({
         .sd-gpa-chips {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 10px;
+          gap: 8px;
         }
 
         .sd-gpa-chip-item {
           background: #f8fafc;
           border: 1px solid #e2e8f0;
           border-radius: 6px;
-          padding: 8px 10px;
+          padding: 6px 8px;
           text-align: center;
         }
 
         .sd-gpa-chip-num {
           display: block;
-          font-size: 1.25rem;
+          font-size: 1.15rem;
           font-weight: 800;
           color: #0f1d2f;
           line-height: 1.1;
         }
 
         .sd-gpa-chip-lbl {
-          font-size: 0.68rem;
+          font-size: 0.65rem;
           font-weight: 700;
           color: #64748b;
           text-transform: uppercase;
           letter-spacing: 0.04em;
-          margin-top: 3px;
+          margin-top: 2px;
         }
 
         .sd-stat-btn {
           align-self: flex-start;
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          padding: 6px 12px;
-          font-size: 0.76rem;
+          gap: 5px;
+          padding: 5px 11px;
+          font-size: 0.75rem;
           font-weight: 700;
           border-radius: 4px;
           border: 1px solid #cbd5e1;
@@ -1157,23 +1158,23 @@ export default function StudentDashboard({
         .sd-contacts-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 14px;
+          gap: 10px;
         }
 
         .sd-contact-card {
           background: #f8fafc;
           border: 1px solid #e2e8f0;
           border-radius: 6px;
-          padding: 14px 16px;
+          padding: 10px 12px;
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: 4px;
           cursor: default;
           box-sizing: border-box;
         }
 
         .sd-contact-role {
-          font-size: 0.72rem;
+          font-size: 0.7rem;
           font-weight: 800;
           color: #b3881e;
           text-transform: uppercase;
@@ -1181,26 +1182,26 @@ export default function StudentDashboard({
         }
 
         .sd-contact-name {
-          font-size: 0.95rem;
+          font-size: 0.88rem;
           font-weight: 700;
           color: #0f1d2f;
           line-height: 1.2;
         }
 
         .sd-contact-detail {
-          font-size: 0.78rem;
+          font-size: 0.75rem;
           color: #64748b;
           display: flex;
           align-items: center;
-          gap: 6px;
-          line-height: 1.35;
+          gap: 5px;
+          line-height: 1.3;
         }
 
         .sd-contact-dept {
-          font-size: 0.7rem;
+          font-size: 0.68rem;
           color: #94a3b8;
           margin-top: auto;
-          padding-top: 4px;
+          padding-top: 2px;
         }
 
         /* Responsive Breakpoints */

@@ -6,6 +6,7 @@ import StudentAchievementsExperience from './StudentAchievementsExperience'
 import PublicPost from './PublicPost'
 import StudentInternships from './StudentInternships'
 import StudentPlacements from './StudentPlacements'
+import PortalFooter from '../../components/PortalFooter'
 
 function StudentPortal({
   onNavigateHome,
@@ -1284,7 +1285,7 @@ function StudentPortal({
 
           {/* STEP 4: Submit for Verification / Verification Status */}
           {demoStep === 4 && (
-            <main className="sp-workspace-container" style={{ paddingBottom: '100px' }}>
+            <main className="sp-workspace-container" style={{ paddingBottom: '24px' }}>
               <div className="sp-pending-frame">
                 <div className="sp-pending-banner sp-pending-banner-pending">
                   <div className="sp-pending-icon-circle">
@@ -1351,7 +1352,7 @@ function StudentPortal({
 
           {/* STEP 5: Student Dashboard */}
           {demoStep === 5 && (
-            <div style={{ paddingBottom: (activeView === 'achievements_experience' || activeView === 'public_post') ? 0 : '100px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
               {activeView === 'achievements_experience' ? (
                 <StudentAchievementsExperience
                   student={currentLive}
@@ -1665,16 +1666,12 @@ function StudentPortal({
         </>
       )}
 
-      {/* Footer */}
-      {(!showDashboard && !showAchievementsExperience && !showPublicPost && !showInternships && !showPlacements && (!isDemoActive || demoStep === 1 || demoStep === 4)) && (
-        <footer className="sp-footer">
-          <div className="sp-footer-inner">
-            <div>
-              <span className="sp-footer-brand">IAS Collaboration Portal</span>
-            </div>
-            <div>Built by Team UDAAN</div>
-          </div>
-        </footer>
+      {/* Official Shared Portal Footer across all Student Portal pages */}
+      {(isDemoActive
+        ? (demoStep === 1 || demoStep === 4 || demoStep === 5)
+        : !(showFirstTimeOnboarding || showEditForm || showDiffView)
+      ) && (
+        <PortalFooter style={isDemoActive ? { paddingBottom: '72px' } : {}} />
       )}
 
       {/* Development-Only Demo Floating Bar (Requirements 5, 6, 7) */}
