@@ -422,13 +422,13 @@ const INITIAL_ASSESSMENTS = [
 const INITIAL_RECENT_RESULTS = [
   {
     id: 'res_01',
-    refId: 'sa_apt_01',
     name: 'National Technical Aptitude Benchmark',
     testName: 'National Technical Aptitude Benchmark',
     company: 'National Skill Development Agency',
     companyLogoBg: '#155e75',
     companyLogoText: 'NSDC',
     date: '14 Sep 2026',
+    time: '10:00 AM - 11:00 AM',
     score: '88%',
     percentile: '94.2 Percentile',
     status: 'Certified',
@@ -437,25 +437,28 @@ const INITIAL_RECENT_RESULTS = [
     certIssuer: 'IAS National Assessment Council & NSDC',
     certStatus: 'Active & Verified',
     mode: 'Online (Proctored Remote)',
+    modeCategory: 'Online (Proctored Remote)',
     cbtCentre: 'Online / Remote Proctored',
     duration: '60 Mins',
     questions: '50 Speed & Accuracy MCQs',
     department: 'Aerospace / Multidisciplinary',
     testType: 'Cognitive & Aptitude',
     feeType: 'Free',
+    feeCategory: 'Free',
+    passingScore: '65%',
     overview: 'Benchmarked national aptitude exam verifying speed mathematics, deductive reasoning, spatial analysis, and critical comprehension.',
     syllabus: 'Permutations, probability, syllogisms, data interpretation tables, and analytical argument evaluations.',
     skills: ['Aptitude & Logical Reasoning', 'Quantitative Ability', 'Technical Communication'],
   },
   {
     id: 'res_02',
-    refId: 'sa_cs_01',
     name: 'Data Structures & Algorithmic Efficiency',
     testName: 'Data Structures & Algorithmic Efficiency',
     company: 'Tata Consultancy Services',
     companyLogoBg: '#1e3a5f',
     companyLogoText: 'TCS',
     date: '04 Sep 2026',
+    time: '02:00 PM - 03:30 PM',
     score: '84%',
     percentile: '91.8 Percentile',
     status: 'Certified',
@@ -464,25 +467,28 @@ const INITIAL_RECENT_RESULTS = [
     certIssuer: 'IAS Engineering Evaluation Board & TCS',
     certStatus: 'Active & Verified',
     mode: 'Online (Proctored Remote)',
+    modeCategory: 'Online (Proctored Remote)',
     cbtCentre: 'Online / Remote Proctored',
     duration: '90 Mins',
     questions: '45 Objective Technical Questions',
     department: 'Computer Science / IT',
     testType: 'Technical Assessment',
     feeType: 'Free',
+    feeCategory: 'Free',
+    passingScore: '70%',
     overview: 'Comprehensive evaluation in algorithmic complexity, graph traversals, and dynamic programming paradigms.',
     syllabus: 'Trees, heaps, graph shortest path algorithms, dynamic programming, and amortized complexity.',
     skills: ['Programming / Software Development', 'Data Structures & Algorithms'],
   },
   {
     id: 'res_03',
-    refId: 'sa_cloud_01',
     name: 'Computer Networks & Internet Protocol Suite',
     testName: 'Computer Networks & Internet Protocol Suite',
     company: 'Cisco Systems / IAS',
     companyLogoBg: '#0284c7',
     companyLogoText: 'CIS',
     date: '22 Aug 2026',
+    time: '11:00 AM - 12:20 PM',
     score: '78%',
     percentile: '86.4 Percentile',
     status: 'Certified',
@@ -491,12 +497,15 @@ const INITIAL_RECENT_RESULTS = [
     certIssuer: 'IAS Technical Standards Council',
     certStatus: 'Active & Verified',
     mode: 'Online (Proctored Remote)',
+    modeCategory: 'Online (Proctored Remote)',
     cbtCentre: 'Online / Remote Proctored',
     duration: '80 Mins',
     questions: '40 Diagnostic Questions',
     department: 'Computer Science / IT',
     testType: 'Technical Assessment',
     feeType: 'Paid',
+    feeCategory: 'Paid',
+    passingScore: '65%',
     overview: 'Standardized evaluation testing OSI layer protocols, TCP congestion algorithms, BGP routing, and network subnetting.',
     syllabus: 'IPv4/IPv6 addressing, socket programming, DNS resolution hierarchy, and packet transmission security.',
     skills: ['Networking & Cloud', 'Programming / Software Development'],
@@ -555,8 +564,12 @@ export default function StudentSkillAssessments({
   student = {},
   onBack,
   onNavigateHome,
-  _onOpenAchievementsExperience,
-  _onOpenDashboard,
+  onOpenDashboard,
+  onOpenAchievementsExperience: _onOpenAchievementsExperience,
+  onOpenInternships: _onOpenInternships,
+  onOpenPlacements: _onOpenPlacements,
+  onOpenPublicPost: _onOpenPublicPost,
+  onEditProfile: _onEditProfile,
 }) {
   // Student Profile Data matching StudentPlacements
   const s = student || {}
@@ -601,7 +614,6 @@ export default function StudentSkillAssessments({
   })
 
   // Modals state
-  const [detailsModalItem, setDetailsModalItem] = useState(null)
   const [takeTestModalItem, setTakeTestModalItem] = useState(null)
   const [isRecentResultsModalOpen, setIsRecentResultsModalOpen] = useState(false)
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false)
@@ -613,8 +625,42 @@ export default function StudentSkillAssessments({
   const [expandedAssessmentId, setExpandedAssessmentId] = useState(null)
   const [selectedResultDetail, setSelectedResultDetail] = useState(null)
 
-  // Direct navigation handlers from "My Assessment Status & Activity Overview"
-  const resetAllFilters = () => {
+  // Back Navigation Helper
+  const handleBack = () => {
+    if (onBack) onBack()
+    else if (onOpenDashboard) onOpenDashboard()
+  }
+
+  // All completed assessment items (initial recent results + assessments taken in current session)
+  const allCompletedItems = useMemo(() => {
+    const sessionItems = takenTestIds.map((id) => {
+      const match = INITIAL_ASSESSMENTS.find((a) => a.id === id)
+      if (!match) return null
+      return {
+        ...match,
+        name: match.testName,
+        score: 'Session Submitted',
+        percentile: 'Under Evaluation',
+        certId: `IAS-REV-${match.id.toUpperCase()}`,
+        status: 'Proctor Review in Progress',
+        isSessionSubmitted: true,
+      }
+    }).filter(Boolean)
+
+    return [...INITIAL_RECENT_RESULTS, ...sessionItems]
+  }, [takenTestIds])
+
+  // Dynamic counts for status overview
+  const upcomingCount = useMemo(() => {
+    return INITIAL_UPCOMING_TESTS.filter(
+      (t) => !takenTestIds.includes(t.refId || t.id)
+    ).length
+  }, [takenTestIds])
+
+  const completedCount = allCompletedItems.length
+
+  // Consolidated Reset Filters Handler
+  const handleResetFilters = () => {
     setSearchQuery('')
     setSelectedDepartment('All Departments')
     setSelectedCompany('All Companies')
@@ -625,12 +671,13 @@ export default function StudentSkillAssessments({
     setSelectedDate('All Dates')
     setSelectedTime('All Slots')
     setSelectedCbtCentre('All Centres / Online')
+    setSortOption('default')
   }
 
-  // 1. Upcoming Tests -> Direct navigation to Skill Assessments page & assessment detail
+  // 1. Upcoming Tests -> Direct navigation to Skill Assessments catalog & assessment detail
   const handleNavigateToUpcomingDetail = (item) => {
     setIsStatusModalOpen(false)
-    resetAllFilters()
+    handleResetFilters()
     setActiveTab('all')
     const targetId = item.refId || item.id
     const match = INITIAL_ASSESSMENTS.find(
@@ -646,37 +693,17 @@ export default function StudentSkillAssessments({
     }, 120)
   }
 
-  // 2. Tests Taken -> Direct navigation to relevant Skill Assessments / result / detail flow
+  // 2. Tests Taken -> Direct navigation to verified result scorecard
   const handleNavigateToTakenDetail = (item) => {
     setIsStatusModalOpen(false)
-    resetAllFilters()
-    const targetId = item.refId || item.id
-    const match = INITIAL_ASSESSMENTS.find(
-      (a) => a.id === targetId || a.testName === (item.testName || item.name)
-    )
-    if (takenTestIds.includes(targetId)) {
-      setActiveTab('status')
-    } else {
-      setActiveTab('all')
-    }
-    if (match) {
-      setHighlightedAssessmentId(match.id)
-      setExpandedAssessmentId(match.id)
-      setTimeout(() => {
-        const el = document.getElementById(`assessment-card-${match.id}`)
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        }
-      }, 120)
-    } else {
-      setSelectedResultDetail(item)
-      setTimeout(() => {
-        const el = document.getElementById('sa-recent-results-widget')
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        }
-      }, 120)
-    }
+    setIsRecentResultsModalOpen(false)
+    setSelectedResultDetail(item)
+    setTimeout(() => {
+      const el = document.getElementById('sa-selected-result-scorecard')
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }, 120)
   }
 
   // Toast auto-hide
@@ -730,31 +757,16 @@ export default function StudentSkillAssessments({
     selectedCbtCentre !== 'All Centres / Online' ||
     sortOption !== 'default'
 
-  // Reset Filters Handler
-  const handleResetFilters = () => {
-    setSearchQuery('')
-    setSelectedDepartment('All Departments')
-    setSelectedCompany('All Companies')
-    setSelectedSkill('All Skills')
-    setSelectedTestType('All Test Types')
-    setSelectedMode('All Modes')
-    setSelectedFeeType('All Fee Types')
-    setSelectedDate('All Dates')
-    setSelectedTime('All Slots')
-    setSelectedCbtCentre('All Centres / Online')
-    setSortOption('default')
-  }
-
   // Filtered Assessments Calculation with Sorting
   const filteredAssessments = useMemo(() => {
     const q = searchQuery.toLowerCase().trim()
+    const sourceList = activeTab === 'status' ? allCompletedItems : INITIAL_ASSESSMENTS
 
-    return INITIAL_ASSESSMENTS.filter((item) => {
-      // Category Tab Filter
+    return sourceList.filter((item) => {
+      // Category Tab Filter (applies to catalog tabs)
       if (activeTab === 'core' && item.categoryTab !== 'core') return false
       if (activeTab === 'software' && item.categoryTab !== 'software') return false
       if (activeTab === 'cert' && item.categoryTab !== 'cert') return false
-      if (activeTab === 'status' && !takenTestIds.includes(item.id)) return false
 
       // Primary Department Filter
       if (selectedDepartment !== 'All Departments' && item.department !== selectedDepartment) {
@@ -763,10 +775,11 @@ export default function StudentSkillAssessments({
 
       // Keyword Search (Company, Role/Test name, Skills)
       if (q) {
-        const matchesName = item.testName.toLowerCase().includes(q)
-        const matchesCompany = item.company.toLowerCase().includes(q)
-        const matchesSkill = item.skills.some((sk) => sk.toLowerCase().includes(q))
-        const matchesDept = item.department.toLowerCase().includes(q)
+        const testTitle = item.testName || item.name || ''
+        const matchesName = testTitle.toLowerCase().includes(q)
+        const matchesCompany = item.company?.toLowerCase().includes(q)
+        const matchesSkill = item.skills?.some((sk) => sk.toLowerCase().includes(q))
+        const matchesDept = item.department?.toLowerCase().includes(q)
         if (!matchesName && !matchesCompany && !matchesSkill && !matchesDept) {
           return false
         }
@@ -779,7 +792,7 @@ export default function StudentSkillAssessments({
 
       // Skill Filter
       if (selectedSkill !== 'All Skills') {
-        const hasSkill = item.skills.some((sk) => sk.toLowerCase() === selectedSkill.toLowerCase())
+        const hasSkill = item.skills?.some((sk) => sk.toLowerCase() === selectedSkill.toLowerCase())
         if (!hasSkill) return false
       }
 
@@ -815,18 +828,20 @@ export default function StudentSkillAssessments({
 
       return true
     }).sort((a, b) => {
+      const aName = a.testName || a.name || ''
+      const bName = b.testName || b.name || ''
       if (sortOption === 'company_az') {
         return a.company.localeCompare(b.company)
       }
       if (sortOption === 'name_az') {
-        return a.testName.localeCompare(b.testName)
+        return aName.localeCompare(bName)
       }
       if (sortOption === 'duration') {
         return parseInt(a.duration, 10) - parseInt(b.duration, 10)
       }
       if (sortOption === 'free_first') {
-        const aFree = a.feeType.toLowerCase().includes('free')
-        const bFree = b.feeType.toLowerCase().includes('free')
+        const aFree = (a.feeType || '').toLowerCase().includes('free')
+        const bFree = (b.feeType || '').toLowerCase().includes('free')
         if (aFree && !bFree) return -1
         if (!aFree && bFree) return 1
       }
@@ -834,6 +849,7 @@ export default function StudentSkillAssessments({
     })
   }, [
     activeTab,
+    allCompletedItems,
     selectedDepartment,
     searchQuery,
     selectedCompany,
@@ -845,7 +861,6 @@ export default function StudentSkillAssessments({
     selectedTime,
     selectedCbtCentre,
     sortOption,
-    takenTestIds,
   ])
 
   // Assessment opportunity card renderer
@@ -853,7 +868,7 @@ export default function StudentSkillAssessments({
     const isTaken = takenTestIds.includes(item.id)
     const isSaved = savedIds.includes(item.id)
     const isHighlighted = highlightedAssessmentId === item.id
-    const isExpanded = expandedAssessmentId === item.id || isHighlighted
+    const isExpanded = expandedAssessmentId === item.id
 
     return (
       /* STRICT RULE: Assessment cards themselves do NOT act as clickable navigation wrappers */
@@ -886,15 +901,19 @@ export default function StudentSkillAssessments({
               </div>
 
               <div className="sa-card-top-right">
-                {/* Distinct & Prominently Highlighted Free / Paid / Sponsored Indicator */}
-                {item.feeType.toLowerCase().includes('free') ? (
+                {/* Score badge if completed or fee badge if available */}
+                {item.score ? (
+                  <span className="sa-result-badge" style={{ fontSize: '0.78rem', padding: '3px 9px' }} title={`Percentile: ${item.percentile || 'Evaluated'}`}>
+                    {item.status || 'Certified'}: {item.score}
+                  </span>
+                ) : (item.feeType || '').toLowerCase().includes('free') ? (
                   <span className="sa-fee-badge free" title="Registration Fee: 100% Free">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                     FREE
                   </span>
-                ) : item.feeType.toLowerCase().includes('paid') ? (
+                ) : (item.feeType || '').toLowerCase().includes('paid') ? (
                   <span className="sa-fee-badge paid" title="Registration Fee: Paid Certification">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
                       <rect x="2" y="4" width="20" height="16" rx="2" />
@@ -925,29 +944,33 @@ export default function StudentSkillAssessments({
               </div>
             </div>
 
-            <h3 className="sa-role-title">{item.testName}</h3>
+            <h3 className="sa-role-title">{item.testName || item.name}</h3>
 
             {/* Complete Specification Pills Row with Full Information Density */}
             <div className="sa-specs-row">
               {/* Duration */}
-              <span className="sa-spec-pill" title="Test Duration">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 14 14" />
-                </svg>
-                {item.duration}
-              </span>
+              {item.duration && (
+                <span className="sa-spec-pill" title="Test Duration">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 14 14" />
+                  </svg>
+                  {item.duration}
+                </span>
+              )}
 
               {/* Number of Questions */}
-              <span className="sa-spec-pill" title="Number of Questions">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                  <polyline points="14 2 14 8 20 8" />
-                  <line x1="16" y1="13" x2="8" y2="13" />
-                  <line x1="16" y1="17" x2="8" y2="17" />
-                </svg>
-                {item.questions}
-              </span>
+              {item.questions && (
+                <span className="sa-spec-pill" title="Number of Questions">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                  </svg>
+                  {item.questions}
+                </span>
+              )}
 
               {/* Coding Tasks, if applicable */}
               {item.codingTasks && (
@@ -961,48 +984,58 @@ export default function StudentSkillAssessments({
               )}
 
               {/* Online / Offline Mode */}
-              <span className="sa-spec-pill" title="Delivery Mode">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                  <line x1="8" y1="21" x2="16" y2="21" />
-                  <line x1="12" y1="17" x2="12" y2="21" />
-                </svg>
-                {item.mode}
-              </span>
+              {item.mode && (
+                <span className="sa-spec-pill" title="Delivery Mode">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                    <line x1="8" y1="21" x2="16" y2="21" />
+                    <line x1="12" y1="17" x2="12" y2="21" />
+                  </svg>
+                  {item.mode}
+                </span>
+              )}
 
               {/* Date */}
-              <span className="sa-spec-pill" title="Scheduled Date">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-                {item.date}
-              </span>
+              {item.date && (
+                <span className="sa-spec-pill" title="Scheduled / Completed Date">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  {item.date}
+                </span>
+              )}
 
               {/* Time */}
-              <span className="sa-spec-pill" title="Scheduled Time Slot">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 14 10" />
-                </svg>
-                {item.time}
-              </span>
+              {item.time && (
+                <span className="sa-spec-pill" title="Scheduled Time Slot">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 14 10" />
+                  </svg>
+                  {item.time}
+                </span>
+              )}
 
               {/* CBT Centre / Location */}
-              <span className={`sa-spec-pill ${item.mode.includes('Offline') ? 'cbt' : ''}`} title="CBT Centre / Examination Facility">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-                {item.cbtCentre}
-              </span>
+              {item.cbtCentre && (
+                <span className={`sa-spec-pill ${item.mode?.includes('Offline') ? 'cbt' : ''}`} title="CBT Centre / Examination Facility">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  {item.cbtCentre}
+                </span>
+              )}
 
               {/* Academic Department */}
-              <span className="sa-spec-pill dept" title="Academic Department">
-                {item.department}
-              </span>
+              {item.department && (
+                <span className="sa-spec-pill dept" title="Academic Department">
+                  {item.department}
+                </span>
+              )}
 
               {/* Passing Standard */}
               {item.passingScore && (
@@ -1014,19 +1047,23 @@ export default function StudentSkillAssessments({
                 </span>
               )}
 
-              {/* Last Registration Date */}
-              <span className="sa-spec-pill deadline" title="Registration Deadline">
-                Last Reg: {item.lastRegDate}
-              </span>
+              {/* Last Registration Date, if available */}
+              {item.lastRegDate && (
+                <span className="sa-spec-pill deadline" title="Registration Deadline">
+                  Last Reg: {item.lastRegDate}
+                </span>
+              )}
             </div>
 
             {/* Skills Covered Row */}
-            <div className="sa-skills-row">
-              <span className="sa-skills-label">Evaluated Competencies:</span>
-              {item.skills.map((sk) => (
-                <span key={sk} className="sa-skill-tag">{sk}</span>
-              ))}
-            </div>
+            {item.skills && item.skills.length > 0 && (
+              <div className="sa-skills-row">
+                <span className="sa-skills-label">Evaluated Competencies:</span>
+                {item.skills.map((sk) => (
+                  <span key={sk} className="sa-skill-tag">{sk}</span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Action Buttons Column */}
@@ -1035,20 +1072,36 @@ export default function StudentSkillAssessments({
               type="button"
               className="sa-btn-view"
               onClick={() => {
-                setExpandedAssessmentId(expandedAssessmentId === item.id ? null : item.id)
-                setHighlightedAssessmentId(item.id)
+                const nextExpanded = expandedAssessmentId === item.id ? null : item.id
+                setExpandedAssessmentId(nextExpanded)
+                if (highlightedAssessmentId === item.id) {
+                  setHighlightedAssessmentId(null)
+                }
               }}
-              title="View full assessment details & syllabus"
+              title={expandedAssessmentId === item.id ? 'Hide full details' : 'View full assessment details & syllabus'}
             >
               {expandedAssessmentId === item.id ? 'Hide Details' : 'View Details'}
             </button>
 
-            {isTaken ? (
+            {item.score ? (
+              <button
+                type="button"
+                className="sa-btn-applied"
+                style={{ background: '#dcfce7', color: '#166534', border: '1px solid #86efac', cursor: 'pointer' }}
+                onClick={() => handleNavigateToTakenDetail(item)}
+                title="View verified scorecard and credential badge"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Scorecard
+              </button>
+            ) : isTaken ? (
               <button
                 type="button"
                 className="sa-btn-applied"
                 disabled
-                title="Assessment already completed"
+                title="Assessment already completed in current session"
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8">
                   <polyline points="20 6 9 17 4 12" />
@@ -1146,7 +1199,7 @@ export default function StudentSkillAssessments({
           <button
             type="button"
             className="sa-nav-back-btn"
-            onClick={onBack}
+            onClick={handleBack}
             title="Return to Student Dashboard"
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -1167,9 +1220,9 @@ export default function StudentSkillAssessments({
             </span>
             <span className="sa-nav-slash">/</span>
             <span
-              onClick={onBack}
-              style={{ cursor: onBack ? 'pointer' : 'default' }}
-              title={onBack ? 'Return to Student Dashboard' : ''}
+              onClick={handleBack}
+              style={{ cursor: 'pointer' }}
+              title="Return to Student Dashboard"
             >
               Student Portal
             </span>
@@ -1342,7 +1395,7 @@ export default function StudentSkillAssessments({
                   className={`sa-quick-tab ${activeTab === 'status' ? 'active' : ''}`}
                   onClick={() => setActiveTab('status')}
                 >
-                  My Completed ({takenTestIds.length})
+                  My Completed ({completedCount})
                 </button>
               </div>
 
@@ -1473,6 +1526,7 @@ export default function StudentSkillAssessments({
             {/* Direct Result / Scorecard Detail Banner if Navigated from Status Overview */}
             {selectedResultDetail && (
               <div
+                id="sa-selected-result-scorecard"
                 style={{
                   background: 'linear-gradient(135deg, #0f1d2f, #1e3a5f)',
                   color: '#ffffff',
@@ -1504,7 +1558,7 @@ export default function StudentSkillAssessments({
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, fontSize: '0.78rem', color: '#cbd5e1' }}>
                     <span>Score: <strong style={{ color: '#4ade80' }}>{selectedResultDetail.score}</strong></span>
                     <span>Percentile: <strong style={{ color: '#ffffff' }}>{selectedResultDetail.percentile}</strong></span>
-                    <span>Completed: <strong>{selectedResultDetail.date}</strong></span>
+                    <span>Completed: <strong>{selectedResultDetail.date || 'Today (Session)'}</strong></span>
                     <span>Credential ID: <strong style={{ color: '#93c5fd' }}>{selectedResultDetail.certId || 'IAS-VERIFIED'}</strong></span>
                   </div>
                 </div>
@@ -1585,7 +1639,7 @@ export default function StudentSkillAssessments({
                       <span className="sa-status-subtitle">Scheduled test sessions</span>
                     </div>
                   </div>
-                  <span className="sa-status-count">2</span>
+                  <span className="sa-status-count">{upcomingCount}</span>
                 </div>
 
                 {/* Tests Taken */}
@@ -1602,7 +1656,7 @@ export default function StudentSkillAssessments({
                       <span className="sa-status-subtitle">Proctored submissions</span>
                     </div>
                   </div>
-                  <span className="sa-status-count">{3 + takenTestIds.length}</span>
+                  <span className="sa-status-count">{completedCount}</span>
                 </div>
               </div>
             </div>
@@ -1647,120 +1701,7 @@ export default function StudentSkillAssessments({
           MODALS
           ==================================================================== */}
 
-      {/* 1. VIEW DETAILS MODAL */}
-      {detailsModalItem && (
-        <div className="sa-modal-overlay" role="dialog" aria-modal="true" onClick={() => setDetailsModalItem(null)}>
-          <div className="sa-modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="sa-modal-header">
-              <div className="sa-modal-header-info">
-                <div
-                  className="sa-company-logo"
-                  style={{ width: 38, height: 38, fontSize: '0.85rem', backgroundColor: detailsModalItem.companyLogoBg || '#112233' }}
-                >
-                  {detailsModalItem.companyLogoText || detailsModalItem.company.slice(0, 2).toUpperCase()}
-                </div>
-                <div>
-                  <h2 className="sa-modal-title">{detailsModalItem.testName}</h2>
-                  <p className="sa-modal-subtitle">
-                    {detailsModalItem.company} • {detailsModalItem.department} • {detailsModalItem.testType}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                className="sa-modal-close-btn"
-                onClick={() => setDetailsModalItem(null)}
-                aria-label="Close modal"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="sa-modal-body">
-              <div className="sa-details-grid">
-                <div className="sa-details-item">
-                  <span className="sa-details-item-label">Duration</span>
-                  <span className="sa-details-item-val">{detailsModalItem.duration}</span>
-                </div>
-                <div className="sa-details-item">
-                  <span className="sa-details-item-label">Questions</span>
-                  <span className="sa-details-item-val">{detailsModalItem.questions}</span>
-                </div>
-                <div className="sa-details-item">
-                  <span className="sa-details-item-label">Test Mode</span>
-                  <span className="sa-details-item-val">{detailsModalItem.mode}</span>
-                </div>
-                <div className="sa-details-item">
-                  <span className="sa-details-item-label">Scheduled Date</span>
-                  <span className="sa-details-item-val">{detailsModalItem.date}</span>
-                </div>
-                <div className="sa-details-item">
-                  <span className="sa-details-item-label">Time Slot</span>
-                  <span className="sa-details-item-val">{detailsModalItem.time}</span>
-                </div>
-                <div className="sa-details-item">
-                  <span className="sa-details-item-label">Fee Status</span>
-                  <span className="sa-details-item-val" style={{ color: '#166534' }}>{detailsModalItem.feeType}</span>
-                </div>
-                <div className="sa-details-item" style={{ gridColumn: 'span 2' }}>
-                  <span className="sa-details-item-label">Testing Location / Centre</span>
-                  <span className="sa-details-item-val">{detailsModalItem.cbtCentre}</span>
-                </div>
-                <div className="sa-details-item">
-                  <span className="sa-details-item-label">Passing Standard</span>
-                  <span className="sa-details-item-val">{detailsModalItem.passingScore}</span>
-                </div>
-              </div>
-
-              <div className="sa-details-section">
-                <h4 className="sa-details-section-title">Assessment Overview</h4>
-                <p className="sa-details-text">{detailsModalItem.overview}</p>
-              </div>
-
-              <div className="sa-details-section">
-                <h4 className="sa-details-section-title">Technical Syllabus &amp; Subject Areas</h4>
-                <p className="sa-details-text" style={{ background: '#f8fafc', padding: '10px 12px', borderRadius: 6, border: '1px solid #e2e8f0' }}>
-                  {detailsModalItem.syllabus}
-                </p>
-              </div>
-
-              <div className="sa-details-section">
-                <h4 className="sa-details-section-title">Evaluated Technical Competencies</h4>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {detailsModalItem.skills.map((sk) => (
-                    <span key={sk} className="sa-skill-tag" style={{ fontSize: '0.75rem', padding: '3px 8px' }}>
-                      {sk}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="sa-modal-footer">
-              <button
-                type="button"
-                className="sa-btn-view"
-                onClick={() => setDetailsModalItem(null)}
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                className="sa-btn-apply"
-                onClick={() => {
-                  const item = detailsModalItem
-                  setDetailsModalItem(null)
-                  setTakeTestModalItem(item)
-                }}
-              >
-                Proceed to Take Test →
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 2. TAKE TEST / CONFIRMATION MODAL */}
+      {/* 1. TAKE TEST / CONFIRMATION MODAL */}
       {takeTestModalItem && (
         <div className="sa-modal-overlay" role="dialog" aria-modal="true" onClick={() => setTakeTestModalItem(null)}>
           <div className="sa-modal-container" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 540 }}>
@@ -1826,7 +1767,7 @@ export default function StudentSkillAssessments({
         </div>
       )}
 
-      {/* 3. VIEW ALL RECENT RESULTS MODAL */}
+      {/* 2. VIEW ALL RECENT RESULTS MODAL */}
       {isRecentResultsModalOpen && (
         <div className="sa-modal-overlay" role="dialog" aria-modal="true" onClick={() => setIsRecentResultsModalOpen(false)}>
           <div className="sa-modal-container" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 640 }}>
@@ -1847,7 +1788,7 @@ export default function StudentSkillAssessments({
 
             <div className="sa-modal-body">
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {INITIAL_RECENT_RESULTS.map((res) => (
+                {allCompletedItems.map((res) => (
                   <div
                     key={res.id}
                     style={{
@@ -1865,14 +1806,14 @@ export default function StudentSkillAssessments({
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
                         <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#475569' }}>{res.company}</span>
                         <span style={{ fontSize: '0.68rem', color: '#166534', fontWeight: 700, background: '#dcfce7', padding: '1px 6px', borderRadius: 4 }}>
-                          ✓ {res.status}
+                          ✓ {res.status || 'Verified'}
                         </span>
                       </div>
                       <strong style={{ fontSize: '0.9rem', color: '#0f1d2f', display: 'block', marginBottom: 3 }}>
-                        {res.name}
+                        {res.name || res.testName}
                       </strong>
                       <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                        <span>Completed on {res.date}</span>
+                        <span>Completed on {res.date || 'Today (Session)'}</span>
                         <span>•</span>
                         <span style={{ color: '#0f1d2f', fontWeight: 600 }}>{res.percentile}</span>
                       </div>
@@ -1890,10 +1831,10 @@ export default function StudentSkillAssessments({
                         style={{ padding: '4px 10px', fontSize: '0.74rem' }}
                         onClick={(e) => {
                           e.stopPropagation()
-                          setDetailsModalItem(res)
+                          handleNavigateToTakenDetail(res)
                         }}
                       >
-                        View Details
+                        View Scorecard
                       </button>
                     </div>
                   </div>
@@ -1914,7 +1855,7 @@ export default function StudentSkillAssessments({
         </div>
       )}
 
-      {/* 4. VIEW ALL ASSESSMENT STATUS MODAL */}
+      {/* 3. VIEW ALL ASSESSMENT STATUS MODAL */}
       {isStatusModalOpen && (
         <div className="sa-modal-overlay" role="dialog" aria-modal="true" onClick={() => setIsStatusModalOpen(false)}>
           <div className="sa-modal-container" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 700, maxHeight: '88vh' }}>
@@ -1967,7 +1908,7 @@ export default function StudentSkillAssessments({
               })}
             </div>
 
-            <div className="sa-modal-body" style={{ maxHeight: 'calc(88vh - 160px)', overflowY: 'auto', padding: '18px 20px' }}>
+            <div className="sa-modal-body">
               {/* CATEGORY 1: UPCOMING TESTS */}
               {statusCategoryTab === 'upcoming' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -1984,12 +1925,12 @@ export default function StudentSkillAssessments({
                       </h3>
                     </div>
                     <span style={{ fontSize: '0.72rem', color: '#15803d', background: '#dcfce7', fontWeight: 700, padding: '2px 8px', borderRadius: 12 }}>
-                      {INITIAL_UPCOMING_TESTS.length} Scheduled
+                      {upcomingCount} Scheduled
                     </span>
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {INITIAL_UPCOMING_TESTS.map((test) => (
+                    {INITIAL_UPCOMING_TESTS.filter((t) => !takenTestIds.includes(t.refId || t.id)).map((test) => (
                       <div
                         key={test.id}
                         style={{
@@ -2058,12 +1999,12 @@ export default function StudentSkillAssessments({
                       </h3>
                     </div>
                     <span style={{ fontSize: '0.72rem', color: '#166534', background: '#dcfce7', fontWeight: 700, padding: '2px 8px', borderRadius: 12 }}>
-                      {INITIAL_RECENT_RESULTS.length + takenTestIds.length} Completed
+                      {completedCount} Completed
                     </span>
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {INITIAL_RECENT_RESULTS.map((res) => (
+                    {allCompletedItems.map((res) => (
                       <div
                         key={`taken_${res.id}`}
                         style={{
@@ -2083,17 +2024,17 @@ export default function StudentSkillAssessments({
                               {res.company}
                             </span>
                             <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#166534', background: '#dcfce7', padding: '2px 8px', borderRadius: 4 }}>
-                              ✓ Completed &amp; Evaluated
+                              ✓ {res.status || 'Completed'}
                             </span>
                           </div>
                           <h4 style={{ margin: '0 0 6px', fontSize: '0.92rem', fontWeight: 800, color: '#0f1d2f' }}>
-                            {res.name}
+                            {res.name || res.testName}
                           </h4>
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, fontSize: '0.75rem', color: '#475569' }}>
-                            <span>📅 Test Date: <strong>{res.date}</strong></span>
+                            <span>📅 Test Date: <strong>{res.date || 'Today (Session)'}</strong></span>
                             <span>💻 Mode: <strong>{res.mode}</strong></span>
                             <span style={{ color: '#0369a1', fontWeight: 600 }}>
-                              📊 Result: <strong>Available ({res.score})</strong>
+                              📊 Result: <strong>{res.score}</strong>
                             </span>
                           </div>
                         </div>
@@ -2107,62 +2048,11 @@ export default function StudentSkillAssessments({
                               handleNavigateToTakenDetail(res)
                             }}
                           >
-                            View Details
+                            View Scorecard
                           </button>
                         </div>
                       </div>
                     ))}
-
-                    {/* Tests Taken In Active Session */}
-                    {takenTestIds.map((id) => {
-                      const match = INITIAL_ASSESSMENTS.find((a) => a.id === id)
-                      if (!match) return null
-                      return (
-                        <div
-                          key={`session_taken_${id}`}
-                          style={{
-                            background: '#ffffff',
-                            border: '1px solid #bbf7d0',
-                            borderRadius: 8,
-                            padding: '14px 16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            gap: 14,
-                          }}
-                        >
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
-                              <span style={{ fontSize: '0.76rem', fontWeight: 700, color: '#475569' }}>{match.company}</span>
-                              <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#0369a1', background: '#e0f2fe', padding: '2px 8px', borderRadius: 4 }}>
-                                ✓ Session Submitted
-                              </span>
-                            </div>
-                            <h4 style={{ margin: '0 0 6px', fontSize: '0.92rem', fontWeight: 800, color: '#0f1d2f' }}>
-                              {match.testName}
-                            </h4>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, fontSize: '0.75rem', color: '#475569' }}>
-                              <span>📅 Test Date: <strong>Today (Session)</strong></span>
-                              <span>💻 Mode: <strong>{match.mode}</strong></span>
-                              <span>📊 Result Availability: <strong>Proctor Review in Progress</strong></span>
-                            </div>
-                          </div>
-                          <div style={{ flexShrink: 0 }}>
-                            <button
-                              type="button"
-                              className="sa-btn-view"
-                              style={{ padding: '6px 12px', fontSize: '0.78rem' }}
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleNavigateToTakenDetail(match)
-                              }}
-                            >
-                              View Details
-                            </button>
-                          </div>
-                        </div>
-                      )
-                    })}
                   </div>
                 </div>
               )}

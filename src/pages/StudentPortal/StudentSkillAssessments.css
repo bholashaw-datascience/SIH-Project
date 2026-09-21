@@ -686,20 +686,6 @@
   color: #334155;
 }
 
-.sa-spec-pill.fee-free {
-  background: #dcfce7;
-  border-color: #86efac;
-  color: #166534;
-  font-weight: 700;
-}
-
-.sa-spec-pill.fee-sponsored {
-  background: #fef3c7;
-  border-color: #fde68a;
-  color: #92400e;
-  font-weight: 700;
-}
-
 .sa-spec-pill.dept {
   background: #ede9fe;
   border-color: #ddd6fe;
@@ -711,13 +697,6 @@
   background: #fdfbf7;
   border-color: #ded9cc;
   color: #475569;
-}
-
-.sa-spec-pill.deadline.urgent {
-  background: #fff1f2;
-  border-color: #fecdd3;
-  color: #be123c;
-  font-weight: 700;
 }
 
 .sa-spec-pill.cbt {
@@ -985,16 +964,6 @@
   color: #b45309;
 }
 
-.sa-status-icon-box.results {
-  background: #dcfce7;
-  color: #15803d;
-}
-
-.sa-status-icon-box.certificates {
-  background: #ede9fe;
-  color: #6d28d9;
-}
-
 .sa-status-info {
   display: flex;
   flex-direction: column;
@@ -1159,61 +1128,6 @@
   box-sizing: border-box;
 }
 
-.sa-details-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 12px;
-}
-
-@media (max-width: 600px) {
-  .sa-details-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.sa-details-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.sa-details-item-label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.sa-details-item-val {
-  font-size: 0.83rem;
-  font-weight: 700;
-  color: #0f1d2f;
-}
-
-.sa-details-section {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.sa-details-section-title {
-  margin: 0;
-  font-size: 0.86rem;
-  font-weight: 800;
-  color: #0f1d2f;
-}
-
-.sa-details-text {
-  margin: 0;
-  font-size: 0.82rem;
-  color: #475569;
-  line-height: 1.5;
-}
 
 .sa-modal-footer {
   padding: 12px 20px;
