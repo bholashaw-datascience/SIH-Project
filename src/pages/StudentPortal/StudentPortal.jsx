@@ -262,7 +262,7 @@ function StudentPortal({
   const showFirstTimeOnboarding = (!isProfileCompleted || verificationStatus === 'unverified' || verificationStatus === 'draft') && !showDashboard && !showDiffView && !showEditForm && !showAchievementsExperience && !showPublicPost && !showInternships && !showPlacements && !showSkillAssessments && !['pending', 'approved', 'rejected'].includes(verificationStatus)
 
   return (
-    <div className="sp-canvas">
+    <div className={`sp-canvas ${isDemoActive && demoStep === 4 ? 'sp-canvas-step4' : ''}`}>
       <style>{`
         html,
         body,
@@ -643,69 +643,93 @@ function StudentPortal({
         }
 
         /* ===================================================================
-           Step 4 Demo Preview: Verification Status Viewport-Fit Layout
+           Step 4 Demo Preview: Verification Status Full-Page Viewport Layout
            =================================================================== */
+        @media (min-width: 900px) and (min-height: 600px) {
+          .sp-canvas-step4 {
+            height: 100vh !important;
+            max-height: 100vh !important;
+            overflow: hidden !important;
+          }
+        }
+
         .sp-step4-workspace {
           flex: 1;
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 8px 24px !important;
+          padding: clamp(8px, 1.5vh, 20px) clamp(16px, 3vw, 40px) !important;
           box-sizing: border-box;
           width: 100%;
           gap: 0 !important;
+          min-height: 0;
         }
 
         .sp-step4-frame {
-          max-width: 680px;
+          max-width: 1180px;
           width: 100%;
           margin: 0 auto !important;
           background: #ffffff;
-          border: 1px solid #ded9cc;
-          border-radius: 8px;
-          box-shadow: 0 4px 20px rgba(15, 29, 47, 0.07);
+          border: 1.5px solid #ded9cc;
+          border-radius: 10px;
+          box-shadow: 0 6px 24px rgba(15, 29, 47, 0.08);
           overflow: hidden;
+          display: flex;
+          flex-direction: column;
         }
 
         .sp-step4-banner {
-          padding: 16px 28px !important;
+          padding: clamp(14px, 2vh, 22px) clamp(20px, 4vw, 48px) !important;
           text-align: center;
           color: #ffffff;
+          background: linear-gradient(135deg, #112233 0%, #1a3956 100%);
+          border-bottom: 3px solid #b3881e;
         }
 
         .sp-step4-icon-circle {
-          width: 40px !important;
-          height: 40px !important;
+          width: 44px !important;
+          height: 44px !important;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.12);
+          border: 1.5px solid rgba(255, 255, 255, 0.25);
+          display: flex;
+          align-items: center;
+          justify-content: center;
           margin: 0 auto 8px !important;
+          color: #f1cf7c;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .sp-step4-heading {
-          font-size: 18px !important;
+          font-size: clamp(18px, 2.2vh, 22px) !important;
           font-weight: 700;
-          margin: 0 0 4px !important;
+          margin: 0 0 6px !important;
           color: #ffffff;
+          letter-spacing: -0.01em;
         }
 
         .sp-step4-sub {
-          font-size: 12.5px !important;
-          line-height: 1.4 !important;
-          max-width: 560px;
+          font-size: 13.5px !important;
+          line-height: 1.5 !important;
+          max-width: 820px;
           margin: 0 auto !important;
-          opacity: 0.92;
+          color: #d1dce5;
+          opacity: 0.95;
         }
 
         .sp-step4-body {
-          padding: 14px 28px !important;
+          padding: clamp(14px, 2vh, 24px) clamp(20px, 3.5vw, 44px) !important;
           display: flex;
           flex-direction: column;
-          gap: 12px !important;
+          gap: clamp(10px, 1.5vh, 16px) !important;
         }
 
         .sp-step4-summary-card {
           background-color: #faf7f0;
           border: 1px solid #ede8de;
-          border-radius: 6px;
-          padding: 8px 18px !important;
+          border-radius: 8px;
+          padding: clamp(6px, 1vh, 12px) clamp(16px, 2.5vw, 32px) !important;
           display: flex !important;
           flex-direction: column !important;
           gap: 0 !important;
@@ -715,9 +739,22 @@ function StudentPortal({
           display: flex;
           align-items: center;
           justify-content: space-between;
-          font-size: 12.5px !important;
-          padding: 5px 0 !important;
+          font-size: 13.5px !important;
+          padding: clamp(7px, 1vh, 10px) 0 !important;
           border-bottom: 1px solid #f0eae1 !important;
+        }
+
+        .sp-step4-summary-row .sp-summary-label {
+          color: #475569;
+          font-weight: 600;
+          font-size: 13.5px;
+          letter-spacing: 0.01em;
+        }
+
+        .sp-step4-summary-row .sp-summary-val {
+          color: #0f1d2f;
+          font-weight: 600;
+          font-size: 14px;
         }
 
         .sp-step4-summary-card .sp-step4-summary-row:last-child {
@@ -728,30 +765,33 @@ function StudentPortal({
         .sp-step4-actions {
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 6px;
           align-items: center;
-          margin-top: 2px;
+          margin-top: 4px;
         }
 
         .sp-step4-proceed-btn {
           background-color: #059669;
           color: #ffffff;
           border: none;
-          padding: 9px 26px !important;
+          padding: 10px 32px !important;
           border-radius: 6px;
           font-weight: 700;
-          font-size: 13.5px !important;
+          font-size: 14px !important;
           cursor: pointer;
           transition: all 0.15s ease;
           font-family: inherit;
+          box-shadow: 0 2px 8px rgba(5, 150, 105, 0.2);
         }
 
         .sp-step4-proceed-btn:hover {
           background-color: #047857;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
         }
 
         .sp-step4-hint {
-          font-size: 11.5px;
+          font-size: 12px;
           color: #64748b;
         }
 
@@ -759,19 +799,19 @@ function StudentPortal({
         .sp-step4-footer {
           margin-top: auto !important;
           margin-bottom: 54px !important;
-          padding: 6px 28px !important;
-          font-size: 11.5px !important;
+          padding: 10px 32px !important;
+          font-size: 12.5px !important;
           box-sizing: border-box !important;
           z-index: 10 !important;
         }
 
         .sp-step4-footer .portal-footer-inner {
-          max-width: 680px !important;
-          justify-content: center !important;
-        }
-
-        .sp-step4-footer .portal-footer-attribution {
-          display: none !important;
+          max-width: 1180px !important;
+          width: 100% !important;
+          margin: 0 auto !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: space-between !important;
         }
 
         /* Development-Only Demo Floating Bar */
