@@ -642,6 +642,138 @@ function StudentPortal({
           }
         }
 
+        /* ===================================================================
+           Step 4 Demo Preview: Verification Status Viewport-Fit Layout
+           =================================================================== */
+        .sp-step4-workspace {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 8px 24px !important;
+          box-sizing: border-box;
+          width: 100%;
+          gap: 0 !important;
+        }
+
+        .sp-step4-frame {
+          max-width: 680px;
+          width: 100%;
+          margin: 0 auto !important;
+          background: #ffffff;
+          border: 1px solid #ded9cc;
+          border-radius: 8px;
+          box-shadow: 0 4px 20px rgba(15, 29, 47, 0.07);
+          overflow: hidden;
+        }
+
+        .sp-step4-banner {
+          padding: 16px 28px !important;
+          text-align: center;
+          color: #ffffff;
+        }
+
+        .sp-step4-icon-circle {
+          width: 40px !important;
+          height: 40px !important;
+          margin: 0 auto 8px !important;
+        }
+
+        .sp-step4-heading {
+          font-size: 18px !important;
+          font-weight: 700;
+          margin: 0 0 4px !important;
+          color: #ffffff;
+        }
+
+        .sp-step4-sub {
+          font-size: 12.5px !important;
+          line-height: 1.4 !important;
+          max-width: 560px;
+          margin: 0 auto !important;
+          opacity: 0.92;
+        }
+
+        .sp-step4-body {
+          padding: 14px 28px !important;
+          display: flex;
+          flex-direction: column;
+          gap: 12px !important;
+        }
+
+        .sp-step4-summary-card {
+          background-color: #faf7f0;
+          border: 1px solid #ede8de;
+          border-radius: 6px;
+          padding: 8px 18px !important;
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 0 !important;
+        }
+
+        .sp-step4-summary-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          font-size: 12.5px !important;
+          padding: 5px 0 !important;
+          border-bottom: 1px solid #f0eae1 !important;
+        }
+
+        .sp-step4-summary-card .sp-step4-summary-row:last-child {
+          border-bottom: none !important;
+          padding-bottom: 0 !important;
+        }
+
+        .sp-step4-actions {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          align-items: center;
+          margin-top: 2px;
+        }
+
+        .sp-step4-proceed-btn {
+          background-color: #059669;
+          color: #ffffff;
+          border: none;
+          padding: 9px 26px !important;
+          border-radius: 6px;
+          font-weight: 700;
+          font-size: 13.5px !important;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          font-family: inherit;
+        }
+
+        .sp-step4-proceed-btn:hover {
+          background-color: #047857;
+        }
+
+        .sp-step4-hint {
+          font-size: 11.5px;
+          color: #64748b;
+        }
+
+        /* Step 4 Footer Docking */
+        .sp-step4-footer {
+          margin-top: auto !important;
+          margin-bottom: 54px !important;
+          padding: 6px 28px !important;
+          font-size: 11.5px !important;
+          box-sizing: border-box !important;
+          z-index: 10 !important;
+        }
+
+        .sp-step4-footer .portal-footer-inner {
+          max-width: 680px !important;
+          justify-content: center !important;
+        }
+
+        .sp-step4-footer .portal-footer-attribution {
+          display: none !important;
+        }
+
         /* Development-Only Demo Floating Bar */
         .sp-demo-floating-bar {
           position: fixed;
@@ -1293,46 +1425,46 @@ function StudentPortal({
 
           {/* STEP 4: Submit for Verification / Verification Status */}
           {demoStep === 4 && (
-            <main className="sp-workspace-container" style={{ paddingBottom: '24px' }}>
-              <div className="sp-pending-frame">
-                <div className="sp-pending-banner sp-pending-banner-pending">
-                  <div className="sp-pending-icon-circle">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <main className="sp-workspace-container sp-step4-workspace">
+              <div className="sp-pending-frame sp-step4-frame">
+                <div className="sp-pending-banner sp-pending-banner-pending sp-step4-banner">
+                  <div className="sp-pending-icon-circle sp-step4-icon-circle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="10" />
                       <polyline points="12 6 12 12 16 14" />
                     </svg>
                   </div>
-                  <h2 className="sp-pending-heading">Profile Submitted for Verification</h2>
-                  <p className="sp-pending-sub">
+                  <h2 className="sp-pending-heading sp-step4-heading">Profile Submitted for Verification</h2>
+                  <p className="sp-pending-sub sp-step4-sub">
                     Your profile and documents have been successfully submitted. Your Principal or Institutional Coordinator will review the submitted records to approve your verified profile.
                   </p>
                 </div>
 
-                <div className="sp-pending-body">
-                  <div className="sp-pending-summary-card">
-                    <div className="sp-summary-row">
+                <div className="sp-pending-body sp-step4-body">
+                  <div className="sp-pending-summary-card sp-step4-summary-card">
+                    <div className="sp-summary-row sp-step4-summary-row">
                       <span className="sp-summary-label">Student Name</span>
                       <span className="sp-summary-val">{pendingProfile?.formData?.name || currentLive.name || '—'}</span>
                     </div>
-                    <div className="sp-summary-row">
+                    <div className="sp-summary-row sp-step4-summary-row">
                       <span className="sp-summary-label">Email Address</span>
                       <span className="sp-summary-val">{pendingProfile?.formData?.email || currentLive.email || '—'}</span>
                     </div>
-                    <div className="sp-summary-row">
+                    <div className="sp-summary-row sp-step4-summary-row">
                       <span className="sp-summary-label">Mobile Number</span>
                       <span className="sp-summary-val">{pendingProfile?.formData?.phone || currentLive.phone || '—'}</span>
                     </div>
-                    <div className="sp-summary-row">
+                    <div className="sp-summary-row sp-step4-summary-row">
                       <span className="sp-summary-label">Institution</span>
                       <span className="sp-summary-val">{pendingProfile?.formData?.institution || currentLive.institution || '—'}</span>
                     </div>
-                    <div className="sp-summary-row">
+                    <div className="sp-summary-row sp-step4-summary-row">
                       <span className="sp-summary-label">Course & Year</span>
                       <span className="sp-summary-val">
                         {pendingProfile?.formData?.course || currentLive.course || '—'}
                       </span>
                     </div>
-                    <div className="sp-summary-row">
+                    <div className="sp-summary-row sp-step4-summary-row">
                       <span className="sp-summary-label">Verification Status</span>
                       <span className="sp-status-pill sp-status-pill-pending">
                         <span className="sp-status-dot-pending" />
@@ -1341,15 +1473,15 @@ function StudentPortal({
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center', marginTop: '8px' }}>
+                  <div className="sp-step4-actions">
                     <button
                       type="button"
-                      className="sp-proceed-btn"
+                      className="sp-proceed-btn sp-step4-proceed-btn"
                       onClick={() => setDemoStep(5)}
                     >
                       Proceed to Student Dashboard →
                     </button>
-                    <span style={{ fontSize: '12px', color: '#64748b' }}>
+                    <span className="sp-step4-hint">
                       Step 4 of 5 • Click button or use the &quot;Next&quot; control at the bottom.
                     </span>
                   </div>
@@ -1720,7 +1852,10 @@ function StudentPortal({
         ? (demoStep === 1 || demoStep === 4 || demoStep === 5)
         : !(showFirstTimeOnboarding || showEditForm || showDiffView)
       ) && (
-        <PortalFooter style={isDemoActive ? { paddingBottom: '72px' } : {}} />
+        <PortalFooter
+          className={isDemoActive && demoStep === 4 ? 'sp-step4-footer' : ''}
+          style={isDemoActive ? (demoStep === 4 ? {} : { paddingBottom: '72px' }) : {}}
+        />
       )}
 
       {/* Development-Only Demo Floating Bar (Requirements 5, 6, 7) */}
