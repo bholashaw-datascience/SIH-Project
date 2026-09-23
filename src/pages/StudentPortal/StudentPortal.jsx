@@ -650,9 +650,14 @@ function StudentPortal({
           .sp-canvas-step4 {
             height: 100vh !important;
             max-height: 100vh !important;
+            min-height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
             overflow: hidden !important;
+            box-sizing: border-box !important;
           }
-          .sp-step3-wrapper {
+          .sp-step3-wrapper,
+          .sp-step4-wrapper {
             height: 100%;
             flex: 1;
             display: flex;
@@ -661,165 +666,265 @@ function StudentPortal({
           }
         }
 
+        .sp-step4-wrapper {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          min-height: 0;
+          width: 100%;
+        }
+
         .sp-step4-workspace {
           flex: 1;
           display: flex;
-          flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: clamp(8px, 1.5vh, 20px) clamp(16px, 3vw, 40px) !important;
+          padding: clamp(10px, 1.8vh, 22px) clamp(16px, 2.5vw, 36px);
           box-sizing: border-box;
           width: 100%;
-          gap: 0 !important;
           min-height: 0;
         }
 
-        .sp-step4-frame {
-          max-width: 1180px;
-          width: 100%;
-          margin: 0 auto !important;
+        /* ONE COORDINATED TWO-PANEL MAIN CONTENT COMPOSITION */
+        .sp-step4-main-container {
+          max-width: 1320px;
+          width: 92%;
+          margin: 0 auto;
           background: #ffffff;
           border: 1.5px solid #ded9cc;
-          border-radius: 10px;
-          box-shadow: 0 6px 24px rgba(15, 29, 47, 0.08);
+          border-radius: 12px;
+          box-shadow: 0 6px 28px rgba(15, 29, 47, 0.07);
+          display: grid;
+          grid-template-columns: 38% 62%;
           overflow: hidden;
+          box-sizing: border-box;
+        }
+
+        /* LEFT PANEL — STUDENT VISUAL (38%) */
+        .sp-step4-left-panel {
+          background: #faf8f4;
+          border-right: 1px solid #ede7db;
+          padding: clamp(20px, 2.8vh, 32px) clamp(22px, 2.5vw, 36px);
           display: flex;
           flex-direction: column;
-        }
-
-        .sp-step4-banner {
-          padding: clamp(14px, 2vh, 22px) clamp(20px, 4vw, 48px) !important;
+          align-items: center;
+          justify-content: center;
           text-align: center;
-          color: #ffffff;
-          background: linear-gradient(135deg, #112233 0%, #1a3956 100%);
-          border-bottom: 3px solid #b3881e;
+          box-sizing: border-box;
+          height: 100%;
         }
 
-        .sp-step4-icon-circle {
-          width: 44px !important;
-          height: 44px !important;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.12);
-          border: 1.5px solid rgba(255, 255, 255, 0.25);
+        .sp-step4-illust-wrap {
+          width: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
-          margin: 0 auto 8px !important;
-          color: #f1cf7c;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          margin-bottom: clamp(10px, 1.6vh, 16px);
         }
 
-        .sp-step4-heading {
-          font-size: clamp(18px, 2.2vh, 22px) !important;
+        .sp-step4-student-img {
+          width: auto;
+          max-width: 100%;
+          max-height: clamp(190px, 28vh, 260px);
+          object-fit: contain;
+          border-radius: 6px;
+        }
+
+        .sp-step4-confirm-box {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          max-width: 340px;
+          width: 100%;
+        }
+
+        .sp-step4-protocol-tag {
+          font-size: 11px;
           font-weight: 700;
-          margin: 0 0 6px !important;
-          color: #ffffff;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: #b3881e;
+          background: #fef9ed;
+          border: 1px solid #f6e2b3;
+          padding: 3px 10px;
+          border-radius: 12px;
+          margin-bottom: 6px;
+          display: inline-block;
+        }
+
+        .sp-step4-confirm-title {
+          font-size: clamp(16px, 2vh, 18px);
+          font-weight: 700;
+          color: #0f1d2f;
+          margin: 0 0 5px;
           letter-spacing: -0.01em;
         }
 
-        .sp-step4-sub {
-          font-size: 13.5px !important;
-          line-height: 1.5 !important;
-          max-width: 820px;
-          margin: 0 auto !important;
-          color: #d1dce5;
-          opacity: 0.95;
+        .sp-step4-confirm-desc {
+          font-size: clamp(12px, 1.4vh, 13px);
+          color: #64748b;
+          line-height: 1.48;
+          margin: 0;
         }
 
-        .sp-step4-body {
-          padding: clamp(14px, 2vh, 24px) clamp(20px, 3.5vw, 44px) !important;
+        /* RIGHT PANEL — VERIFICATION (62%) */
+        .sp-step4-right-panel {
+          padding: clamp(22px, 3vh, 34px) clamp(28px, 3.2vw, 44px);
           display: flex;
           flex-direction: column;
-          gap: clamp(10px, 1.5vh, 16px) !important;
+          justify-content: center;
+          box-sizing: border-box;
+          width: 100%;
         }
 
-        .sp-step4-summary-card {
-          background-color: #faf7f0;
-          border: 1px solid #ede8de;
+        .sp-step4-header-block {
+          margin-bottom: clamp(10px, 1.4vh, 14px);
+        }
+
+        .sp-step4-step-pill {
+          display: inline-block;
+          font-size: 11px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          color: #1e3a8a;
+          background: #eff6ff;
+          border: 1px solid #dbeafe;
+          padding: 3px 9px;
+          border-radius: 4px;
+          margin-bottom: 6px;
+        }
+
+        .sp-step4-title {
+          font-size: clamp(20px, 2.4vh, 24px);
+          font-weight: 700;
+          color: #0f1d2f;
+          margin: 0 0 5px;
+          letter-spacing: -0.01em;
+        }
+
+        .sp-step4-desc {
+          font-size: clamp(12.5px, 1.4vh, 13.5px);
+          color: #475569;
+          line-height: 1.48;
+          margin: 0;
+        }
+
+        .sp-step4-info-panel {
+          width: 100%;
+          background: #fdfcf9;
+          border: 1px solid #ebe4d5;
           border-radius: 8px;
-          padding: clamp(6px, 1vh, 12px) clamp(16px, 2.5vw, 32px) !important;
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 0 !important;
+          overflow: hidden;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          margin-bottom: clamp(12px, 1.6vh, 18px);
         }
 
-        .sp-step4-summary-row {
+        .sp-step4-info-row {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          font-size: 13.5px !important;
-          padding: clamp(7px, 1vh, 10px) 0 !important;
-          border-bottom: 1px solid #f0eae1 !important;
+          padding: clamp(8px, 1.2vh, 12px) clamp(16px, 2vw, 24px) !important;
+          border-bottom: 1px solid #f1ebe0 !important;
+          box-sizing: border-box;
+          transition: background-color 0.15s ease;
         }
 
-        .sp-step4-summary-row .sp-summary-label {
-          color: #475569;
+        .sp-step4-info-row:hover {
+          background-color: #f7f3ea;
+        }
+
+        .sp-step4-info-row:last-child {
+          border-bottom: none !important;
+        }
+
+        .sp-step4-info-label {
+          color: #64748b;
           font-weight: 600;
-          font-size: 13.5px;
+          font-size: clamp(13px, 1.4vh, 14px);
           letter-spacing: 0.01em;
         }
 
-        .sp-step4-summary-row .sp-summary-val {
+        .sp-step4-info-val {
           color: #0f1d2f;
           font-weight: 600;
-          font-size: 14px;
+          font-size: clamp(13.5px, 1.45vh, 14.5px);
         }
 
-        .sp-step4-summary-card .sp-step4-summary-row:last-child {
-          border-bottom: none !important;
-          padding-bottom: 0 !important;
-        }
-
-        .sp-step4-actions {
+        /* Action Block */
+        .sp-step4-action-block {
           display: flex;
           flex-direction: column;
-          gap: 6px;
-          align-items: center;
-          margin-top: 4px;
+          gap: 5px;
+          align-items: flex-start;
+          width: 100%;
         }
 
         .sp-step4-proceed-btn {
           background-color: #059669;
           color: #ffffff;
           border: none;
-          padding: 10px 32px !important;
+          padding: clamp(9px, 1.25vh, 12px) 32px !important;
           border-radius: 6px;
           font-weight: 700;
-          font-size: 14px !important;
+          font-size: clamp(13.5px, 1.4vh, 14.5px) !important;
           cursor: pointer;
           transition: all 0.15s ease;
           font-family: inherit;
           box-shadow: 0 2px 8px rgba(5, 150, 105, 0.2);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
         }
 
         .sp-step4-proceed-btn:hover {
           background-color: #047857;
           transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+          box-shadow: 0 4px 12px rgba(5, 150, 105, 0.28);
         }
 
-        .sp-step4-hint {
-          font-size: 12px;
+        .sp-step4-helper-text {
+          font-size: 11.5px;
           color: #64748b;
+          font-weight: 500;
         }
 
-        /* Step 4 Footer Docking */
+        /* 5. Step 4 Footer Docking */
         .sp-step4-footer {
           margin-top: auto !important;
           margin-bottom: 54px !important;
-          padding: 10px 32px !important;
+          padding: 11px 36px !important;
           font-size: 12.5px !important;
+          width: 100% !important;
           box-sizing: border-box !important;
           z-index: 10 !important;
+          flex-shrink: 0 !important;
         }
 
         .sp-step4-footer .portal-footer-inner {
-          max-width: 1180px !important;
-          width: 100% !important;
+          max-width: 1320px !important;
+          width: 92% !important;
           margin: 0 auto !important;
           display: flex !important;
           align-items: center !important;
           justify-content: space-between !important;
+        }
+
+        @media (max-width: 899px) {
+          .sp-step4-main-container {
+            grid-template-columns: 1fr;
+            max-width: 580px;
+          }
+          .sp-step4-left-panel {
+            border-right: none;
+            border-bottom: 1px solid #ede7db;
+          }
+          .sp-step4-action-block {
+            align-items: center;
+          }
         }
 
         /* Development-Only Demo Floating Bar */
@@ -1473,69 +1578,85 @@ function StudentPortal({
 
           {/* STEP 4: Submit for Verification / Verification Status */}
           {demoStep === 4 && (
-            <main className="sp-workspace-container sp-step4-workspace">
-              <div className="sp-pending-frame sp-step4-frame">
-                <div className="sp-pending-banner sp-pending-banner-pending sp-step4-banner">
-                  <div className="sp-pending-icon-circle sp-step4-icon-circle">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10" />
-                      <polyline points="12 6 12 12 16 14" />
-                    </svg>
-                  </div>
-                  <h2 className="sp-pending-heading sp-step4-heading">Profile Submitted for Verification</h2>
-                  <p className="sp-pending-sub sp-step4-sub">
-                    Your profile and documents have been successfully submitted. Your Principal or Institutional Coordinator will review the submitted records to approve your verified profile.
-                  </p>
-                </div>
-
-                <div className="sp-pending-body sp-step4-body">
-                  <div className="sp-pending-summary-card sp-step4-summary-card">
-                    <div className="sp-summary-row sp-step4-summary-row">
-                      <span className="sp-summary-label">Student Name</span>
-                      <span className="sp-summary-val">{pendingProfile?.formData?.name || currentLive.name || '—'}</span>
+            <div className="sp-step4-wrapper">
+              <main className="sp-step4-workspace">
+                <div className="sp-step4-main-container">
+                  {/* LEFT PANEL — STUDENT VISUAL (38%) */}
+                  <div className="sp-step4-left-panel">
+                    <div className="sp-step4-illust-wrap">
+                      <img
+                        src="/student-verification-success.png"
+                        alt="Student sitting at desk using laptop giving thumbs-up"
+                        className="sp-step4-student-img"
+                      />
                     </div>
-                    <div className="sp-summary-row sp-step4-summary-row">
-                      <span className="sp-summary-label">Email Address</span>
-                      <span className="sp-summary-val">{pendingProfile?.formData?.email || currentLive.email || '—'}</span>
-                    </div>
-                    <div className="sp-summary-row sp-step4-summary-row">
-                      <span className="sp-summary-label">Mobile Number</span>
-                      <span className="sp-summary-val">{pendingProfile?.formData?.phone || currentLive.phone || '—'}</span>
-                    </div>
-                    <div className="sp-summary-row sp-step4-summary-row">
-                      <span className="sp-summary-label">Institution</span>
-                      <span className="sp-summary-val">{pendingProfile?.formData?.institution || currentLive.institution || '—'}</span>
-                    </div>
-                    <div className="sp-summary-row sp-step4-summary-row">
-                      <span className="sp-summary-label">Course & Year</span>
-                      <span className="sp-summary-val">
-                        {pendingProfile?.formData?.course || currentLive.course || '—'}
-                      </span>
-                    </div>
-                    <div className="sp-summary-row sp-step4-summary-row">
-                      <span className="sp-summary-label">Verification Status</span>
-                      <span className="sp-status-pill sp-status-pill-pending">
-                        <span className="sp-status-dot-pending" />
-                        Pending Verification
-                      </span>
+                    <div className="sp-step4-confirm-box">
+                      <span className="sp-step4-protocol-tag">INSTITUTIONAL VERIFICATION PROTOCOL</span>
+                      <h3 className="sp-step4-confirm-title">Submission Confirmed!</h3>
+                      <p className="sp-step4-confirm-desc">
+                        Your records and authentic documents are queued for institutional verification review.
+                      </p>
                     </div>
                   </div>
 
-                  <div className="sp-step4-actions">
-                    <button
-                      type="button"
-                      className="sp-proceed-btn sp-step4-proceed-btn"
-                      onClick={() => setDemoStep(5)}
-                    >
-                      Proceed to Student Dashboard →
-                    </button>
-                    <span className="sp-step4-hint">
-                      Step 4 of 5 • Click button or use the &quot;Next&quot; control at the bottom.
-                    </span>
+                  {/* RIGHT PANEL — VERIFICATION (62%) */}
+                  <div className="sp-step4-right-panel">
+                    <div className="sp-step4-header-block">
+                      <span className="sp-step4-step-pill">STEP 4 OF 5</span>
+                      <h2 className="sp-step4-title">Profile Submitted for Verification</h2>
+                      <p className="sp-step4-desc">
+                        Your profile and documents have been successfully submitted. Your Principal or Institutional Coordinator will review the submitted records to approve your verified profile.
+                      </p>
+                    </div>
+
+                    <div className="sp-step4-info-panel">
+                      <div className="sp-step4-info-row">
+                        <span className="sp-step4-info-label">Student Name</span>
+                        <span className="sp-step4-info-val">{pendingProfile?.formData?.name || currentLive.name || '—'}</span>
+                      </div>
+                      <div className="sp-step4-info-row">
+                        <span className="sp-step4-info-label">Email Address</span>
+                        <span className="sp-step4-info-val">{pendingProfile?.formData?.email || currentLive.email || '—'}</span>
+                      </div>
+                      <div className="sp-step4-info-row">
+                        <span className="sp-step4-info-label">Mobile Number</span>
+                        <span className="sp-step4-info-val">{pendingProfile?.formData?.phone || currentLive.phone || '—'}</span>
+                      </div>
+                      <div className="sp-step4-info-row">
+                        <span className="sp-step4-info-label">Institution</span>
+                        <span className="sp-step4-info-val">{pendingProfile?.formData?.institution || currentLive.institution || '—'}</span>
+                      </div>
+                      <div className="sp-step4-info-row">
+                        <span className="sp-step4-info-label">Course & Year</span>
+                        <span className="sp-step4-info-val">
+                          {pendingProfile?.formData?.course || currentLive.course || '—'}
+                        </span>
+                      </div>
+                      <div className="sp-step4-info-row">
+                        <span className="sp-step4-info-label">Verification Status</span>
+                        <span className="sp-status-pill sp-status-pill-pending">
+                          <span className="sp-status-dot-pending" />
+                          PENDING VERIFICATION
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="sp-step4-action-block">
+                      <button
+                        type="button"
+                        className="sp-proceed-btn sp-step4-proceed-btn"
+                        onClick={() => setDemoStep(5)}
+                      >
+                        Proceed to Student Dashboard →
+                      </button>
+                      <span className="sp-step4-helper-text">
+                        Step 4 of 5 • Click button or use the &quot;Next&quot; control at the bottom.
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </main>
+              </main>
+            </div>
           )}
 
           {/* STEP 5: Student Dashboard */}
