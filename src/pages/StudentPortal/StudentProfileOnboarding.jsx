@@ -323,7 +323,7 @@ export default function StudentProfileOnboarding({
   }
 
   return (
-    <div className="onb-page-wrapper">
+    <div className={`onb-page-wrapper ${activeSection === 'documents' ? 'onb-docs-only-mode' : ''}`}>
       <style>{`
         .onb-page-wrapper {
           min-height: 100vh;
@@ -1467,6 +1467,239 @@ export default function StudentProfileOnboarding({
         .onb-footer-attribution {
           color: #cbd5e1;
           font-weight: 600;
+        }
+
+        /* ===================================================================
+           Demo Preview Step 3: Full-Page Single-Viewport Documents Upload Mode
+           =================================================================== */
+        .onb-docs-only-mode {
+          padding-bottom: 60px;
+        }
+
+        .onb-docs-only-mode .onb-footer {
+          margin-bottom: 54px;
+        }
+
+        @media (min-width: 900px) and (min-height: 550px) {
+          .onb-docs-only-mode {
+            min-height: 100vh !important;
+            height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            padding-bottom: 0 !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+          }
+
+          .onb-docs-only-mode .onb-top-nav-bar {
+            padding: clamp(8px, 1.2vh, 12px) 36px !important;
+            flex-shrink: 0 !important;
+          }
+
+          .onb-docs-only-mode .onb-hero-banner {
+            padding: clamp(12px, 1.8vh, 18px) clamp(24px, 3vw, 40px) !important;
+            flex-shrink: 0 !important;
+          }
+
+          .onb-docs-only-mode .onb-hero-badge {
+            font-size: 11px !important;
+            padding: 3px 11px !important;
+            margin-bottom: 5px !important;
+          }
+
+          .onb-docs-only-mode .onb-hero-title {
+            font-size: clamp(20px, 2.3vh, 23px) !important;
+            margin: 0 0 4px !important;
+          }
+
+          .onb-docs-only-mode .onb-hero-subtitle {
+            font-size: 13px !important;
+            line-height: 1.4 !important;
+            max-width: 760px !important;
+          }
+
+          .onb-docs-only-mode form {
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            justify-content: center !important;
+          }
+
+          .onb-docs-only-mode .onb-content-container {
+            max-width: 1200px !important;
+            width: 100% !important;
+            margin: 0 auto !important;
+            padding: 0 clamp(20px, 3vw, 40px) !important;
+            box-sizing: border-box !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            gap: 0 !important;
+            flex: 1 !important;
+            min-height: 0 !important;
+          }
+
+          .onb-docs-only-mode .onb-section-card {
+            border: 1.5px solid #ded9cc !important;
+            border-radius: 10px !important;
+            box-shadow: 0 6px 22px rgba(15, 29, 47, 0.07) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            width: 100% !important;
+          }
+
+          .onb-docs-only-mode .onb-section-header {
+            padding: clamp(8px, 1.2vh, 12px) clamp(16px, 2vw, 24px) !important;
+            gap: 8px !important;
+          }
+
+          .onb-docs-only-mode .onb-step-num {
+            width: 24px !important;
+            height: 24px !important;
+            font-size: 12px !important;
+          }
+
+          .onb-docs-only-mode .onb-section-title {
+            font-size: 15.5px !important;
+          }
+
+          .onb-docs-only-mode .onb-section-desc {
+            font-size: 12px !important;
+            margin: 2px 0 0 !important;
+          }
+
+          .onb-docs-only-mode .onb-section-body {
+            padding: clamp(10px, 1.5vh, 16px) clamp(16px, 2vw, 24px) !important;
+          }
+
+          .onb-docs-only-mode .onb-docs-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: clamp(10px, 1.4vh, 14px) !important;
+          }
+
+          .onb-docs-only-mode .onb-doc-card {
+            padding: clamp(10px, 1.4vh, 15px) clamp(14px, 1.8vw, 20px) !important;
+            gap: clamp(8px, 1vh, 12px) !important;
+            border-radius: 8px !important;
+            background-color: #faf7f0 !important;
+            border: 1.5px solid #ded9cc !important;
+          }
+
+          .onb-docs-only-mode .onb-doc-title {
+            font-size: 14.5px !important;
+            font-weight: 700 !important;
+          }
+
+          .onb-docs-only-mode .onb-doc-desc {
+            font-size: 12px !important;
+            line-height: 1.38 !important;
+            margin-top: 2px !important;
+          }
+
+          .onb-docs-only-mode .onb-badge {
+            font-size: 10.5px !important;
+            font-weight: 700 !important;
+            padding: 3px 9px !important;
+            border-radius: 12px !important;
+          }
+
+          .onb-docs-only-mode .onb-doc-btn-upload {
+            padding: clamp(7px, 0.9vh, 9px) 18px !important;
+            font-size: 12.5px !important;
+            font-weight: 600 !important;
+            border-radius: 6px !important;
+          }
+
+          .onb-docs-only-mode .onb-uploaded-meta-box {
+            padding: 8px 12px !important;
+            gap: 8px !important;
+          }
+
+          .onb-docs-only-mode .onb-file-icon {
+            width: 32px !important;
+            height: 32px !important;
+          }
+
+          .onb-docs-only-mode .onb-file-name {
+            font-size: 12.5px !important;
+            font-weight: 700 !important;
+          }
+
+          .onb-docs-only-mode .onb-file-sub {
+            font-size: 11px !important;
+          }
+
+          .onb-docs-only-mode .onb-action-bar {
+            position: static !important;
+            margin-top: clamp(8px, 1.2vh, 14px) !important;
+            padding: clamp(8px, 1.1vh, 12px) clamp(18px, 2.5vw, 32px) !important;
+            background: #ffffff !important;
+            border: 1.5px solid #ded9cc !important;
+            border-radius: 8px !important;
+            box-shadow: 0 2px 8px rgba(15, 29, 47, 0.04) !important;
+            flex-shrink: 0 !important;
+          }
+
+          .onb-docs-only-mode .onb-action-bar-inner {
+            max-width: 1200px !important;
+            width: 100% !important;
+            margin: 0 auto !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+          }
+
+          .onb-docs-only-mode .onb-action-status-col {
+            font-size: 12.5px !important;
+          }
+
+          .onb-docs-only-mode .onb-draft-badge {
+            font-size: 11px !important;
+            padding: 3px 8px !important;
+          }
+
+          .onb-docs-only-mode .onb-btn-draft {
+            padding: 8px 18px !important;
+            font-size: 12.5px !important;
+            font-weight: 600 !important;
+          }
+
+          .onb-docs-only-mode .onb-btn-submit {
+            padding: 9px 24px !important;
+            font-size: 13.5px !important;
+            font-weight: 700 !important;
+            background-color: #059669 !important;
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.2) !important;
+          }
+
+          .onb-docs-only-mode .onb-btn-submit:hover {
+            background-color: #047857 !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3) !important;
+          }
+
+          .onb-docs-only-mode .onb-footer {
+            margin-top: auto !important;
+            margin-bottom: 54px !important;
+            padding: 11px 36px !important;
+            font-size: 12.5px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            z-index: 10 !important;
+            flex-shrink: 0 !important;
+          }
+
+          .onb-docs-only-mode .onb-footer-inner {
+            max-width: 1200px !important;
+            width: 100% !important;
+            margin: 0 auto !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+          }
         }
       `}</style>
 

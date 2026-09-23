@@ -262,7 +262,7 @@ function StudentPortal({
   const showFirstTimeOnboarding = (!isProfileCompleted || verificationStatus === 'unverified' || verificationStatus === 'draft') && !showDashboard && !showDiffView && !showEditForm && !showAchievementsExperience && !showPublicPost && !showInternships && !showPlacements && !showSkillAssessments && !['pending', 'approved', 'rejected'].includes(verificationStatus)
 
   return (
-    <div className={`sp-canvas ${isDemoActive && demoStep === 4 ? 'sp-canvas-step4' : ''}`}>
+    <div className={`sp-canvas ${isDemoActive && demoStep === 4 ? 'sp-canvas-step4' : ''} ${isDemoActive && demoStep === 3 ? 'sp-canvas-step3' : ''}`}>
       <style>{`
         html,
         body,
@@ -643,13 +643,21 @@ function StudentPortal({
         }
 
         /* ===================================================================
-           Step 4 Demo Preview: Verification Status Full-Page Viewport Layout
+           Step 3 & 4 Demo Preview: Full-Page Viewport Layouts
            =================================================================== */
-        @media (min-width: 900px) and (min-height: 600px) {
+        @media (min-width: 900px) and (min-height: 550px) {
+          .sp-canvas-step3,
           .sp-canvas-step4 {
             height: 100vh !important;
             max-height: 100vh !important;
             overflow: hidden !important;
+          }
+          .sp-step3-wrapper {
+            height: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
           }
         }
 
@@ -1448,7 +1456,7 @@ function StudentPortal({
 
           {/* STEP 3: Required Documents Upload section/page */}
           {demoStep === 3 && (
-            <div style={{ paddingBottom: '100px' }}>
+            <div className="sp-step3-wrapper">
               <StudentProfileOnboarding
                 initialData={draftProfile?.formData || student}
                 initialDocuments={draftProfile?.documents || {}}
