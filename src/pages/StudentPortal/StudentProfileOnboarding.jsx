@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import ImageCropModal from '../../components/Auth/ImageCropModal'
 import { DOCUMENT_SPECS } from './documentSpecs'
+import StudentPortalPageHeader from '../../components/StudentPortalPageHeader'
 
 export default function StudentProfileOnboarding({
   initialData,
@@ -398,51 +399,7 @@ export default function StudentProfileOnboarding({
           color: #f1cf7c;
         }
 
-        /* Hero Banner */
-        .onb-hero-banner {
-          background: linear-gradient(135deg, #112233 0%, #193855 100%);
-          color: #ffffff;
-          padding: 36px 36px 32px;
-          border-bottom: 3px solid #b3881e;
-          text-align: center;
-        }
 
-        .onb-hero-inner {
-          max-width: 860px;
-          margin: 0 auto;
-        }
-
-        .onb-hero-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          background-color: rgba(179, 136, 30, 0.2);
-          border: 1px solid rgba(241, 207, 124, 0.4);
-          color: #f1cf7c;
-          font-size: 11px;
-          font-weight: 700;
-          padding: 4px 12px;
-          border-radius: 20px;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          margin-bottom: 12px;
-        }
-
-        .onb-hero-title {
-          font-size: 28px;
-          font-weight: 800;
-          color: #ffffff;
-          margin: 0 0 10px;
-          letter-spacing: -0.01em;
-        }
-
-        .onb-hero-subtitle {
-          font-size: 14.5px;
-          color: #c7d5e0;
-          max-width: 680px;
-          margin: 0 auto;
-          line-height: 1.55;
-        }
 
         /* Rejection / Warning Banner if editing a rejected profile */
         .onb-rejection-banner {
@@ -1390,12 +1347,7 @@ export default function StudentProfileOnboarding({
           .onb-top-nav-bar {
             padding: 12px 18px;
           }
-          .onb-hero-banner {
-            padding: 24px 18px;
-          }
-          .onb-hero-title {
-            font-size: 22px;
-          }
+
           .onb-content-container {
             padding: 0 12px;
           }
@@ -1496,27 +1448,7 @@ export default function StudentProfileOnboarding({
             flex-shrink: 0 !important;
           }
 
-          .onb-docs-only-mode .onb-hero-banner {
-            padding: clamp(12px, 1.8vh, 18px) clamp(24px, 3vw, 40px) !important;
-            flex-shrink: 0 !important;
-          }
 
-          .onb-docs-only-mode .onb-hero-badge {
-            font-size: 11px !important;
-            padding: 3px 11px !important;
-            margin-bottom: 5px !important;
-          }
-
-          .onb-docs-only-mode .onb-hero-title {
-            font-size: clamp(20px, 2.3vh, 23px) !important;
-            margin: 0 0 4px !important;
-          }
-
-          .onb-docs-only-mode .onb-hero-subtitle {
-            font-size: 13px !important;
-            line-height: 1.4 !important;
-            max-width: 760px !important;
-          }
 
           .onb-docs-only-mode form {
             flex: 1 !important;
@@ -1723,31 +1655,7 @@ export default function StudentProfileOnboarding({
           font-size: 11.5px;
         }
 
-        .onb-profile-only-mode .onb-hero-banner {
-          padding: 14px 24px 12px;
-          border-bottom: 2.5px solid #b3881e;
-          flex-shrink: 0;
-        }
 
-        .onb-profile-only-mode .onb-hero-badge {
-          font-size: 10px;
-          padding: 2px 9px;
-          margin-bottom: 4px;
-        }
-
-        .onb-profile-only-mode .onb-hero-title {
-          font-size: 20px;
-          margin: 0 0 3px;
-          font-weight: 700;
-        }
-
-        .onb-profile-only-mode .onb-hero-subtitle {
-          font-size: 12.5px;
-          line-height: 1.4;
-          color: #cbd5e1;
-          max-width: 760px;
-          margin: 0 auto;
-        }
 
         .onb-profile-only-mode .onb-content-container {
           max-width: 980px;
@@ -2018,29 +1926,25 @@ export default function StudentProfileOnboarding({
       </header>
 
       {/* Institutional Hero Banner */}
-      <section className="onb-hero-banner">
-        <div className="onb-hero-inner">
-          <div className="onb-hero-badge">
-            <span>Institutional Verification Protocol</span>
-          </div>
-          <h2 className="onb-hero-title">
-            {activeSection === 'profile'
-              ? 'Edit / Complete Student Profile'
-              : activeSection === 'documents'
-              ? 'Required Documents Upload'
-              : isEditMode
-              ? 'Update Your Student Profile'
-              : 'Complete Your Student Profile'}
-          </h2>
-          <p className="onb-hero-subtitle">
-            {activeSection === 'profile'
-              ? 'Enter and update your personal identity, contact coordinates, permanent address, and official institutional enrollment credentials.'
-              : activeSection === 'documents'
-              ? 'Submit authentic institutional verification documents for review by your Principal or Institutional Coordinator.'
-              : 'Complete your profile and submit the required documents for institutional verification. Your Principal or Institutional Coordinator will review these records to grant full access to accredited internships and academic credentials.'}
-          </p>
-        </div>
-      </section>
+      <StudentPortalPageHeader
+        eyebrow="Institutional Verification Protocol"
+        title={
+          activeSection === 'profile'
+            ? 'Edit / Complete Student Profile'
+            : activeSection === 'documents'
+            ? 'Required Documents Upload'
+            : isEditMode
+            ? 'Update Your Student Profile'
+            : 'Complete Your Student Profile'
+        }
+        description={
+          activeSection === 'profile'
+            ? 'Enter and update your personal identity, contact coordinates, permanent address, and official institutional enrollment credentials.'
+            : activeSection === 'documents'
+            ? 'Submit authentic institutional verification documents for review by your Principal or Institutional Coordinator.'
+            : 'Complete your profile and submit the required documents for institutional verification. Your Principal or Institutional Coordinator will review these records to grant full access to accredited internships and academic credentials.'
+        }
+      />
 
       {/* Rejection notice if student is re-submitting */}
       {rejectionNotice && (

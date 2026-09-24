@@ -8,6 +8,7 @@ import StudentInternships from './StudentInternships'
 import StudentPlacements from './StudentPlacements'
 import StudentSkillAssessments from './StudentSkillAssessments'
 import PortalFooter from '../../components/PortalFooter'
+import StudentPortalPageHeader from '../../components/StudentPortalPageHeader'
 
 function StudentPortal({
   onNavigateHome,
@@ -693,53 +694,7 @@ function StudentPortal({
           box-sizing: border-box;
         }
 
-        /* 1. Full-Width Verification Introduction Section (Matching Step 3 Hero Banner) */
-        .sp-step4-hero-banner {
-          background: linear-gradient(135deg, #112233 0%, #193855 100%);
-          color: #ffffff;
-          padding: clamp(10px, 1.5vh, 16px) clamp(24px, 3vw, 40px);
-          border-bottom: 3px solid #b3881e;
-          text-align: center;
-          flex-shrink: 0;
-          width: 100%;
-          box-sizing: border-box;
-        }
-
-        .sp-step4-hero-inner {
-          max-width: 860px;
-          margin: 0 auto;
-        }
-
-        .sp-step4-hero-badge {
-          display: inline-flex;
-          align-items: center;
-          background-color: rgba(179, 136, 30, 0.2);
-          border: 1px solid rgba(241, 207, 124, 0.4);
-          color: #f1cf7c;
-          font-size: 11px;
-          font-weight: 700;
-          padding: 3px 11px;
-          border-radius: 20px;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          margin-bottom: 5px;
-        }
-
-        .sp-step4-hero-title {
-          font-size: clamp(20px, 2.3vh, 23px);
-          font-weight: 800;
-          color: #ffffff;
-          margin: 0 0 4px;
-          letter-spacing: -0.01em;
-        }
-
-        .sp-step4-hero-subtitle {
-          font-size: 13px;
-          color: #cbd5e1;
-          line-height: 1.4;
-          max-width: 760px;
-          margin: 0 auto;
-        }
+        /* 1. Content Container */
 
         /* 2. Structured Content Container */
         .sp-step4-content-container {
@@ -1075,53 +1030,7 @@ function StudentPortal({
           box-sizing: border-box;
         }
 
-        /* Hero Banner */
-        .sp-step1-hero-banner {
-          background: linear-gradient(135deg, #112233 0%, #193855 100%);
-          color: #ffffff;
-          padding: clamp(10px, 1.5vh, 16px) clamp(24px, 3vw, 40px);
-          border-bottom: 3px solid #b3881e;
-          text-align: center;
-          flex-shrink: 0;
-          width: 100%;
-          box-sizing: border-box;
-        }
 
-        .sp-step1-hero-inner {
-          max-width: 860px;
-          margin: 0 auto;
-        }
-
-        .sp-step1-hero-badge {
-          display: inline-flex;
-          align-items: center;
-          background-color: rgba(179, 136, 30, 0.2);
-          border: 1px solid rgba(241, 207, 124, 0.4);
-          color: #f1cf7c;
-          font-size: 11px;
-          font-weight: 700;
-          padding: 3px 11px;
-          border-radius: 20px;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          margin-bottom: 5px;
-        }
-
-        .sp-step1-hero-title {
-          font-size: clamp(20px, 2.3vh, 23px);
-          font-weight: 800;
-          color: #ffffff;
-          margin: 0 0 4px;
-          letter-spacing: -0.01em;
-        }
-
-        .sp-step1-hero-subtitle {
-          font-size: 13px;
-          color: #cbd5e1;
-          line-height: 1.4;
-          max-width: 760px;
-          margin: 0 auto;
-        }
 
         /* Content Container */
         .sp-step1-content-container {
@@ -1404,18 +1313,11 @@ function StudentPortal({
           {/* STEP 1: First-Time Student Profile Screen */}
           {demoStep === 1 && (
             <div className="sp-step1-wrapper">
-              {/* Institutional Hero Banner */}
-              <section className="sp-step1-hero-banner">
-                <div className="sp-step1-hero-inner">
-                  <div className="sp-step1-hero-badge">
-                    <span>Institutional Verification Protocol</span>
-                  </div>
-                  <h2 className="sp-step1-hero-title">First-Time Student Profile</h2>
-                  <p className="sp-step1-hero-subtitle">
-                    Welcome to your student workspace. Review your registered identity credentials and complete your profile to submit for institutional verification.
-                  </p>
-                </div>
-              </section>
+              <StudentPortalPageHeader
+                eyebrow="Institutional Verification Protocol"
+                title="First-Time Student Profile"
+                description="Welcome to your student workspace. Review your registered identity credentials and complete your profile to submit for institutional verification."
+              />
 
               {/* Central Content Area */}
               <div className="sp-step1-content-container">
@@ -1526,18 +1428,11 @@ function StudentPortal({
           {/* STEP 4: Submit for Verification / Verification Status */}
           {demoStep === 4 && (
             <div className="sp-step4-wrapper">
-              {/* Full-Width Institutional Verification Introduction (matching Step 3 Hero Banner) */}
-              <section className="sp-step4-hero-banner">
-                <div className="sp-step4-hero-inner">
-                  <div className="sp-step4-hero-badge">
-                    <span>Institutional Verification Protocol</span>
-                  </div>
-                  <h2 className="sp-step4-hero-title">Profile Submitted for Verification</h2>
-                  <p className="sp-step4-hero-subtitle">
-                    Your profile and documents have been successfully submitted. Your Principal or Institutional Coordinator will review the submitted records to approve your verified profile.
-                  </p>
-                </div>
-              </section>
+              <StudentPortalPageHeader
+                eyebrow="Institutional Verification Protocol"
+                title="Profile Submitted for Verification"
+                description="Your profile and documents have been successfully submitted. Your Principal or Institutional Coordinator will review the submitted records to approve your verified profile."
+              />
 
               {/* Structured Content Area (matching Step 3 Content Container) */}
               <div className="sp-step4-content-container">
@@ -1625,6 +1520,11 @@ function StudentPortal({
           {/* STEP 5: Student Dashboard */}
           {demoStep === 5 && (
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+              <StudentPortalPageHeader
+                eyebrow="Institutional Student Workspace"
+                title="Student Dashboard"
+                description="Official verified student portal for academic performance, accredited internships, campus placements, and verified institutional records."
+              />
               {activeView === 'achievements_experience' ? (
                 <StudentAchievementsExperience
                   student={currentLive}
