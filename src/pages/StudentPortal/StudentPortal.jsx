@@ -1063,279 +1063,299 @@ function StudentPortal({
           border-color: #ef4444;
         }
 
-        /* First-Time Student Profile Screen (Demo Step 1) */
-        .sp-initial-profile-container {
-          max-width: 960px;
-          width: 100%;
-          margin: 0 auto;
+        /* ===================================================================
+           Step 1: First-Time Student Profile / Verification Onboarding
+           =================================================================== */
+        .sp-step1-wrapper {
+          flex: 1;
           display: flex;
           flex-direction: column;
-          gap: 24px;
+          width: 100%;
+          min-height: 0;
+          box-sizing: border-box;
         }
 
-        .sp-initial-hero {
-          background: linear-gradient(135deg, #112233 0%, #1a3956 100%);
-          border-radius: 8px;
-          padding: 28px 32px;
+        /* Hero Banner */
+        .sp-step1-hero-banner {
+          background: linear-gradient(135deg, #112233 0%, #193855 100%);
           color: #ffffff;
+          padding: clamp(10px, 1.5vh, 16px) clamp(24px, 3vw, 40px);
           border-bottom: 3px solid #b3881e;
-          box-shadow: 0 4px 16px rgba(15, 29, 47, 0.08);
+          text-align: center;
+          flex-shrink: 0;
+          width: 100%;
+          box-sizing: border-box;
         }
 
-        .sp-initial-badge {
+        .sp-step1-hero-inner {
+          max-width: 860px;
+          margin: 0 auto;
+        }
+
+        .sp-step1-hero-badge {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
           background-color: rgba(179, 136, 30, 0.2);
           border: 1px solid rgba(241, 207, 124, 0.4);
           color: #f1cf7c;
           font-size: 11px;
           font-weight: 700;
-          padding: 4px 10px;
-          border-radius: 16px;
+          padding: 3px 11px;
+          border-radius: 20px;
           letter-spacing: 0.04em;
           text-transform: uppercase;
-          margin-bottom: 10px;
+          margin-bottom: 5px;
         }
 
-        .sp-initial-hero-title {
-          font-size: 24px;
+        .sp-step1-hero-title {
+          font-size: clamp(20px, 2.3vh, 23px);
           font-weight: 800;
-          margin: 0 0 8px;
           color: #ffffff;
+          margin: 0 0 4px;
+          letter-spacing: -0.01em;
         }
 
-        .sp-initial-hero-sub {
-          font-size: 13.5px;
-          color: #c7d5e0;
-          margin: 0;
-          line-height: 1.55;
-          max-width: 720px;
+        .sp-step1-hero-subtitle {
+          font-size: 13px;
+          color: #cbd5e1;
+          line-height: 1.4;
+          max-width: 760px;
+          margin: 0 auto;
         }
 
-        .sp-initial-card {
-          background: #ffffff;
-          border: 1px solid #ded9cc;
-          border-radius: 8px;
-          box-shadow: 0 2px 10px rgba(15, 29, 47, 0.04);
-          overflow: hidden;
-        }
-
-        .sp-initial-card-header {
-          padding: 16px 24px;
-          background-color: #faf7f0;
-          border-bottom: 1px solid #ede8de;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-
-        .sp-initial-card-title {
-          font-size: 16px;
-          font-weight: 700;
-          color: #112233;
-          margin: 0;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .sp-initial-card-body {
-          padding: 24px;
+        /* Content Container */
+        .sp-step1-content-container {
+          max-width: 840px;
+          width: 100%;
+          margin: 0 auto;
+          padding: clamp(16px, 2.5vh, 28px) clamp(20px, 3vw, 36px);
+          box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          justify-content: center;
+          align-items: center;
+          flex: 1;
+          min-height: 0;
         }
 
-        .sp-initial-profile-row {
+        /* Central Institutional Onboarding Card */
+        .sp-step1-card {
+          background: #ffffff;
+          border: 1.5px solid #ded9cc;
+          border-radius: 10px;
+          box-shadow: 0 4px 18px rgba(15, 29, 47, 0.06);
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          overflow: hidden;
+          box-sizing: border-box;
+        }
+
+        .sp-step1-card-header {
+          background-color: #faf7f0;
+          border-bottom: 1px solid #ede8de;
+          padding: 12px 24px;
+          box-sizing: border-box;
+        }
+
+        .sp-step1-card-title-wrap {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .sp-step1-card-title {
+          font-size: 15.5px;
+          font-weight: 700;
+          color: #0f1d2f;
+          margin: 0;
+          letter-spacing: -0.01em;
+        }
+
+        .sp-step1-card-desc {
+          font-size: 12px;
+          color: #64748b;
+          margin: 2px 0 0;
+        }
+
+        .sp-step1-card-body {
+          padding: clamp(16px, 2.2vh, 24px) clamp(20px, 2.5vw, 28px);
           display: flex;
           align-items: center;
-          gap: 24px;
-          flex-wrap: wrap;
+          gap: clamp(20px, 3vw, 32px);
+          box-sizing: border-box;
         }
 
-        .sp-initial-avatar-box {
-          width: 92px;
-          height: 92px;
-          border-radius: 50%;
-          background-color: #1b525c;
-          color: #ffffff;
+        /* Profile Photo Avatar Column */
+        .sp-step1-avatar-col {
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
-          border: 3px solid #b3881e;
-          overflow: hidden;
-          box-shadow: 0 4px 12px rgba(15, 29, 47, 0.12);
           flex-shrink: 0;
         }
 
-        .sp-initial-avatar-img {
+        .sp-step1-avatar-frame {
+          width: clamp(80px, 9vw, 96px);
+          height: clamp(80px, 9vw, 96px);
+          border-radius: 50%;
+          border: 3px solid #b3881e;
+          background-color: #faf7f0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          box-shadow: 0 4px 14px rgba(15, 29, 47, 0.1);
+        }
+
+        .sp-step1-avatar-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          display: block;
         }
 
-        .sp-initial-avatar-placeholder {
-          font-size: 32px;
+        .sp-step1-avatar-placeholder {
+          font-size: clamp(30px, 3.5vw, 36px);
           font-weight: 800;
-          color: #f1cf7c;
+          color: #1b525c;
         }
 
-        .sp-initial-details-grid {
+        /* Info Column */
+        .sp-step1-info-col {
           flex: 1;
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 16px;
-        }
-
-        .sp-initial-detail-item {
           display: flex;
           flex-direction: column;
-          gap: 4px;
-          background-color: #faf7f0;
-          padding: 10px 14px;
-          border-radius: 6px;
-          border: 1px solid #ede8de;
-        }
-
-        .sp-initial-detail-label {
-          font-size: 11px;
-          font-weight: 700;
-          color: #64748b;
-          text-transform: uppercase;
-          letter-spacing: 0.04em;
-        }
-
-        .sp-initial-detail-val {
-          font-size: 14px;
-          font-weight: 600;
-          color: #0f1d2f;
-        }
-
-        .sp-initial-empty-val {
-          color: #94a3b8;
-          font-style: italic;
-          font-weight: 500;
-        }
-
-        /* Verification Section */
-        .sp-initial-verify-section {
-          background: #ffffff;
-          border: 1.5px solid #ded9cc;
-          border-left: 5px solid #b3881e;
-          border-radius: 8px;
-          padding: 24px;
-          box-shadow: 0 2px 10px rgba(15, 29, 47, 0.04);
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-
-        .sp-initial-verify-header {
-          display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
-          gap: 16px;
-          flex-wrap: wrap;
-        }
-
-        .sp-initial-verify-title {
-          font-size: 18px;
-          font-weight: 800;
-          color: #112233;
-          margin: 0 0 6px;
-          line-height: 1.35;
-        }
-
-        .sp-initial-verify-desc {
-          font-size: 13.5px;
-          color: #475569;
-          line-height: 1.6;
-          margin: 0;
-        }
-
-        .sp-initial-status-pill {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          background-color: #faf7f0;
-          border: 1px solid #f1cf7c;
-          color: #8a620b;
-          font-size: 11.5px;
-          font-weight: 700;
-          padding: 5px 12px;
-          border-radius: 16px;
-          white-space: nowrap;
-        }
-
-        .sp-initial-verify-steps {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-          gap: 12px;
-          margin-top: 4px;
-        }
-
-        .sp-initial-step-card {
-          background-color: #faf7f0;
-          border: 1px solid #ede8de;
-          border-radius: 6px;
-          padding: 12px 14px;
-          display: flex;
           gap: 10px;
-          align-items: flex-start;
+          min-width: 0;
         }
 
-        .sp-initial-step-num {
-          width: 22px;
-          height: 22px;
-          border-radius: 50%;
-          background-color: #112233;
-          color: #f1cf7c;
-          font-size: 11px;
-          font-weight: 800;
+        .sp-step1-row {
           display: flex;
           align-items: center;
-          justify-content: center;
+          justify-content: space-between;
+          padding: 8px 12px;
+          background-color: #faf7f0;
+          border: 1px solid #ede8de;
+          border-radius: 6px;
+          box-sizing: border-box;
+          transition: background-color 0.15s ease;
+        }
+
+        .sp-step1-row:hover {
+          background-color: #f5f0e3;
+        }
+
+        .sp-step1-label {
+          color: #64748b;
+          font-weight: 600;
+          font-size: 12.5px;
+          letter-spacing: 0.01em;
           flex-shrink: 0;
         }
 
-        .sp-initial-step-text {
-          font-size: 12.5px;
-          color: #334155;
-          line-height: 1.45;
-        }
-
-        .sp-initial-actions {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-          flex-wrap: wrap;
-          padding-top: 8px;
-          border-top: 1px solid #ede8de;
-        }
-
-        .sp-initial-cta-btn {
-          background-color: #112233;
-          color: #ffffff;
-          border: 1px solid #b3881e;
+        .sp-step1-val {
+          color: #0f1d2f;
+          font-weight: 600;
           font-size: 13.5px;
+          text-align: right;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          margin-left: 12px;
+        }
+
+        .sp-step1-val-name {
           font-weight: 700;
-          padding: 11px 22px;
+          color: #112233;
+          font-size: 14.5px;
+        }
+
+        /* Action Row with Prominent Primary CTA */
+        .sp-step1-action-row {
+          padding: 14px 24px 18px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-top: 1px solid #f1ece1;
+          background-color: #faf8f4;
+          box-sizing: border-box;
+        }
+
+        .sp-step1-cta-btn {
+          background-color: #059669;
+          color: #ffffff;
+          border: none;
+          padding: 11px 28px;
           border-radius: 6px;
+          font-weight: 700;
+          font-size: 14px;
           cursor: pointer;
+          transition: all 0.18s ease;
           display: inline-flex;
           align-items: center;
-          gap: 8px;
-          transition: all 0.18s ease;
-          box-shadow: 0 2px 6px rgba(17, 34, 51, 0.16);
+          justify-content: center;
+          gap: 9px;
+          box-shadow: 0 2px 8px rgba(5, 150, 105, 0.22);
           font-family: inherit;
         }
 
-        .sp-initial-cta-btn:hover {
-          background-color: #1b525c;
-          border-color: #f1cf7c;
+        .sp-step1-cta-btn:hover {
+          background-color: #047857;
           transform: translateY(-1px);
+          box-shadow: 0 4px 14px rgba(5, 150, 105, 0.32);
+        }
+
+        .sp-step1-cta-arrow {
+          font-size: 15px;
+          transition: transform 0.15s ease;
+        }
+
+        .sp-step1-cta-btn:hover .sp-step1-cta-arrow {
+          transform: translateX(2px);
+        }
+
+        /* Footer in Step 1 */
+        .sp-step1-footer {
+          margin-top: auto !important;
+          margin-bottom: 54px !important;
+          padding: 11px 36px !important;
+          font-size: 12.5px !important;
+          width: 100% !important;
+          box-sizing: border-box !important;
+          z-index: 10 !important;
+          flex-shrink: 0 !important;
+        }
+
+        .sp-step1-footer .portal-footer-inner {
+          max-width: 1200px !important;
+          width: 100% !important;
+          margin: 0 auto !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+        }
+
+        @media (max-width: 640px) {
+          .sp-step1-card-body {
+            flex-direction: column;
+            text-align: center;
+            gap: 16px;
+          }
+          .sp-step1-info-col {
+            width: 100%;
+          }
+          .sp-step1-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+          }
+          .sp-step1-val {
+            margin-left: 0;
+            text-align: left;
+          }
+          .sp-step1-cta-btn {
+            width: 100%;
+          }
         }
       `}</style>
 
@@ -1383,134 +1403,89 @@ function StudentPortal({
         <>
           {/* STEP 1: First-Time Student Profile Screen */}
           {demoStep === 1 && (
-            <main className="sp-workspace-container" style={{ paddingBottom: '100px' }}>
-              <div className="sp-initial-profile-container">
-                {/* Hero / Information Strip */}
-                <div className="sp-initial-hero">
-                  <div className="sp-initial-badge">
+            <div className="sp-step1-wrapper">
+              {/* Institutional Hero Banner */}
+              <section className="sp-step1-hero-banner">
+                <div className="sp-step1-hero-inner">
+                  <div className="sp-step1-hero-badge">
                     <span>Institutional Verification Protocol</span>
                   </div>
-                  <h2 className="sp-initial-hero-title">First-Time Student Profile</h2>
-                  <p className="sp-initial-hero-sub">
-                    Welcome to your student workspace. Review your initial registered profile credentials below and proceed to complete institutional verification to unlock authenticated academic and placement features.
+                  <h2 className="sp-step1-hero-title">First-Time Student Profile</h2>
+                  <p className="sp-step1-hero-subtitle">
+                    Welcome to your student workspace. Review your registered identity credentials and complete your profile to submit for institutional verification.
                   </p>
                 </div>
+              </section>
 
-                {/* Card 1: Registered Identity Credentials (Profile picture, Name, Email, Phone number) */}
-                <div className="sp-initial-card">
-                  <div className="sp-initial-card-header">
-                    <h3 className="sp-initial-card-title">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                        <circle cx="12" cy="7" r="4" />
-                      </svg>
-                      <span>Registered Account Identity</span>
-                    </h3>
-                    <span className="sp-initial-status-pill">
-                      ● Action Required
-                    </span>
+              {/* Central Content Area */}
+              <div className="sp-step1-content-container">
+                <section className="sp-step1-card">
+                  <div className="sp-step1-card-header">
+                    <div className="sp-step1-card-title-wrap">
+                      <h3 className="sp-step1-card-title">Registered Account Identity</h3>
+                      <p className="sp-step1-card-desc">
+                        Official primary credentials registered on the portal
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="sp-initial-card-body">
-                    <div className="sp-initial-profile-row">
-                      <div className="sp-initial-avatar-box" title="Profile picture">
+                  <div className="sp-step1-card-body">
+                    {/* 1. Student Profile Picture */}
+                    <div className="sp-step1-avatar-col">
+                      <div className="sp-step1-avatar-frame" title="Student Profile Photo">
                         {currentLive.profilePic ? (
-                          <img src={currentLive.profilePic} alt={currentLive.name || 'Profile'} className="sp-initial-avatar-img" />
+                          <img
+                            src={currentLive.profilePic}
+                            alt={currentLive.name || student.name || 'Student Profile'}
+                            className="sp-step1-avatar-img"
+                          />
                         ) : (
-                          <span className="sp-initial-avatar-placeholder">
+                          <span className="sp-step1-avatar-placeholder">
                             {(currentLive.name || student.name || 'S').charAt(0).toUpperCase()}
                           </span>
                         )}
                       </div>
+                    </div>
 
-                      <div className="sp-initial-details-grid">
-                        <div className="sp-initial-detail-item">
-                          <span className="sp-initial-detail-label">Profile Picture</span>
-                          <span className="sp-initial-detail-val">
-                            {currentLive.profilePic ? 'Uploaded' : <span className="sp-initial-empty-val">Not uploaded yet</span>}
-                          </span>
-                        </div>
-
-                        <div className="sp-initial-detail-item">
-                          <span className="sp-initial-detail-label">Full Name</span>
-                          <span className="sp-initial-detail-val">
-                            {currentLive.name || student.name || <span className="sp-initial-empty-val">—</span>}
-                          </span>
-                        </div>
-
-                        <div className="sp-initial-detail-item">
-                          <span className="sp-initial-detail-label">Email Address</span>
-                          <span className="sp-initial-detail-val">
-                            {currentLive.email || student.email || <span className="sp-initial-empty-val">—</span>}
-                          </span>
-                        </div>
-
-                        <div className="sp-initial-detail-item">
-                          <span className="sp-initial-detail-label">Phone Number</span>
-                          <span className="sp-initial-detail-val">
-                            {currentLive.phone || student.phone || <span className="sp-initial-empty-val">—</span>}
-                          </span>
-                        </div>
+                    {/* Student Identity Information: 2. Name, 3. Email, 4. Phone Number */}
+                    <div className="sp-step1-info-col">
+                      <div className="sp-step1-row">
+                        <span className="sp-step1-label">Student Name</span>
+                        <span className="sp-step1-val sp-step1-val-name">
+                          {currentLive.name || student.name || '—'}
+                        </span>
                       </div>
-                    </div>
-                  </div>
-                </div>
 
-                {/* Card 2: Complete Your Profile and Send to Principal of Your Institute for Verification */}
-                <div className="sp-initial-verify-section">
-                  <div className="sp-initial-verify-header">
-                    <div>
-                      <h3 className="sp-initial-verify-title">
-                        Complete Your Profile and Send to Principal of Your Institute for Verification
-                      </h3>
-                      <p className="sp-initial-verify-desc">
-                        As per institutional protocol, all student records require verification by the Principal or Institutional Coordinator of your institute before full internship and placement features are activated.
-                      </p>
-                    </div>
-                    <span className="sp-initial-status-pill">
-                      Verification Pending
-                    </span>
-                  </div>
-
-                  <div className="sp-initial-verify-steps">
-                    <div className="sp-initial-step-card">
-                      <div className="sp-initial-step-num">1</div>
-                      <div className="sp-initial-step-text">
-                        <strong>Personal & Academic Details:</strong> Fill permanent address, academic branch, roll numbers, and current semester.
+                      <div className="sp-step1-row">
+                        <span className="sp-step1-label">Email Address</span>
+                        <span className="sp-step1-val">
+                          {currentLive.email || student.email || '—'}
+                        </span>
                       </div>
-                    </div>
 
-                    <div className="sp-initial-step-card">
-                      <div className="sp-initial-step-num">2</div>
-                      <div className="sp-initial-step-text">
-                        <strong>Document Uploads:</strong> Attach authentic Admission Slip, Aadhaar Card, and Marksheet for verification check.
-                      </div>
-                    </div>
-
-                    <div className="sp-initial-step-card">
-                      <div className="sp-initial-step-num">3</div>
-                      <div className="sp-initial-step-text">
-                        <strong>Principal Verification:</strong> Submit records for institutional review and grant of verified student status.
+                      <div className="sp-step1-row">
+                        <span className="sp-step1-label">Phone Number</span>
+                        <span className="sp-step1-val">
+                          {currentLive.phone || student.phone || '—'}
+                        </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="sp-initial-actions">
+                  {/* 5. One primary CTA: Complete Your Profile & Send for Verification */}
+                  <div className="sp-step1-action-row">
                     <button
                       type="button"
-                      className="sp-initial-cta-btn"
+                      className="sp-step1-cta-btn"
                       onClick={() => setDemoStep(2)}
                     >
-                      <span>Complete Profile & Upload Documents</span>
-                      <span>→</span>
+                      <span>Complete Your Profile &amp; Send for Verification</span>
+                      <span className="sp-step1-cta-arrow">→</span>
                     </button>
-                    <span style={{ fontSize: '12px', color: '#64748b' }}>
-                      Step 1 of 3 • Click button or use the &quot;Next&quot; control at the bottom.
-                    </span>
                   </div>
-                </div>
+                </section>
               </div>
-            </main>
+            </div>
           )}
 
           {/* STEP 2: Edit / Complete Student Profile page */}
@@ -2010,8 +1985,14 @@ function StudentPortal({
         : !(showFirstTimeOnboarding || showEditForm || showDiffView)
       ) && (
         <PortalFooter
-          className={isDemoActive && demoStep === 4 ? 'sp-step4-footer' : ''}
-          style={isDemoActive ? (demoStep === 4 ? {} : { paddingBottom: '72px' }) : {}}
+          className={
+            isDemoActive && demoStep === 1
+              ? 'sp-step1-footer'
+              : isDemoActive && demoStep === 4
+              ? 'sp-step4-footer'
+              : ''
+          }
+          style={isDemoActive ? (demoStep === 1 || demoStep === 4 ? {} : { paddingBottom: '72px' }) : {}}
         />
       )}
 
