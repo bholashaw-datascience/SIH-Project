@@ -2216,14 +2216,14 @@ export default function StudentProfileOnboarding({
             <section className="onb-section-card">
               <div className="onb-section-header">
                 <div className="onb-section-title-wrap">
-                  <span className="onb-step-num">{activeSection === 'documents' ? '1' : '5'}</span>
+                  {activeSection !== 'documents' && <span className="onb-step-num">5</span>}
                   <div>
                     <h3 className="onb-section-title">Required Documents</h3>
-                  <p className="onb-section-desc">
-                    Submit authentic institutional proofs for verification by your Principal / Coordinator. Max 5MB per file (PDF, JPG, PNG). Admission Slip, Aadhaar Card, and Marksheet are mandatory; College ID Card is optional.
-                  </p>
+                    <p className="onb-section-desc">
+                      Submit authentic institutional proofs for verification by your Principal / Coordinator. Max 5MB per file (PDF, JPG, PNG). Admission Slip, Aadhaar Card, and Marksheet are mandatory; College ID Card is optional.
+                    </p>
+                  </div>
                 </div>
-              </div>
             </div>
 
             <div className="onb-section-body">
