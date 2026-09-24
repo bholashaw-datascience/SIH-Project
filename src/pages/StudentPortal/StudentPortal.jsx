@@ -646,8 +646,7 @@ function StudentPortal({
            Step 3 & 4 Demo Preview: Full-Page Viewport Layouts
            =================================================================== */
         @media (min-width: 900px) and (min-height: 550px) {
-          .sp-canvas-step3,
-          .sp-canvas-step4 {
+          .sp-canvas-step3 {
             height: 100vh !important;
             max-height: 100vh !important;
             min-height: 100vh !important;
@@ -656,8 +655,7 @@ function StudentPortal({
             overflow: hidden !important;
             box-sizing: border-box !important;
           }
-          .sp-step3-wrapper,
-          .sp-step4-wrapper {
+          .sp-step3-wrapper {
             height: 100%;
             flex: 1;
             display: flex;
@@ -666,233 +664,206 @@ function StudentPortal({
           }
         }
 
+        /* Step 4 Single-Viewport Desktop Institutional Portal Layout */
+        .sp-canvas-step4 {
+          height: 100vh !important;
+          max-height: 100vh !important;
+          min-height: 100vh !important;
+          display: flex !important;
+          flex-direction: column !important;
+          overflow: hidden !important;
+          box-sizing: border-box !important;
+        }
+
         .sp-step4-wrapper {
+          flex: 1;
           display: flex;
           flex-direction: column;
-          flex: 1;
-          min-height: 0;
           width: 100%;
-        }
-
-        .sp-step4-workspace {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: clamp(10px, 1.8vh, 22px) clamp(16px, 2.5vw, 36px);
+          min-height: 0;
           box-sizing: border-box;
+        }
+
+        /* 1. Full-Width Verification Introduction Section (Matching Step 3 Hero Banner) */
+        .sp-step4-hero-banner {
+          background: linear-gradient(135deg, #112233 0%, #193855 100%);
+          color: #ffffff;
+          padding: clamp(10px, 1.5vh, 16px) clamp(24px, 3vw, 40px);
+          border-bottom: 3px solid #b3881e;
+          text-align: center;
+          flex-shrink: 0;
           width: 100%;
+          box-sizing: border-box;
+        }
+
+        .sp-step4-hero-inner {
+          max-width: 860px;
+          margin: 0 auto;
+        }
+
+        .sp-step4-hero-badge {
+          display: inline-flex;
+          align-items: center;
+          background-color: rgba(179, 136, 30, 0.2);
+          border: 1px solid rgba(241, 207, 124, 0.4);
+          color: #f1cf7c;
+          font-size: 11px;
+          font-weight: 700;
+          padding: 3px 11px;
+          border-radius: 20px;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          margin-bottom: 5px;
+        }
+
+        .sp-step4-hero-title {
+          font-size: clamp(20px, 2.3vh, 23px);
+          font-weight: 800;
+          color: #ffffff;
+          margin: 0 0 4px;
+          letter-spacing: -0.01em;
+        }
+
+        .sp-step4-hero-subtitle {
+          font-size: 13px;
+          color: #cbd5e1;
+          line-height: 1.4;
+          max-width: 760px;
+          margin: 0 auto;
+        }
+
+        /* 2. Structured Content Container */
+        .sp-step4-content-container {
+          max-width: 980px;
+          width: 100%;
+          margin: 0 auto;
+          padding: 0 clamp(20px, 3vw, 40px);
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          flex: 1;
           min-height: 0;
         }
 
-        /* ONE COORDINATED TWO-PANEL MAIN CONTENT COMPOSITION */
-        .sp-step4-main-container {
-          max-width: 1320px;
-          width: 92%;
-          margin: 0 auto;
+        /* 3. Section Card (Matching Step 3 Section Card) */
+        .sp-step4-section-card {
           background: #ffffff;
           border: 1.5px solid #ded9cc;
-          border-radius: 12px;
-          box-shadow: 0 6px 28px rgba(15, 29, 47, 0.07);
-          display: grid;
-          grid-template-columns: 38% 62%;
+          border-radius: 10px;
+          box-shadow: 0 6px 22px rgba(15, 29, 47, 0.07);
+          display: flex;
+          flex-direction: column;
+          width: 100%;
           overflow: hidden;
           box-sizing: border-box;
         }
 
-        /* LEFT PANEL — STUDENT VISUAL (38%) */
-        .sp-step4-left-panel {
-          background: #faf8f4;
-          border-right: 1px solid #ede7db;
-          padding: clamp(20px, 2.8vh, 32px) clamp(22px, 2.5vw, 36px);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          box-sizing: border-box;
-          height: 100%;
-        }
-
-        .sp-step4-illust-wrap {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: clamp(10px, 1.6vh, 16px);
-        }
-
-        .sp-step4-student-img {
-          width: auto;
-          max-width: 100%;
-          max-height: clamp(190px, 28vh, 260px);
-          object-fit: contain;
-          border-radius: 6px;
-        }
-
-        .sp-step4-confirm-box {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          max-width: 340px;
-          width: 100%;
-        }
-
-        .sp-step4-protocol-tag {
-          font-size: 11px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          color: #b3881e;
-          background: #fef9ed;
-          border: 1px solid #f6e2b3;
-          padding: 3px 10px;
-          border-radius: 12px;
-          margin-bottom: 6px;
-          display: inline-block;
-        }
-
-        .sp-step4-confirm-title {
-          font-size: clamp(16px, 2vh, 18px);
-          font-weight: 700;
-          color: #0f1d2f;
-          margin: 0 0 5px;
-          letter-spacing: -0.01em;
-        }
-
-        .sp-step4-confirm-desc {
-          font-size: clamp(12px, 1.4vh, 13px);
-          color: #64748b;
-          line-height: 1.48;
-          margin: 0;
-        }
-
-        /* RIGHT PANEL — VERIFICATION (62%) */
-        .sp-step4-right-panel {
-          padding: clamp(22px, 3vh, 34px) clamp(28px, 3.2vw, 44px);
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          box-sizing: border-box;
-          width: 100%;
-        }
-
-        .sp-step4-header-block {
-          margin-bottom: clamp(10px, 1.4vh, 14px);
-        }
-
-        .sp-step4-step-pill {
-          display: inline-block;
-          font-size: 11px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.06em;
-          color: #1e3a8a;
-          background: #eff6ff;
-          border: 1px solid #dbeafe;
-          padding: 3px 9px;
-          border-radius: 4px;
-          margin-bottom: 6px;
-        }
-
-        .sp-step4-title {
-          font-size: clamp(20px, 2.4vh, 24px);
-          font-weight: 700;
-          color: #0f1d2f;
-          margin: 0 0 5px;
-          letter-spacing: -0.01em;
-        }
-
-        .sp-step4-desc {
-          font-size: clamp(12.5px, 1.4vh, 13.5px);
-          color: #475569;
-          line-height: 1.48;
-          margin: 0;
-        }
-
-        .sp-step4-info-panel {
-          width: 100%;
-          background: #fdfcf9;
-          border: 1px solid #ebe4d5;
-          border-radius: 8px;
-          overflow: hidden;
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: column;
-          margin-bottom: clamp(12px, 1.6vh, 18px);
-        }
-
-        .sp-step4-info-row {
+        .sp-step4-card-header {
+          background-color: #faf7f0;
+          border-bottom: 1px solid #ede8de;
+          padding: clamp(8px, 1.2vh, 12px) clamp(16px, 2vw, 24px);
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: clamp(8px, 1.2vh, 12px) clamp(16px, 2vw, 24px) !important;
-          border-bottom: 1px solid #f1ebe0 !important;
+          box-sizing: border-box;
+        }
+
+        .sp-step4-card-title-wrap {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .sp-step4-card-title {
+          font-size: 15.5px;
+          font-weight: 700;
+          color: #0f1d2f;
+          margin: 0;
+          letter-spacing: -0.01em;
+        }
+
+        .sp-step4-card-desc {
+          font-size: 12px;
+          color: #64748b;
+          margin: 2px 0 0;
+        }
+
+        .sp-step4-card-body {
+          padding: clamp(4px, 0.8vh, 8px) clamp(16px, 2vw, 24px);
+          display: flex;
+          flex-direction: column;
+          box-sizing: border-box;
+        }
+
+        .sp-step4-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: clamp(5.5px, 0.85vh, 8px) 8px;
+          border-bottom: 1px solid #f1ebe0;
           box-sizing: border-box;
           transition: background-color 0.15s ease;
+          border-radius: 4px;
         }
 
-        .sp-step4-info-row:hover {
-          background-color: #f7f3ea;
+        .sp-step4-row:hover {
+          background-color: #faf8f4;
         }
 
-        .sp-step4-info-row:last-child {
-          border-bottom: none !important;
+        .sp-step4-row:last-child {
+          border-bottom: none;
         }
 
-        .sp-step4-info-label {
+        .sp-step4-label {
           color: #64748b;
           font-weight: 600;
-          font-size: clamp(13px, 1.4vh, 14px);
+          font-size: clamp(12.5px, 1.3vh, 13.5px);
           letter-spacing: 0.01em;
         }
 
-        .sp-step4-info-val {
+        .sp-step4-val {
           color: #0f1d2f;
           font-weight: 600;
-          font-size: clamp(13.5px, 1.45vh, 14.5px);
+          font-size: clamp(13px, 1.35vh, 14px);
+          text-align: right;
         }
 
-        /* Action Block */
-        .sp-step4-action-block {
+        /* 4. Centered Action Button Area (No outer card/box) */
+        .sp-step4-action-wrap {
           display: flex;
-          flex-direction: column;
-          gap: 5px;
-          align-items: flex-start;
+          justify-content: center;
+          align-items: center;
           width: 100%;
+          margin-top: clamp(14px, 2vh, 22px);
+          flex-shrink: 0;
+          box-sizing: border-box;
         }
 
         .sp-step4-proceed-btn {
           background-color: #059669;
           color: #ffffff;
           border: none;
-          padding: clamp(9px, 1.25vh, 12px) 32px !important;
+          padding: 10px 28px;
           border-radius: 6px;
           font-weight: 700;
-          font-size: clamp(13.5px, 1.4vh, 14.5px) !important;
+          font-size: 13.5px;
           cursor: pointer;
           transition: all 0.15s ease;
           font-family: inherit;
           box-shadow: 0 2px 8px rgba(5, 150, 105, 0.2);
           display: inline-flex;
           align-items: center;
-          justify-content: center;
           gap: 8px;
         }
 
         .sp-step4-proceed-btn:hover {
           background-color: #047857;
           transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(5, 150, 105, 0.28);
+          box-shadow: 0 4px 14px rgba(5, 150, 105, 0.32);
         }
 
-        .sp-step4-helper-text {
-          font-size: 11.5px;
-          color: #64748b;
-          font-weight: 500;
-        }
-
-        /* 5. Step 4 Footer Docking */
+        /* 5. Step 4 Footer Docking (Matching Step 3 Footer) */
         .sp-step4-footer {
           margin-top: auto !important;
           margin-bottom: 54px !important;
@@ -905,25 +876,17 @@ function StudentPortal({
         }
 
         .sp-step4-footer .portal-footer-inner {
-          max-width: 1320px !important;
-          width: 92% !important;
+          max-width: 1200px !important;
+          width: 100% !important;
           margin: 0 auto !important;
           display: flex !important;
           align-items: center !important;
           justify-content: space-between !important;
         }
 
-        @media (max-width: 899px) {
-          .sp-step4-main-container {
-            grid-template-columns: 1fr;
-            max-width: 580px;
-          }
-          .sp-step4-left-panel {
-            border-right: none;
-            border-bottom: 1px solid #ede7db;
-          }
-          .sp-step4-action-block {
-            align-items: center;
+        @media (max-width: 768px) {
+          .sp-step4-content-container {
+            padding: 0 16px;
           }
         }
 
@@ -1579,83 +1542,99 @@ function StudentPortal({
           {/* STEP 4: Submit for Verification / Verification Status */}
           {demoStep === 4 && (
             <div className="sp-step4-wrapper">
-              <main className="sp-step4-workspace">
-                <div className="sp-step4-main-container">
-                  {/* LEFT PANEL — STUDENT VISUAL (38%) */}
-                  <div className="sp-step4-left-panel">
-                    <div className="sp-step4-illust-wrap">
-                      <img
-                        src="/student-verification-success.png"
-                        alt="Student sitting at desk using laptop giving thumbs-up"
-                        className="sp-step4-student-img"
-                      />
-                    </div>
-                    <div className="sp-step4-confirm-box">
-                      <span className="sp-step4-protocol-tag">INSTITUTIONAL VERIFICATION PROTOCOL</span>
-                      <h3 className="sp-step4-confirm-title">Submission Confirmed!</h3>
-                      <p className="sp-step4-confirm-desc">
-                        Your records and authentic documents are queued for institutional verification review.
+              {/* Full-Width Institutional Verification Introduction (matching Step 3 Hero Banner) */}
+              <section className="sp-step4-hero-banner">
+                <div className="sp-step4-hero-inner">
+                  <div className="sp-step4-hero-badge">
+                    <span>Institutional Verification Protocol</span>
+                  </div>
+                  <h2 className="sp-step4-hero-title">Profile Submitted for Verification</h2>
+                  <p className="sp-step4-hero-subtitle">
+                    Your profile and documents have been successfully submitted. Your Principal or Institutional Coordinator will review the submitted records to approve your verified profile.
+                  </p>
+                </div>
+              </section>
+
+              {/* Structured Content Area (matching Step 3 Content Container) */}
+              <div className="sp-step4-content-container">
+                {/* Section Card (matching Step 3 Required Documents section card) */}
+                <section className="sp-step4-section-card">
+                  <div className="sp-step4-card-header">
+                    <div className="sp-step4-card-title-wrap">
+                      <h3 className="sp-step4-card-title">Submitted Profile Information</h3>
+                      <p className="sp-step4-card-desc">
+                        Official records and identity details queued for institutional review
                       </p>
                     </div>
                   </div>
 
-                  {/* RIGHT PANEL — VERIFICATION (62%) */}
-                  <div className="sp-step4-right-panel">
-                    <div className="sp-step4-header-block">
-                      <span className="sp-step4-step-pill">STEP 4 OF 5</span>
-                      <h2 className="sp-step4-title">Profile Submitted for Verification</h2>
-                      <p className="sp-step4-desc">
-                        Your profile and documents have been successfully submitted. Your Principal or Institutional Coordinator will review the submitted records to approve your verified profile.
-                      </p>
+                  <div className="sp-step4-card-body">
+                    {/* Row 1: Student Name */}
+                    <div className="sp-step4-row">
+                      <span className="sp-step4-label">Student Name</span>
+                      <span className="sp-step4-val">
+                        {pendingProfile?.formData?.name || currentLive.name || student.name || '—'}
+                      </span>
                     </div>
 
-                    <div className="sp-step4-info-panel">
-                      <div className="sp-step4-info-row">
-                        <span className="sp-step4-info-label">Student Name</span>
-                        <span className="sp-step4-info-val">{pendingProfile?.formData?.name || currentLive.name || '—'}</span>
-                      </div>
-                      <div className="sp-step4-info-row">
-                        <span className="sp-step4-info-label">Email Address</span>
-                        <span className="sp-step4-info-val">{pendingProfile?.formData?.email || currentLive.email || '—'}</span>
-                      </div>
-                      <div className="sp-step4-info-row">
-                        <span className="sp-step4-info-label">Mobile Number</span>
-                        <span className="sp-step4-info-val">{pendingProfile?.formData?.phone || currentLive.phone || '—'}</span>
-                      </div>
-                      <div className="sp-step4-info-row">
-                        <span className="sp-step4-info-label">Institution</span>
-                        <span className="sp-step4-info-val">{pendingProfile?.formData?.institution || currentLive.institution || '—'}</span>
-                      </div>
-                      <div className="sp-step4-info-row">
-                        <span className="sp-step4-info-label">Course & Year</span>
-                        <span className="sp-step4-info-val">
-                          {pendingProfile?.formData?.course || currentLive.course || '—'}
-                        </span>
-                      </div>
-                      <div className="sp-step4-info-row">
-                        <span className="sp-step4-info-label">Verification Status</span>
-                        <span className="sp-status-pill sp-status-pill-pending">
-                          <span className="sp-status-dot-pending" />
-                          PENDING VERIFICATION
-                        </span>
-                      </div>
+                    {/* Row 2: Email Address */}
+                    <div className="sp-step4-row">
+                      <span className="sp-step4-label">Email Address</span>
+                      <span className="sp-step4-val">
+                        {pendingProfile?.formData?.email || currentLive.email || student.email || '—'}
+                      </span>
                     </div>
 
-                    <div className="sp-step4-action-block">
-                      <button
-                        type="button"
-                        className="sp-proceed-btn sp-step4-proceed-btn"
-                        onClick={() => setDemoStep(5)}
-                      >
-                        Proceed to Student Dashboard →
-                      </button>
-                      <span className="sp-step4-helper-text">
-                        Step 4 of 5 • Click button or use the &quot;Next&quot; control at the bottom.
+                    {/* Row 3: Mobile Number */}
+                    <div className="sp-step4-row">
+                      <span className="sp-step4-label">Mobile Number</span>
+                      <span className="sp-step4-val">
+                        {pendingProfile?.formData?.phone || currentLive.phone || student.phone || '—'}
+                      </span>
+                    </div>
+
+                    {/* Row 4: Institution */}
+                    <div className="sp-step4-row">
+                      <span className="sp-step4-label">Institution</span>
+                      <span className="sp-step4-val">
+                        {pendingProfile?.formData?.institution || currentLive.institution || student.institution || '—'}
+                      </span>
+                    </div>
+
+                    {/* Row 5: Course & Year */}
+                    <div className="sp-step4-row">
+                      <span className="sp-step4-label">Course &amp; Year</span>
+                      <span className="sp-step4-val">
+                        {[
+                          pendingProfile?.formData?.course || currentLive.course || currentLive.branch || student.course || student.branch,
+                          pendingProfile?.formData?.currentYear || currentLive.currentYear || student.currentYear,
+                        ].filter(Boolean).join(' • ') || '—'}
+                      </span>
+                    </div>
+
+                    {/* Row 6: Verification Status */}
+                    <div className="sp-step4-row">
+                      <span className="sp-step4-label">Verification Status</span>
+                      <span className="sp-status-pill sp-status-pill-pending">
+                        <span className="sp-status-dot-pending" />
+                        PENDING VERIFICATION
                       </span>
                     </div>
                   </div>
+                </section>
+
+                {/* Centered Proceed Action Button */}
+                <div className="sp-step4-action-wrap">
+                  <button
+                    type="button"
+                    className="sp-step4-proceed-btn"
+                    onClick={() => setDemoStep(5)}
+                  >
+                    <span>Proceed to Student Dashboard</span>
+                    <span style={{ fontSize: '15px' }}>→</span>
+                  </button>
                 </div>
-              </main>
+              </div>
             </div>
           )}
 
