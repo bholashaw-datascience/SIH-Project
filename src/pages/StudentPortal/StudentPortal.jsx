@@ -675,6 +675,15 @@ function StudentPortal({
           box-sizing: border-box !important;
         }
 
+        .sp-step2-wrapper {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          min-height: 0;
+          box-sizing: border-box;
+        }
+
         .sp-step4-wrapper {
           flex: 1;
           display: flex;
@@ -1506,7 +1515,7 @@ function StudentPortal({
 
           {/* STEP 2: Edit / Complete Student Profile page */}
           {demoStep === 2 && (
-            <div style={{ paddingBottom: '100px' }}>
+            <div className="sp-step2-wrapper">
               <StudentProfileOnboarding
                 initialData={draftProfile?.formData || student}
                 initialDocuments={draftProfile?.documents || {}}

@@ -323,7 +323,7 @@ export default function StudentProfileOnboarding({
   }
 
   return (
-    <div className={`onb-page-wrapper ${activeSection === 'documents' ? 'onb-docs-only-mode' : ''}`}>
+    <div className={`onb-page-wrapper ${activeSection === 'documents' ? 'onb-docs-only-mode' : ''} ${activeSection === 'profile' ? 'onb-profile-only-mode' : ''}`}>
       <style>{`
         .onb-page-wrapper {
           min-height: 100vh;
@@ -1701,6 +1701,298 @@ export default function StudentProfileOnboarding({
             justify-content: space-between !important;
           }
         }
+
+        /* ===================================================================
+           Demo Preview Step 2: Compact Professional Profile Form Mode
+           =================================================================== */
+        .onb-profile-only-mode {
+          padding-bottom: 0 !important;
+        }
+
+        .onb-profile-only-mode .onb-top-nav-bar {
+          padding: 8px 32px;
+          flex-shrink: 0;
+        }
+
+        .onb-profile-only-mode .onb-nav-title {
+          font-size: 15px;
+        }
+
+        .onb-profile-only-mode .onb-return-btn {
+          padding: 5px 12px;
+          font-size: 11.5px;
+        }
+
+        .onb-profile-only-mode .onb-hero-banner {
+          padding: 14px 24px 12px;
+          border-bottom: 2.5px solid #b3881e;
+          flex-shrink: 0;
+        }
+
+        .onb-profile-only-mode .onb-hero-badge {
+          font-size: 10px;
+          padding: 2px 9px;
+          margin-bottom: 4px;
+        }
+
+        .onb-profile-only-mode .onb-hero-title {
+          font-size: 20px;
+          margin: 0 0 3px;
+          font-weight: 700;
+        }
+
+        .onb-profile-only-mode .onb-hero-subtitle {
+          font-size: 12.5px;
+          line-height: 1.4;
+          color: #cbd5e1;
+          max-width: 760px;
+          margin: 0 auto;
+        }
+
+        .onb-profile-only-mode .onb-content-container {
+          max-width: 980px;
+          margin: 14px auto 0;
+          padding: 0 20px;
+          gap: 12px;
+        }
+
+        .onb-profile-only-mode .onb-section-card {
+          border: 1px solid #ded9cc;
+          border-radius: 6px;
+          box-shadow: 0 1px 4px rgba(15, 29, 47, 0.04);
+        }
+
+        .onb-profile-only-mode .onb-section-header {
+          padding: 8px 16px;
+          gap: 8px;
+        }
+
+        .onb-profile-only-mode .onb-section-title-wrap {
+          gap: 8px;
+        }
+
+        .onb-profile-only-mode .onb-step-num {
+          width: 22px;
+          height: 22px;
+          font-size: 11px;
+          font-weight: 700;
+        }
+
+        .onb-profile-only-mode .onb-section-title {
+          font-size: 14px;
+          font-weight: 700;
+          color: #0f1d2f;
+        }
+
+        .onb-profile-only-mode .onb-section-desc {
+          font-size: 11.5px;
+          color: #64748b;
+          margin: 1px 0 0;
+        }
+
+        .onb-profile-only-mode .onb-section-body {
+          padding: 12px 16px;
+        }
+
+        /* Profile photo in Section 1 */
+        .onb-profile-only-mode .onb-photo-row {
+          gap: 14px;
+          padding-bottom: 10px;
+          margin-bottom: 12px;
+          border-bottom: 1px solid #f1ece1;
+        }
+
+        .onb-profile-only-mode .onb-avatar-preview-box {
+          width: 58px;
+          height: 58px;
+          border: 2px solid #b3881e;
+        }
+
+        .onb-profile-only-mode .onb-avatar-placeholder {
+          font-size: 20px;
+        }
+
+        .onb-profile-only-mode .onb-photo-actions {
+          gap: 4px;
+        }
+
+        .onb-profile-only-mode .onb-photo-btns {
+          gap: 8px;
+        }
+
+        .onb-profile-only-mode .onb-btn-upload-photo {
+          font-size: 11.5px;
+          padding: 5px 12px;
+          border-radius: 4px;
+          gap: 5px;
+        }
+
+        .onb-profile-only-mode .onb-btn-remove-photo {
+          font-size: 11px;
+          padding: 4px 10px;
+          border-radius: 4px;
+        }
+
+        .onb-profile-only-mode .onb-photo-tip {
+          font-size: 11px;
+          color: #64748b;
+          margin: 0;
+        }
+
+        /* Form Grids & Fields */
+        .onb-profile-only-mode .onb-grid-2 {
+          gap: 9px 14px;
+        }
+
+        .onb-profile-only-mode .onb-grid-3 {
+          gap: 9px 14px;
+        }
+
+        .onb-profile-only-mode .onb-personal-grid {
+          display: grid;
+          grid-template-columns: repeat(6, 1fr);
+          gap: 9px 14px;
+        }
+
+        .onb-profile-only-mode .onb-personal-grid > :nth-child(1) {
+          grid-column: span 3;
+        }
+
+        .onb-profile-only-mode .onb-personal-grid > :nth-child(2) {
+          grid-column: span 3;
+        }
+
+        .onb-profile-only-mode .onb-personal-grid > :nth-child(3) {
+          grid-column: span 2;
+        }
+
+        .onb-profile-only-mode .onb-personal-grid > :nth-child(4) {
+          grid-column: span 2;
+        }
+
+        .onb-profile-only-mode .onb-personal-grid > :nth-child(5) {
+          grid-column: span 2;
+        }
+
+        @media (max-width: 768px) {
+          .onb-profile-only-mode .onb-personal-grid {
+            grid-template-columns: 1fr;
+          }
+          .onb-profile-only-mode .onb-personal-grid > :nth-child(n) {
+            grid-column: span 1;
+          }
+        }
+
+        .onb-profile-only-mode .onb-field-group {
+          gap: 3px;
+        }
+
+        .onb-profile-only-mode .onb-field-label {
+          font-size: 11.5px;
+          font-weight: 700;
+          color: #112233;
+        }
+
+        .onb-profile-only-mode .onb-input,
+        .onb-profile-only-mode .onb-select {
+          padding: 5px 9px;
+          font-size: 12.5px;
+          height: 32px;
+          border-radius: 4px;
+          border: 1px solid #cbd5e1;
+          box-sizing: border-box;
+        }
+
+        .onb-profile-only-mode .onb-textarea {
+          padding: 6px 9px;
+          font-size: 12px;
+          border-radius: 4px;
+          border: 1px solid #cbd5e1;
+          resize: vertical;
+          min-height: 48px;
+          height: 52px;
+          box-sizing: border-box;
+        }
+
+        .onb-profile-only-mode .onb-checkbox-label {
+          margin-top: 3px;
+          font-size: 11px;
+          gap: 6px;
+        }
+
+        .onb-profile-only-mode .onb-field-error {
+          font-size: 10.5px;
+          margin-top: 1px;
+        }
+
+        /* Action Bar */
+        .onb-profile-only-mode .onb-action-bar {
+          position: static;
+          background-color: #ffffff;
+          border: 1px solid #ded9cc;
+          border-radius: 6px;
+          box-shadow: 0 1px 4px rgba(15, 29, 47, 0.04);
+          padding: 8px 16px;
+          margin-top: 12px;
+          margin-bottom: 0;
+        }
+
+        .onb-profile-only-mode .onb-action-bar-inner {
+          max-width: 100%;
+          gap: 10px;
+        }
+
+        .onb-profile-only-mode .onb-action-status-col {
+          font-size: 11.5px;
+          color: #64748b;
+          gap: 8px;
+        }
+
+        .onb-profile-only-mode .onb-draft-badge {
+          font-size: 10.5px;
+          padding: 2px 6px;
+        }
+
+        .onb-profile-only-mode .onb-action-btns-col {
+          gap: 10px;
+        }
+
+        .onb-profile-only-mode .onb-btn-draft {
+          font-size: 12px;
+          font-weight: 600;
+          padding: 6px 14px;
+          border-radius: 5px;
+        }
+
+        .onb-profile-only-mode .onb-btn-submit {
+          font-size: 12.5px;
+          font-weight: 700;
+          padding: 7px 18px;
+          border-radius: 5px;
+          gap: 6px;
+        }
+
+        /* Footer */
+        .onb-profile-only-mode .onb-footer {
+          margin-top: 16px;
+          margin-bottom: 54px;
+          padding: 10px 24px;
+          font-size: 12px;
+          background: #0f1d2f;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .onb-profile-only-mode .onb-footer-inner {
+          max-width: 980px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
       `}</style>
 
       {/* Top Navigation Bar */}
@@ -1839,7 +2131,7 @@ export default function StudentProfileOnboarding({
               </div>
 
               {/* Personal Information Fields */}
-              <div className="onb-grid-2">
+              <div className="onb-grid-2 onb-personal-grid">
                 <div className="onb-field-group">
                   <label className="onb-field-label">
                     Full Name <span className="onb-req-star">*</span>
