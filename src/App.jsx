@@ -20,11 +20,12 @@ function App() {
   // Synchronize with browser history and hash navigation
   useEffect(() => {
     const handleLocationChange = () => {
+      const hash = window.location.hash
       const params = new URLSearchParams(window.location.search)
-      const isDemo = params.get('demo') === 'true' || window.location.hash.includes('demo')
+      const isDemo = params.get('demo') === 'true' || hash.includes('demo')
       setIsDemoMode(isDemo)
       const isStudentPortal =
-        params.get('portal') === 'student' || window.location.hash.startsWith('#student-portal')
+        params.get('portal') === 'student' || hash.startsWith('#student-portal')
       if (isStudentPortal) {
         setCurrentPage('student-portal')
       } else {
@@ -41,16 +42,36 @@ function App() {
 
   const [demoKey, setDemoKey] = useState(0)
 
-  const navigateTo = (page, { demo = false } = {}) => {
+  const navigateTo = (page, { demo = false, hash = null } = {}) => {
     setIsDemoMode(demo)
     if (demo) {
       setDemoKey((k) => k + 1)
-    }
-    if (page === 'student-portal') {
-      window.location.hash = demo ? '#student-portal-demo' : '#student-portal'
+      const targetHash = hash || '#student-portal-demo/step-1'
+      if (window.location.hash !== targetHash) {
+        window.location.hash = targetHash
+      }
+    } else if (page === 'student-portal') {
+      let targetHash = hash
+      if (!targetHash) {
+        try {
+          const status = localStorage.getItem('udaan_student_verification_status')
+          const completed = localStorage.getItem('udaan_student_profile_completed') === 'true'
+          if (completed && status === 'verified') {
+            targetHash = '#student-portal/dashboard'
+          } else {
+            targetHash = '#student-portal/first-time'
+          }
+        } catch {
+          targetHash = '#student-portal/first-time'
+        }
+      }
+      if (window.location.hash !== targetHash) {
+        window.location.hash = targetHash
+      }
     } else {
-      if (window.location.hash.startsWith('#student-portal')) {
-        window.history.pushState(null, '', window.location.pathname)
+      const targetHash = hash || '#home'
+      if (window.location.hash !== targetHash) {
+        window.location.hash = targetHash
       }
     }
     setCurrentPage(page)

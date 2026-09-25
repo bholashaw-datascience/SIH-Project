@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import StudentProfileOnboarding from './StudentProfileOnboarding'
 import StudentProfileDiffView from './StudentProfileDiffView'
 import StudentDashboard from './StudentDashboard/StudentDashboard'
@@ -23,27 +23,67 @@ function StudentPortal({
 
   const [demoStep, setDemoStep] = useState(() => {
     try {
+      const hash = window.location.hash
+      const match = hash.match(/step-(\d+)/)
+      if (match) {
+        const s = parseInt(match[1], 10)
+        if (s >= 1 && s <= 5) return s
+      }
       const params = new URLSearchParams(window.location.search)
       const s = parseInt(params.get('step'), 10)
       if (s >= 1 && s <= 5) return s
-      if (params.get('view') === 'achievements_experience' || window.location.hash.includes('achievements')) {
+      if (params.get('view') === 'achievements_experience' || hash.includes('achievements')) {
         return 5
       }
-      if (params.get('view') === 'public_post' || window.location.hash.includes('public-post') || window.location.hash.includes('public_post')) {
+      if (params.get('view') === 'public_post' || hash.includes('public-post') || hash.includes('public_post')) {
         return 5
       }
-      if (params.get('view') === 'internships' || window.location.hash.includes('internships')) {
+      if (params.get('view') === 'internships' || hash.includes('internships')) {
         return 5
       }
-      if (params.get('view') === 'placements' || window.location.hash.includes('placements')) {
+      if (params.get('view') === 'placements' || hash.includes('placements')) {
         return 5
       }
-      if (params.get('view') === 'skill_assessments' || window.location.hash.includes('skill-assessments') || window.location.hash.includes('skill_assessments')) {
+      if (params.get('view') === 'skill_assessments' || hash.includes('skill-assessments') || hash.includes('skill_assessments')) {
         return 5
       }
     } catch {}
     return 1
   })
+
+  // Normal Student Flow stage: 'first-time' | 'complete-profile' | 'documents-upload' | 'verification-submitted' | 'dashboard'
+  const [normalStage, setNormalStage] = useState(() => {
+    try {
+      const hash = window.location.hash
+      if (hash.includes('/first-time')) return 'first-time'
+      if (hash.includes('/complete-profile')) return 'complete-profile'
+      if (hash.includes('/documents-upload')) return 'documents-upload'
+      if (hash.includes('/verification-submitted')) return 'verification-submitted'
+      if (hash.includes('/edit-profile') || hash.includes('/diff-view') || hash.includes('/dashboard')) {
+        return 'dashboard'
+      }
+      if (
+        hash.includes('achievements') ||
+        hash.includes('public-post') ||
+        hash.includes('internships') ||
+        hash.includes('placements') ||
+        hash.includes('skill-assessments')
+      ) {
+        return 'dashboard'
+      }
+      const status = localStorage.getItem('udaan_student_verification_status')
+      const completed = localStorage.getItem('udaan_student_profile_completed') === 'true'
+      if (completed && status === 'verified') return 'dashboard'
+      if (status === 'pending' || status === 'approved' || status === 'rejected') return 'verification-submitted'
+    } catch {}
+    return 'first-time'
+  })
+
+  const demoDocs = {
+    admissionSlip: { docId: 'admissionSlip', fileName: 'admission_receipt_2026.pdf', fileSize: '142 KB', uploadedAt: '25 Sep 2026' },
+    aadhaarCard: { docId: 'aadhaarCard', fileName: 'aadhaar_identity.pdf', fileSize: '188 KB', uploadedAt: '25 Sep 2026' },
+    latestResult: { docId: 'latestResult', fileName: 'marksheet_sem5.pdf', fileSize: '210 KB', uploadedAt: '25 Sep 2026' },
+  }
   // Retrieve active student or fallback to empty real record
   const student =
     studentData ||
@@ -160,21 +200,28 @@ function StudentPortal({
   // View state: 'auto' | 'edit_form' | 'diff_view' | 'achievements_experience'
   const [activeView, setActiveView] = useState(() => {
     try {
+      const hash = window.location.hash
       const params = new URLSearchParams(window.location.search)
-      if (params.get('view') === 'achievements_experience' || window.location.hash.includes('achievements')) {
+      if (params.get('view') === 'achievements_experience' || hash.includes('achievements')) {
         return 'achievements_experience'
       }
-      if (params.get('view') === 'public_post' || window.location.hash.includes('public-post') || window.location.hash.includes('public_post')) {
+      if (params.get('view') === 'public_post' || hash.includes('public-post') || hash.includes('public_post')) {
         return 'public_post'
       }
-      if (params.get('view') === 'internships' || window.location.hash.includes('internships')) {
+      if (params.get('view') === 'internships' || hash.includes('internships')) {
         return 'internships'
       }
-      if (params.get('view') === 'placements' || window.location.hash.includes('placements')) {
+      if (params.get('view') === 'placements' || hash.includes('placements')) {
         return 'placements'
       }
-      if (params.get('view') === 'skill_assessments' || window.location.hash.includes('skill-assessments') || window.location.hash.includes('skill_assessments')) {
+      if (params.get('view') === 'skill_assessments' || hash.includes('skill-assessments') || hash.includes('skill_assessments')) {
         return 'skill_assessments'
+      }
+      if (hash.includes('edit-profile')) {
+        return 'edit_form'
+      }
+      if (hash.includes('diff-view')) {
+        return 'diff_view'
       }
     } catch {}
     return 'auto'
@@ -189,6 +236,109 @@ function StudentPortal({
     } catch {}
     return 'skills'
   })
+
+  // Navigation helpers that synchronize with browser history without triggering loops
+  const goToDemoStep = (step) => {
+    setDemoStep(step)
+    setActiveView('auto')
+    const targetHash = `#student-portal-demo/step-${step}`
+    if (window.location.hash !== targetHash) {
+      window.location.hash = targetHash
+    }
+  }
+
+  const goToDemoView = (view) => {
+    setActiveView(view)
+    const targetHash = view === 'auto' ? '#student-portal-demo/step-5' : `#student-portal-demo/step-5/${view}`
+    if (window.location.hash !== targetHash) {
+      window.location.hash = targetHash
+    }
+  }
+
+  const goToNormalStage = (stage) => {
+    setNormalStage(stage)
+    setActiveView('auto')
+    const targetHash = stage === 'dashboard' ? '#student-portal/dashboard' : `#student-portal/${stage}`
+    if (window.location.hash !== targetHash) {
+      window.location.hash = targetHash
+    }
+  }
+
+  const goToNormalView = (view) => {
+    setActiveView(view)
+    const targetHash = view === 'auto' ? '#student-portal/dashboard' : `#student-portal/dashboard/${view}`
+    if (window.location.hash !== targetHash) {
+      window.location.hash = targetHash
+    }
+  }
+
+  // Synchronize React state when user presses browser Back/Forward (popstate/hashchange)
+  useEffect(() => {
+    const handleNavigationSync = () => {
+      const hash = window.location.hash
+      if (isDemoActive) {
+        const match = hash.match(/step-(\d+)/)
+        if (match) {
+          const s = parseInt(match[1], 10)
+          if (s >= 1 && s <= 5) setDemoStep(s)
+        }
+        if (hash.includes('internships')) setActiveView('internships')
+        else if (hash.includes('placements')) setActiveView('placements')
+        else if (hash.includes('achievements')) setActiveView('achievements_experience')
+        else if (hash.includes('public-post') || hash.includes('public_post')) setActiveView('public_post')
+        else if (hash.includes('skill-assessments') || hash.includes('skill_assessments')) setActiveView('skill_assessments')
+        else setActiveView('auto')
+      } else {
+        if (hash.includes('/first-time')) {
+          setNormalStage('first-time')
+          setActiveView('auto')
+        } else if (hash.includes('/complete-profile')) {
+          setNormalStage('complete-profile')
+          setActiveView('auto')
+        } else if (hash.includes('/documents-upload')) {
+          setNormalStage('documents-upload')
+          setActiveView('auto')
+        } else if (hash.includes('/verification-submitted')) {
+          setNormalStage('verification-submitted')
+          setActiveView('auto')
+        } else if (hash.includes('/dashboard') || hash.includes('student-portal')) {
+          setNormalStage('dashboard')
+          if (hash.includes('internships')) setActiveView('internships')
+          else if (hash.includes('placements')) setActiveView('placements')
+          else if (hash.includes('achievements')) setActiveView('achievements_experience')
+          else if (hash.includes('public-post') || hash.includes('public_post')) setActiveView('public_post')
+          else if (hash.includes('skill-assessments') || hash.includes('skill_assessments')) setActiveView('skill_assessments')
+          else if (hash.includes('edit-profile')) setActiveView('edit_form')
+          else if (hash.includes('diff-view')) setActiveView('diff_view')
+          else setActiveView('auto')
+        }
+      }
+    }
+
+    window.addEventListener('popstate', handleNavigationSync)
+    window.addEventListener('hashchange', handleNavigationSync)
+    return () => {
+      window.removeEventListener('popstate', handleNavigationSync)
+      window.removeEventListener('hashchange', handleNavigationSync)
+    }
+  }, [isDemoActive])
+
+  // On mount, ensure current URL has a valid canonical hash without adding duplicate history
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash
+      if (isDemoActive) {
+        if (!hash.startsWith('#student-portal-demo')) {
+          window.history.replaceState(null, '', `#student-portal-demo/step-${demoStep}`)
+        }
+      } else {
+        if (!hash.startsWith('#student-portal/')) {
+          const target = normalStage === 'dashboard' ? '#student-portal/dashboard' : `#student-portal/${normalStage}`
+          window.history.replaceState(null, '', target)
+        }
+      }
+    }
+  }, [isDemoActive, demoStep, normalStage])
 
   // Helper to persist verification state changes
   const updateVerificationStatus = (newStatus) => {
@@ -250,17 +400,7 @@ function StudentPortal({
   // Determine current active display profile
   const currentLive = verifiedProfile.formData || student
 
-  // Determine current route/screen:
-  // Rule 1 & 8: Main Student Dashboard opens ONLY after profile setup completed AND status is verified.
-  const showAchievementsExperience = activeView === 'achievements_experience'
-  const showPublicPost = activeView === 'public_post'
-  const showInternships = activeView === 'internships'
-  const showPlacements = activeView === 'placements'
-  const showSkillAssessments = activeView === 'skill_assessments'
-  const showDashboard = isProfileCompleted && verificationStatus === 'verified' && activeView !== 'diff_view' && activeView !== 'edit_form' && !showAchievementsExperience && !showPublicPost && !showInternships && !showPlacements && !showSkillAssessments
-  const showDiffView = (activeView === 'diff_view' || (isProfileCompleted && hasPendingChanges && activeView !== 'edit_form' && activeView !== 'auto_dashboard')) && !showAchievementsExperience && !showPublicPost && !showInternships && !showPlacements && !showSkillAssessments
-  const showEditForm = activeView === 'edit_form' && !showAchievementsExperience && !showPublicPost && !showInternships && !showPlacements && !showSkillAssessments
-  const showFirstTimeOnboarding = (!isProfileCompleted || verificationStatus === 'unverified' || verificationStatus === 'draft') && !showDashboard && !showDiffView && !showEditForm && !showAchievementsExperience && !showPublicPost && !showInternships && !showPlacements && !showSkillAssessments && !['pending', 'approved', 'rejected'].includes(verificationStatus)
+
 
   return (
     <div className={`sp-canvas ${isDemoActive && demoStep === 4 ? 'sp-canvas-step4' : ''} ${isDemoActive && demoStep === 3 ? 'sp-canvas-step3' : ''}`}>
@@ -1336,34 +1476,21 @@ function StudentPortal({
         }
       `}</style>
 
-      {/* Top Gold Accent Bar (Non-demo mode only) */}
-      {(!isDemoActive && !showDashboard && !showAchievementsExperience) && <div className="sp-gold-accent-bar" />}
+      {/* Top Gold Accent Bar */}
+      {(!isDemoActive && normalStage !== 'dashboard') && <div className="sp-gold-accent-bar" />}
 
-      {/* Top Navigation Navbar for Non-Demo flow */}
-      {(!isDemoActive && !showDashboard && !showAchievementsExperience) && (
-        <header className="sp-top-navbar">
-          <div className="sp-brand-block">
-            <h1 className="sp-brand-title">IAS Collaboration Portal</h1>
+      {/* Top Navigation Navbar for Demo Preview Steps 1 & 4 (Matching Step 3 Reference Design) */}
+      {(isDemoActive && (demoStep === 1 || demoStep === 4)) && (
+        <header className="onb-top-nav-bar">
+          <div className="onb-brand-row">
+            <span className="onb-brand-tag">Student Pathway</span>
+            <h1 className="onb-nav-title">IAS Collaboration Portal</h1>
           </div>
 
-          <div className="sp-header-actions">
-            <div className="sp-user-summary">
-              <div className="sp-avatar-circle">
-                {currentLive.profilePic ? (
-                  <img src={currentLive.profilePic} alt={currentLive.name || 'Student'} />
-                ) : (
-                  (currentLive.name || student.name || 'S').charAt(0).toUpperCase()
-                )}
-              </div>
-              <div className="sp-user-info">
-                <span className="sp-user-name">{currentLive.name || student.name || 'Student Account'}</span>
-                <span className="sp-user-role">{student.username ? `@${student.username}` : 'Official Record'}</span>
-              </div>
-            </div>
-
+          <div className="onb-nav-actions">
             <button
               type="button"
-              className="sp-exit-btn"
+              className="onb-return-btn"
               onClick={onNavigateHome}
               aria-label="Return to Main Portal"
             >
@@ -1373,8 +1500,8 @@ function StudentPortal({
         </header>
       )}
 
-      {/* Top Navigation Navbar for Demo Preview Steps 1 & 4 (Matching Step 3 Reference Design) */}
-      {(isDemoActive && (demoStep === 1 || demoStep === 4)) && (
+      {/* Top Navigation Navbar for Normal Flow Stages 1 & 4 (Matching Step 3 Reference Design) */}
+      {(!isDemoActive && (normalStage === 'first-time' || normalStage === 'verification-submitted')) && (
         <header className="onb-top-nav-bar">
           <div className="onb-brand-row">
             <span className="onb-brand-tag">Student Pathway</span>
@@ -1468,7 +1595,7 @@ function StudentPortal({
                     <button
                       type="button"
                       className="sp-step1-cta-btn"
-                      onClick={() => setDemoStep(2)}
+                      onClick={() => goToDemoStep(2)}
                     >
                       <span>Complete Your Profile &amp; Send for Verification</span>
                       <span className="sp-step1-cta-arrow">→</span>
@@ -1484,12 +1611,12 @@ function StudentPortal({
             <div className="sp-step2-wrapper">
               <StudentProfileOnboarding
                 initialData={draftProfile?.formData || student}
-                initialDocuments={draftProfile?.documents || {}}
+                initialDocuments={draftProfile?.documents || demoDocs}
                 draftSavedTime={draftProfile?.savedAt}
                 onSaveDraft={handleSaveDraft}
                 onSubmitVerification={handleSubmitForVerification}
-                onProceedToDocuments={() => setDemoStep(3)}
-                onBackHome={() => setDemoStep(1)}
+                onProceedToDocuments={() => goToDemoStep(3)}
+                onBackHome={() => goToDemoStep(1)}
                 isEditMode={false}
                 rejectionNotice={null}
                 activeSection="profile"
@@ -1502,11 +1629,11 @@ function StudentPortal({
             <div className="sp-step3-wrapper">
               <StudentProfileOnboarding
                 initialData={draftProfile?.formData || student}
-                initialDocuments={draftProfile?.documents || {}}
+                initialDocuments={draftProfile?.documents || demoDocs}
                 draftSavedTime={draftProfile?.savedAt}
                 onSaveDraft={handleSaveDraft}
-                onSubmitVerification={() => setDemoStep(4)}
-                onBackHome={() => setDemoStep(2)}
+                onSubmitVerification={() => goToDemoStep(4)}
+                onBackHome={() => goToDemoStep(2)}
                 isEditMode={false}
                 rejectionNotice={null}
                 activeSection="documents"
@@ -1596,7 +1723,7 @@ function StudentPortal({
                   <button
                     type="button"
                     className="sp-step4-proceed-btn"
-                    onClick={() => setDemoStep(5)}
+                    onClick={() => goToDemoStep(5)}
                   >
                     <span>Proceed to Student Dashboard</span>
                     <span style={{ fontSize: '15px' }}>→</span>
@@ -1613,40 +1740,40 @@ function StudentPortal({
                 <StudentAchievementsExperience
                   student={currentLive}
                   initialTab={achievementsTab}
-                  onBack={() => setActiveView('auto')}
+                  onBack={() => goToDemoView('auto')}
                   onNavigateHome={onNavigateHome}
                 />
               ) : activeView === 'public_post' ? (
                 <PublicPost
                   student={currentLive}
-                  onBack={() => setActiveView('auto')}
+                  onBack={() => goToDemoView('auto')}
                   onNavigateHome={onNavigateHome}
                 />
               ) : activeView === 'internships' ? (
                 <StudentInternships
                   student={currentLive}
-                  onBack={() => setActiveView('auto')}
+                  onBack={() => goToDemoView('auto')}
                   onNavigateHome={onNavigateHome}
                 />
               ) : activeView === 'placements' ? (
                 <StudentPlacements
                   student={currentLive}
-                  onBack={() => setActiveView('auto')}
+                  onBack={() => goToDemoView('auto')}
                   onNavigateHome={onNavigateHome}
                 />
               ) : activeView === 'skill_assessments' ? (
                 <StudentSkillAssessments
                   student={currentLive}
-                  onBack={() => setActiveView('auto')}
-                  onOpenDashboard={() => setActiveView('auto')}
+                  onBack={() => goToDemoView('auto')}
+                  onOpenDashboard={() => goToDemoView('auto')}
                   onOpenAchievementsExperience={(tab) => {
                     setAchievementsTab(tab || 'skills')
-                    setActiveView('achievements_experience')
+                    goToDemoView('achievements_experience')
                   }}
-                  onOpenInternships={() => setActiveView('internships')}
-                  onOpenPlacements={() => setActiveView('placements')}
-                  onOpenPublicPost={() => setActiveView('public_post')}
-                  onEditProfile={() => setDemoStep(2)}
+                  onOpenInternships={() => goToDemoView('internships')}
+                  onOpenPlacements={() => goToDemoView('placements')}
+                  onOpenPublicPost={() => goToDemoView('public_post')}
+                  onEditProfile={() => goToDemoStep(2)}
                   onNavigateHome={onNavigateHome}
                 />
               ) : (
@@ -1654,16 +1781,16 @@ function StudentPortal({
                   student={currentLive}
                   verifiedProfile={verifiedProfile}
                   hasPendingChanges={false}
-                  onEditProfile={() => setDemoStep(2)}
+                  onEditProfile={() => goToDemoStep(2)}
                   onViewPendingDiff={() => {}}
                   onOpenAchievementsExperience={(tab) => {
                     setAchievementsTab(tab || 'skills')
-                    setActiveView('achievements_experience')
+                    goToDemoView('achievements_experience')
                   }}
-                  onOpenPublicPost={() => setActiveView('public_post')}
-                  onOpenInternships={() => setActiveView('internships')}
-                  onOpenPlacements={() => setActiveView('placements')}
-                  onOpenSkillAssessments={() => setActiveView('skill_assessments')}
+                  onOpenPublicPost={() => goToDemoView('public_post')}
+                  onOpenInternships={() => goToDemoView('internships')}
+                  onOpenPlacements={() => goToDemoView('placements')}
+                  onOpenSkillAssessments={() => goToDemoView('skill_assessments')}
                   onNavigateHome={onNavigateHome}
                   onLogout={onNavigateHome}
                   verificationStatus="verified"
@@ -1674,291 +1801,317 @@ function StudentPortal({
           )}
         </>
       ) : (
-        /* NORMAL FLOW */
+        /* NORMAL PRODUCTION FLOW */
         <>
-          {/* 1. EDIT PROFILE FORM VIEW (When student clicked Edit Profile) */}
-          {showEditForm && (
-            <StudentProfileOnboarding
-              initialData={pendingProfile?.formData || verifiedProfile?.formData || student}
-              initialDocuments={pendingProfile?.documents || verifiedProfile?.documents || {}}
-              onSaveDraft={handleSaveDraft}
-              onSubmitVerification={handleSubmitForVerification}
-              onBackHome={() => setActiveView('auto')}
-              isEditMode={true}
-              rejectionNotice={verificationStatus === 'rejected' ? rejectionReason : null}
-            />
-          )}
+          {/* STAGE 1: First-Time Student Profile Screen */}
+          {normalStage === 'first-time' && (
+            <div className="sp-step1-wrapper">
+              <StudentPortalPageHeader
+                eyebrow="Institutional Verification Protocol"
+                title="First-Time Student Profile"
+                description="Welcome to your student workspace. Review your registered identity credentials and complete your profile to submit for institutional verification."
+              />
 
-          {/* 2. PENDING CHANGES COMPARISON VIEW (Requirement 6) */}
-          {showDiffView && !showEditForm && (
-            <StudentProfileDiffView
-              verifiedData={verifiedProfile.formData}
-              verifiedDocuments={verifiedProfile.documents}
-              pendingData={pendingProfile?.formData || verifiedProfile.formData}
-              pendingDocuments={pendingProfile?.documents || verifiedProfile.documents}
-              pendingStatus={verificationStatus === 'rejected' ? 'rejected' : 'pending'}
-              rejectionReason={rejectionReason}
-              onEditPending={handleEditAndResubmit}
-              onCancelPending={() => {
-                setHasPendingChanges(false)
-                setPendingProfile(null)
-                try {
-                  localStorage.setItem('udaan_student_has_pending_changes', 'false')
-                  localStorage.removeItem('udaan_student_pending_profile')
-                } catch {}
-                setActiveView('auto_dashboard')
-              }}
-              onBackToDashboard={() => setActiveView('auto_dashboard')}
-            />
-          )}
-
-          {/* 3. FIRST-TIME DEDICATED ONBOARDING PAGE */}
-          {showFirstTimeOnboarding && (
-            <StudentProfileOnboarding
-              initialData={draftProfile?.formData || student}
-              initialDocuments={draftProfile?.documents || {}}
-              draftSavedTime={draftProfile?.savedAt}
-              onSaveDraft={handleSaveDraft}
-              onSubmitVerification={handleSubmitForVerification}
-              onBackHome={onNavigateHome}
-              isEditMode={false}
-              rejectionNotice={verificationStatus === 'rejected' ? rejectionReason : null}
-            />
-          )}
-
-          {/* 4. VERIFICATION REVIEW STATES (Pending / Approved / Rejected) */}
-          {!showDashboard && !showDiffView && !showEditForm && !showFirstTimeOnboarding && (
-            <main className="sp-workspace-container">
-              <div className="sp-pending-frame">
-                <div className={`sp-pending-banner sp-pending-banner-${verificationStatus}`}>
-                  {verificationStatus === 'pending' && (
-                    <>
-                      <div className="sp-pending-icon-circle">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <circle cx="12" cy="12" r="10" />
-                          <polyline points="12 6 12 12 16 14" />
-                        </svg>
-                      </div>
-                      <h2 className="sp-pending-heading">Profile Submitted for Verification</h2>
-                      <p className="sp-pending-sub">
-                        Your profile and documents have been successfully submitted. Your Principal or Institutional Coordinator will review the submitted records to approve your verified profile.
+              <div className="sp-step1-content-container">
+                <section className="sp-step1-card">
+                  <div className="sp-step1-card-header">
+                    <div className="sp-step1-card-title-wrap">
+                      <h3 className="sp-step1-card-title">Registered Account Identity</h3>
+                      <p className="sp-step1-card-desc">
+                        Official primary credentials registered on the portal
                       </p>
-                    </>
-                  )}
-
-                  {verificationStatus === 'approved' && (
-                    <>
-                      <div className="sp-pending-icon-circle sp-status-icon-approved">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                          <polyline points="22 4 12 14.01 9 11.01" />
-                        </svg>
-                      </div>
-                      <h2 className="sp-pending-heading">Profile Verification Approved</h2>
-                      <p className="sp-pending-sub">
-                        Your profile details and required documents have been verified and approved by your Institution. You may now access the full student portal features.
-                      </p>
-                    </>
-                  )}
-
-                  {verificationStatus === 'rejected' && (
-                    <>
-                      <div className="sp-pending-icon-circle sp-status-icon-rejected">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                          <circle cx="12" cy="12" r="10" />
-                          <line x1="15" y1="9" x2="9" y2="15" />
-                          <line x1="9" y1="9" x2="15" y2="15" />
-                        </svg>
-                      </div>
-                      <h2 className="sp-pending-heading">Profile Verification Rejected</h2>
-                      <p className="sp-pending-sub">
-                        Your profile verification was not approved by your Institution. Please review the reviewer&apos;s remarks below and re-submit.
-                      </p>
-                    </>
-                  )}
-                </div>
-
-                <div className="sp-pending-body">
-                  {/* Rejection Note if Rejected */}
-                  {verificationStatus === 'rejected' && rejectionReason && (
-                    <div className="sp-rejection-box">
-                      <strong>Institutional Remarks:</strong> {rejectionReason}
-                    </div>
-                  )}
-
-                  <div className="sp-pending-summary-card">
-                    <div className="sp-summary-row">
-                      <span className="sp-summary-label">Student Name</span>
-                      <span className="sp-summary-val">{pendingProfile?.formData?.name || currentLive.name}</span>
-                    </div>
-                    <div className="sp-summary-row">
-                      <span className="sp-summary-label">Email Address</span>
-                      <span className="sp-summary-val">{pendingProfile?.formData?.email || currentLive.email}</span>
-                    </div>
-                    <div className="sp-summary-row">
-                      <span className="sp-summary-label">Mobile Number</span>
-                      <span className="sp-summary-val">{pendingProfile?.formData?.phone || currentLive.phone}</span>
-                    </div>
-                    <div className="sp-summary-row">
-                      <span className="sp-summary-label">Institution</span>
-                      <span className="sp-summary-val">{pendingProfile?.formData?.institution || currentLive.institution}</span>
-                    </div>
-                    <div className="sp-summary-row">
-                      <span className="sp-summary-label">Course & Year</span>
-                      <span className="sp-summary-val">
-                        {pendingProfile?.formData?.course || currentLive.course || currentLive.branch} • {pendingProfile?.formData?.currentYear || currentLive.currentYear || '3rd Year'}
-                      </span>
-                    </div>
-                    <div className="sp-summary-row">
-                      <span className="sp-summary-label">Verification Status</span>
-                      {verificationStatus === 'pending' && (
-                        <span className="sp-status-pill sp-status-pill-pending">
-                          <span className="sp-status-dot-pending" />
-                          Pending Verification
-                        </span>
-                      )}
-                      {verificationStatus === 'approved' && (
-                        <span className="sp-status-pill sp-status-pill-approved">
-                          <span className="sp-status-dot-approved" />
-                          Approved
-                        </span>
-                      )}
-                      {verificationStatus === 'rejected' && (
-                        <span className="sp-status-pill sp-status-pill-rejected">
-                          <span className="sp-status-dot-rejected" />
-                          Rejected
-                        </span>
-                      )}
                     </div>
                   </div>
 
-                  {/* State-Specific Action Buttons */}
-                  {verificationStatus === 'rejected' && (
+                  <div className="sp-step1-card-body">
+                    <div className="sp-step1-avatar-col">
+                      <div className="sp-step1-avatar-frame" title="Student Profile Photo">
+                        {currentLive.profilePic ? (
+                          <img
+                            src={currentLive.profilePic}
+                            alt={currentLive.name || student.name || 'Student Profile'}
+                            className="sp-step1-avatar-img"
+                          />
+                        ) : (
+                          <span className="sp-step1-avatar-placeholder">
+                            {(currentLive.name || student.name || 'S').charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="sp-step1-info-col">
+                      <div className="sp-step1-row">
+                        <span className="sp-step1-label">Student Name</span>
+                        <span className="sp-step1-val sp-step1-val-name">
+                          {currentLive.name || student.name || '—'}
+                        </span>
+                      </div>
+
+                      <div className="sp-step1-row">
+                        <span className="sp-step1-label">Email Address</span>
+                        <span className="sp-step1-val">
+                          {currentLive.email || student.email || '—'}
+                        </span>
+                      </div>
+
+                      <div className="sp-step1-row">
+                        <span className="sp-step1-label">Phone Number</span>
+                        <span className="sp-step1-val">
+                          {currentLive.phone || student.phone || '—'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="sp-step1-action-row">
                     <button
                       type="button"
-                      className="sp-reapply-btn"
-                      onClick={handleEditAndResubmit}
+                      className="sp-step1-cta-btn"
+                      onClick={() => goToNormalStage('complete-profile')}
                     >
-                      ↻ Edit & Re-submit Profile
+                      <span>Complete Your Profile &amp; Send for Verification</span>
+                      <span className="sp-step1-cta-arrow">→</span>
                     </button>
-                  )}
+                  </div>
+                </section>
+              </div>
+            </div>
+          )}
 
-                  {verificationStatus === 'approved' && (
-                    <button
-                      type="button"
-                      className="sp-proceed-btn"
-                      onClick={handleProceedToDashboard}
-                    >
-                      Proceed to Student Dashboard →
-                    </button>
-                  )}
+          {/* STAGE 2: Complete Student Profile page */}
+          {normalStage === 'complete-profile' && (
+            <div className="sp-step2-wrapper">
+              <StudentProfileOnboarding
+                initialData={draftProfile?.formData || student}
+                initialDocuments={draftProfile?.documents || {}}
+                draftSavedTime={draftProfile?.savedAt}
+                onSaveDraft={handleSaveDraft}
+                onSubmitVerification={handleSubmitForVerification}
+                onProceedToDocuments={({ formData, documents }) => {
+                  handleSaveDraft({ formData, documents })
+                  goToNormalStage('documents-upload')
+                }}
+                onBackHome={() => goToNormalStage('first-time')}
+                isEditMode={false}
+                rejectionNotice={null}
+                activeSection="profile"
+              />
+            </div>
+          )}
 
+          {/* STAGE 3: Required Documents Upload */}
+          {normalStage === 'documents-upload' && (
+            <div className="sp-step3-wrapper">
+              <StudentProfileOnboarding
+                initialData={draftProfile?.formData || student}
+                initialDocuments={draftProfile?.documents || demoDocs}
+                draftSavedTime={draftProfile?.savedAt}
+                onSaveDraft={handleSaveDraft}
+                onSubmitVerification={({ formData, documents }) => {
+                  handleSubmitForVerification({ formData, documents })
+                  goToNormalStage('verification-submitted')
+                }}
+                onBackHome={() => goToNormalStage('complete-profile')}
+                isEditMode={false}
+                rejectionNotice={null}
+                activeSection="documents"
+              />
+            </div>
+          )}
+
+          {/* STAGE 4: Profile Submitted for Verification */}
+          {normalStage === 'verification-submitted' && (
+            <div className="sp-step4-wrapper">
+              <StudentPortalPageHeader
+                eyebrow="Institutional Verification Protocol"
+                title="Profile Submitted for Verification"
+                description="Your profile and documents have been successfully submitted. Your Principal or Institutional Coordinator will review the submitted records to approve your verified profile."
+              />
+
+              <div className="sp-step4-content-container">
+                <section className="sp-step4-section-card">
+                  <div className="sp-step4-card-header">
+                    <div className="sp-step4-card-title-wrap">
+                      <h3 className="sp-step4-card-title">Submitted Profile Information</h3>
+                      <p className="sp-step4-card-desc">
+                        Official records and identity details queued for institutional review
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="sp-step4-card-body">
+                    <div className="sp-step4-row">
+                      <span className="sp-step4-label">Student Name</span>
+                      <span className="sp-step4-val">
+                        {pendingProfile?.formData?.name || currentLive.name || student.name || '—'}
+                      </span>
+                    </div>
+
+                    <div className="sp-step4-row">
+                      <span className="sp-step4-label">Email Address</span>
+                      <span className="sp-step4-val">
+                        {pendingProfile?.formData?.email || currentLive.email || student.email || '—'}
+                      </span>
+                    </div>
+
+                    <div className="sp-step4-row">
+                      <span className="sp-step4-label">Mobile Number</span>
+                      <span className="sp-step4-val">
+                        {pendingProfile?.formData?.phone || currentLive.phone || student.phone || '—'}
+                      </span>
+                    </div>
+
+                    <div className="sp-step4-row">
+                      <span className="sp-step4-label">Institution</span>
+                      <span className="sp-step4-val">
+                        {pendingProfile?.formData?.institution || currentLive.institution || student.institution || '—'}
+                      </span>
+                    </div>
+
+                    <div className="sp-step4-row">
+                      <span className="sp-step4-label">Course &amp; Year</span>
+                      <span className="sp-step4-val">
+                        {[
+                          pendingProfile?.formData?.course || currentLive.course || currentLive.branch || student.course || student.branch,
+                          pendingProfile?.formData?.currentYear || currentLive.currentYear || student.currentYear,
+                        ].filter(Boolean).join(' • ') || '—'}
+                      </span>
+                    </div>
+
+                    <div className="sp-step4-row">
+                      <span className="sp-step4-label">Verification Status</span>
+                      <span className="sp-status-pill sp-status-pill-pending">
+                        <span className="sp-status-dot-pending" />
+                        PENDING VERIFICATION
+                      </span>
+                    </div>
+                  </div>
+                </section>
+
+                <div className="sp-step4-action-wrap">
                   <button
                     type="button"
-                    className="sp-exit-btn"
-                    style={{ alignSelf: 'center', color: '#64748b' }}
-                    onClick={onNavigateHome}
+                    className="sp-step4-proceed-btn"
+                    onClick={() => {
+                      handleProceedToDashboard()
+                      goToNormalStage('dashboard')
+                    }}
                   >
-                    ← Return to Main Portal
+                    <span>Proceed to Student Dashboard</span>
+                    <span style={{ fontSize: '15px' }}>→</span>
                   </button>
                 </div>
               </div>
-            </main>
+            </div>
           )}
 
-          {/* 5. MAIN DEDICATED STUDENT DASHBOARD COMPONENT */}
-          {showDashboard && (
-            <StudentDashboard
-              student={currentLive}
-              verifiedProfile={verifiedProfile}
-              hasPendingChanges={hasPendingChanges}
-              onEditProfile={() => {
-                if (hasPendingChanges) {
-                  setActiveView('diff_view')
-                } else {
-                  setActiveView('edit_form')
-                }
-              }}
-              onViewPendingDiff={() => setActiveView('diff_view')}
-              onOpenAchievementsExperience={(tab) => {
-                setAchievementsTab(tab || 'skills')
-                setActiveView('achievements_experience')
-              }}
-              onOpenPublicPost={() => setActiveView('public_post')}
-              onOpenInternships={() => setActiveView('internships')}
-              onOpenPlacements={() => setActiveView('placements')}
-              onOpenSkillAssessments={() => setActiveView('skill_assessments')}
-              onNavigateHome={onNavigateHome}
-              onLogout={() => {
-                try {
-                  localStorage.removeItem('udaan_active_student')
-                } catch {}
-                onNavigateHome?.()
-              }}
-              verificationStatus={verificationStatus}
-              rejectionReason={rejectionReason}
-            />
-          )}
-
-          {/* 6. DEDICATED ACHIEVEMENTS & EXPERIENCE PAGE */}
-          {showAchievementsExperience && (
-            <StudentAchievementsExperience
-              student={currentLive}
-              initialTab={achievementsTab}
-              onBack={() => setActiveView('auto')}
-              onNavigateHome={onNavigateHome}
-            />
-          )}
-
-          {/* 7. DEDICATED CREATE PUBLIC POST PAGE */}
-          {showPublicPost && (
-            <PublicPost
-              student={currentLive}
-              onBack={() => setActiveView('auto')}
-              onNavigateHome={onNavigateHome}
-            />
-          )}
-
-          {/* 8. DEDICATED INTERNSHIPS PAGE */}
-          {showInternships && (
-            <StudentInternships
-              student={currentLive}
-              onBack={() => setActiveView('auto')}
-              onNavigateHome={onNavigateHome}
-            />
-          )}
-
-          {/* 9. DEDICATED PLACEMENTS PAGE */}
-          {showPlacements && (
-            <StudentPlacements
-              student={currentLive}
-              onBack={() => setActiveView('auto')}
-              onNavigateHome={onNavigateHome}
-            />
-          )}
-
-          {/* 10. DEDICATED SKILL ASSESSMENTS PAGE */}
-          {showSkillAssessments && (
-            <StudentSkillAssessments
-              student={currentLive}
-              onBack={() => setActiveView('auto')}
-              onOpenDashboard={() => setActiveView('auto')}
-              onOpenAchievementsExperience={(tab) => {
-                setAchievementsTab(tab || 'skills')
-                setActiveView('achievements_experience')
-              }}
-              onOpenInternships={() => setActiveView('internships')}
-              onOpenPlacements={() => setActiveView('placements')}
-              onOpenPublicPost={() => setActiveView('public_post')}
-              onEditProfile={() => {
-                if (hasPendingChanges) {
-                  setActiveView('diff_view')
-                } else {
-                  setActiveView('edit_form')
-                }
-              }}
-              onNavigateHome={onNavigateHome}
-            />
+          {/* STAGE 5: Student Dashboard */}
+          {normalStage === 'dashboard' && (
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+              {activeView === 'achievements_experience' ? (
+                <StudentAchievementsExperience
+                  student={currentLive}
+                  initialTab={achievementsTab}
+                  onBack={() => goToNormalView('auto')}
+                  onNavigateHome={onNavigateHome}
+                />
+              ) : activeView === 'public_post' ? (
+                <PublicPost
+                  student={currentLive}
+                  onBack={() => goToNormalView('auto')}
+                  onNavigateHome={onNavigateHome}
+                />
+              ) : activeView === 'internships' ? (
+                <StudentInternships
+                  student={currentLive}
+                  onBack={() => goToNormalView('auto')}
+                  onNavigateHome={onNavigateHome}
+                />
+              ) : activeView === 'placements' ? (
+                <StudentPlacements
+                  student={currentLive}
+                  onBack={() => goToNormalView('auto')}
+                  onNavigateHome={onNavigateHome}
+                />
+              ) : activeView === 'skill_assessments' ? (
+                <StudentSkillAssessments
+                  student={currentLive}
+                  onBack={() => goToNormalView('auto')}
+                  onOpenDashboard={() => goToNormalView('auto')}
+                  onOpenAchievementsExperience={(tab) => {
+                    setAchievementsTab(tab || 'skills')
+                    goToNormalView('achievements_experience')
+                  }}
+                  onOpenInternships={() => goToNormalView('internships')}
+                  onOpenPlacements={() => goToNormalView('placements')}
+                  onOpenPublicPost={() => goToNormalView('public_post')}
+                  onEditProfile={() => goToNormalView('edit_form')}
+                  onNavigateHome={onNavigateHome}
+                />
+              ) : activeView === 'edit_form' ? (
+                <StudentProfileOnboarding
+                  initialData={pendingProfile?.formData || verifiedProfile?.formData || student}
+                  initialDocuments={pendingProfile?.documents || verifiedProfile?.documents || {}}
+                  onSaveDraft={handleSaveDraft}
+                  onSubmitVerification={handleSubmitForVerification}
+                  onBackHome={() => goToNormalView('auto')}
+                  isEditMode={true}
+                  rejectionNotice={verificationStatus === 'rejected' ? rejectionReason : null}
+                />
+              ) : activeView === 'diff_view' ? (
+                <StudentProfileDiffView
+                  verifiedData={verifiedProfile.formData}
+                  verifiedDocuments={verifiedProfile.documents}
+                  pendingData={pendingProfile?.formData || verifiedProfile.formData}
+                  pendingDocuments={pendingProfile?.documents || verifiedProfile.documents}
+                  pendingStatus={verificationStatus === 'rejected' ? 'rejected' : 'pending'}
+                  rejectionReason={rejectionReason}
+                  onEditPending={handleEditAndResubmit}
+                  onCancelPending={() => {
+                    setHasPendingChanges(false)
+                    setPendingProfile(null)
+                    try {
+                      localStorage.setItem('udaan_student_has_pending_changes', 'false')
+                      localStorage.removeItem('udaan_student_pending_profile')
+                    } catch {}
+                    goToNormalView('auto')
+                  }}
+                  onBackToDashboard={() => goToNormalView('auto')}
+                />
+              ) : (
+                <StudentDashboard
+                  student={currentLive}
+                  verifiedProfile={verifiedProfile}
+                  hasPendingChanges={hasPendingChanges}
+                  onEditProfile={() => {
+                    if (hasPendingChanges) {
+                      goToNormalView('diff_view')
+                    } else {
+                      goToNormalView('edit_form')
+                    }
+                  }}
+                  onViewPendingDiff={() => goToNormalView('diff_view')}
+                  onOpenAchievementsExperience={(tab) => {
+                    setAchievementsTab(tab || 'skills')
+                    goToNormalView('achievements_experience')
+                  }}
+                  onOpenPublicPost={() => goToNormalView('public_post')}
+                  onOpenInternships={() => goToNormalView('internships')}
+                  onOpenPlacements={() => goToNormalView('placements')}
+                  onOpenSkillAssessments={() => goToNormalView('skill_assessments')}
+                  onNavigateHome={onNavigateHome}
+                  onLogout={() => {
+                    try {
+                      localStorage.removeItem('udaan_active_student')
+                    } catch {}
+                    onNavigateHome?.()
+                  }}
+                  verificationStatus={verificationStatus}
+                  rejectionReason={rejectionReason}
+                />
+              )}
+            </div>
           )}
         </>
       )}
@@ -1966,13 +2119,13 @@ function StudentPortal({
       {/* Official Shared Portal Footer across all Student Portal pages */}
       {(isDemoActive
         ? (demoStep === 1 || demoStep === 4 || demoStep === 5)
-        : !(showFirstTimeOnboarding || showEditForm || showDiffView)
+        : (normalStage === 'first-time' || normalStage === 'verification-submitted' || normalStage === 'dashboard')
       ) && (
         <PortalFooter
           className={
-            isDemoActive && demoStep === 1
+            (isDemoActive && demoStep === 1) || (!isDemoActive && normalStage === 'first-time')
               ? 'sp-step1-footer'
-              : isDemoActive && demoStep === 4
+              : (isDemoActive && demoStep === 4) || (!isDemoActive && normalStage === 'verification-submitted')
               ? 'sp-step4-footer'
               : ''
           }
@@ -2003,7 +2156,7 @@ function StudentPortal({
                 <span key={stepNum} style={{ display: 'flex', alignItems: 'center' }}>
                   <span
                     className={`sp-demo-dot ${demoStep === stepNum ? 'is-active' : demoStep > stepNum ? 'is-done' : ''}`}
-                    onClick={() => setDemoStep(stepNum)}
+                    onClick={() => goToDemoStep(stepNum)}
                     title={`Jump to Step ${stepNum}`}
                   >
                     {stepNum}
@@ -2019,7 +2172,7 @@ function StudentPortal({
                   type="button"
                   id="demo-prev-btn"
                   className="sp-demo-btn sp-demo-btn-prev"
-                  onClick={() => setDemoStep((s) => s - 1)}
+                  onClick={() => goToDemoStep(demoStep - 1)}
                 >
                   ← Previous
                 </button>
@@ -2030,7 +2183,7 @@ function StudentPortal({
                   type="button"
                   id="demo-next-btn"
                   className="sp-demo-btn sp-demo-btn-next"
-                  onClick={() => setDemoStep((s) => s + 1)}
+                  onClick={() => goToDemoStep(demoStep + 1)}
                 >
                   <span>Next</span>
                   <span className="sp-demo-arrow">→</span>
@@ -2042,7 +2195,7 @@ function StudentPortal({
                   type="button"
                   id="demo-restart-btn"
                   className="sp-demo-btn sp-demo-btn-restart"
-                  onClick={() => setDemoStep(1)}
+                  onClick={() => goToDemoStep(1)}
                 >
                   ↺ Restart Demo Flow
                 </button>

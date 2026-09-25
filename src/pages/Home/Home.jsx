@@ -1,15 +1,66 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import LoginModal from '../../components/Auth/LoginModal'
 import RegisterModal from '../../components/Auth/RegisterModal'
 import ForgotPasswordModal from '../../components/Auth/ForgotPasswordModal'
 
 function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
-  const [selectedRole, setSelectedRole] = useState(null)
-  const [activeModal, setActiveModal] = useState(null) // 'academic' | 'industries' | 'students' | 'admin' | null
-  const [studentMode, setStudentMode] = useState('login') // 'login' | 'register'
+  const [selectedRole, setSelectedRole] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash
+      if (hash === '#student-login' || hash === '#student-register' || hash === '#student-forgot') {
+        return 'students'
+      }
+    }
+    return null
+  })
+  const [activeModal, setActiveModal] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash
+      if (hash === '#student-login' || hash === '#student-register' || hash === '#student-forgot') {
+        return 'students'
+      }
+    }
+    return null
+  })
+  const [studentMode, setStudentMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash
+      if (hash === '#student-register') return 'register'
+      if (hash === '#student-forgot') return 'forgot'
+    }
+    return 'login'
+  }) // 'login' | 'register' | 'forgot'
   const [academicMode, setAcademicMode] = useState('login') // 'login' | 'register'
   const [industryMode, setIndustryMode] = useState('login') // 'login' | 'register'
   const [adminMode, setAdminMode] = useState('login') // 'login' | 'register'
+
+  // Synchronize modal open/switch states with browser Back/Forward navigation
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash
+      if (hash === '#student-login') {
+        setSelectedRole('students')
+        setActiveModal('students')
+        setStudentMode('login')
+      } else if (hash === '#student-register') {
+        setSelectedRole('students')
+        setActiveModal('students')
+        setStudentMode('register')
+      } else if (hash === '#student-forgot') {
+        setSelectedRole('students')
+        setActiveModal('students')
+        setStudentMode('forgot')
+      } else if (!hash || hash === '#' || hash === '#home') {
+        setActiveModal(null)
+      }
+    }
+    window.addEventListener('popstate', handleHashChange)
+    window.addEventListener('hashchange', handleHashChange)
+    return () => {
+      window.removeEventListener('popstate', handleHashChange)
+      window.removeEventListener('hashchange', handleHashChange)
+    }
+  }, [])
 
   const roles = [
     {
@@ -88,6 +139,11 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
   const handleRoleClick = (roleId) => {
     setSelectedRole(roleId)
     setActiveModal(roleId)
+    if (roleId === 'students') {
+      if (window.location.hash !== '#student-login') {
+        window.location.hash = '#student-login'
+      }
+    }
   }
 
   const closeModal = () => {
@@ -96,6 +152,14 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
     setAcademicMode('login')
     setIndustryMode('login')
     setAdminMode('login')
+    if (
+      typeof window !== 'undefined' &&
+      (window.location.hash === '#student-login' ||
+        window.location.hash === '#student-register' ||
+        window.location.hash === '#student-forgot')
+    ) {
+      window.location.hash = '#home'
+    }
   }
 
   return (
@@ -2275,8 +2339,18 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
       <LoginModal
         isOpen={activeModal === 'students' && studentMode === 'login'}
         onClose={closeModal}
-        onSwitchToRegister={() => setStudentMode('register')}
-        onSwitchToForgotPassword={() => setStudentMode('forgot')}
+        onSwitchToRegister={() => {
+          setStudentMode('register')
+          if (window.location.hash !== '#student-register') {
+            window.location.hash = '#student-register'
+          }
+        }}
+        onSwitchToForgotPassword={() => {
+          setStudentMode('forgot')
+          if (window.location.hash !== '#student-forgot') {
+            window.location.hash = '#student-forgot'
+          }
+        }}
         role="student"
         onLoginSuccess={() => onOpenStudentPortal && onOpenStudentPortal()}
       />
@@ -2284,14 +2358,24 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
       <RegisterModal
         isOpen={activeModal === 'students' && studentMode === 'register'}
         onClose={closeModal}
-        onSwitchToLogin={() => setStudentMode('login')}
+        onSwitchToLogin={() => {
+          setStudentMode('login')
+          if (window.location.hash !== '#student-login') {
+            window.location.hash = '#student-login'
+          }
+        }}
         role="student"
       />
 
       <ForgotPasswordModal
         isOpen={activeModal === 'students' && studentMode === 'forgot'}
         onClose={closeModal}
-        onSwitchToLogin={() => setStudentMode('login')}
+        onSwitchToLogin={() => {
+          setStudentMode('login')
+          if (window.location.hash !== '#student-login') {
+            window.location.hash = '#student-login'
+          }
+        }}
         role="student"
       />
 
