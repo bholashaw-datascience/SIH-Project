@@ -1609,11 +1609,6 @@ function StudentPortal({
           {/* STEP 5: Student Dashboard */}
           {demoStep === 5 && (
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-              <StudentPortalPageHeader
-                eyebrow="Institutional Student Workspace"
-                title="Student Dashboard"
-                description="Official verified student portal for academic performance, accredited internships, campus placements, and verified institutional records."
-              />
               {activeView === 'achievements_experience' ? (
                 <StudentAchievementsExperience
                   student={currentLive}
