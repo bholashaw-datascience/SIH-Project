@@ -218,27 +218,11 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
           background-color: #112233;
           color: #ffffff;
           width: 100%;
-          padding: clamp(20px, 2.8vh, 36px) clamp(20px, 4vw, 56px);
+          padding: clamp(28px, 3.8vh, 44px) clamp(20px, 4vw, 56px);
           text-align: center;
           border-bottom: 1px solid #20354b;
           box-sizing: border-box;
           flex-shrink: 0;
-        }
-
-        .hero-gold-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.07em;
-          text-transform: uppercase;
-          color: #d4af37;
-          background-color: #1a2e42;
-          border: 1px solid #7c621f;
-          padding: 3px 12px;
-          border-radius: 3px;
-          margin-bottom: clamp(8px, 1.2vh, 14px);
         }
 
         .hero-portal-title {
@@ -246,16 +230,38 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
           font-weight: 700;
           line-height: 1.25;
           letter-spacing: -0.01em;
-          margin: 0 0 clamp(6px, 0.9vh, 10px);
+          margin: 0 0 clamp(8px, 1.1vh, 12px);
           color: #fbfaf6;
         }
 
         .hero-portal-desc {
-          font-size: clamp(13.5px, 1.05vw, 15px);
+          font-size: clamp(13px, 1.05vw, 15px);
           color: #cbd5e1;
           max-width: 780px;
           margin: 0 auto;
           line-height: 1.5;
+        }
+
+        .hero-portal-subtitle {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex-wrap: wrap;
+          column-gap: 14px;
+          row-gap: 6px;
+        }
+
+        .hero-subtitle-word {
+          color: #cbd5e1;
+          font-weight: 600;
+          letter-spacing: 0.05em;
+        }
+
+        .hero-subtitle-dot {
+          color: #b3881e;
+          font-size: 11px;
+          line-height: 1;
+          user-select: none;
         }
 
         /* Roles Selection Container (Warm Ivory Tone) */
@@ -2263,14 +2269,15 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
 
         {/* Deep Navy Hero / Title Banner Section */}
         <section className="hero-navy-strip">
-          <div className="hero-gold-badge">
-            <span>ACADEMIA – INDUSTRY BRIDGE</span>
-          </div>
           <h1 className="hero-portal-title">
             IAS Collaboration Portal
           </h1>
-          <p className="hero-portal-desc">
-            Skill mapping, internships, and placement — one bridge connecting classrooms to careers.
+          <p className="hero-portal-desc hero-portal-subtitle">
+            <span className="hero-subtitle-word">Industries</span>
+            <span className="hero-subtitle-dot" aria-hidden="true">•</span>
+            <span className="hero-subtitle-word">Academic</span>
+            <span className="hero-subtitle-dot" aria-hidden="true">•</span>
+            <span className="hero-subtitle-word">Student</span>
           </p>
         </section>
 
