@@ -7,6 +7,7 @@ import './StudentDashboardNavbar.css'
 export default function StudentDashboardNavbar({
   student = {},
   verifiedProfile = {},
+  title = 'IAS Collaboration Portal',
   subtitle = 'Student Overview Dashboard',
   onNavigateHome,
   onBack,
@@ -150,7 +151,7 @@ export default function StudentDashboardNavbar({
           >
             <div className="sd-brand-emblem">IAS</div>
             <div className="sd-brand-titles">
-              <span className="sd-brand-main">IAS Collaboration Portal</span>
+              <span className="sd-brand-main">{title}</span>
               <span className="sd-brand-sub">{subtitle}</span>
             </div>
           </div>

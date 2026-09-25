@@ -1278,6 +1278,7 @@ export default function StudentDashboard({
         onLogout={onLogout}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        title="Student Dashboard"
         subtitle="Student Overview Dashboard"
       />
 
@@ -1415,14 +1416,6 @@ export default function StudentDashboard({
               </li>
             </ul>
           </nav>
-
-          <div className="sd-sidebar-footer">
-            <div className="sd-sys-status-badge">
-              <span className="sd-sys-status-dot" />
-              <span>System Online</span>
-            </div>
-            <div style={{ marginTop: 4 }}>IAS Portal • v2.4.0</div>
-          </div>
         </aside>
 
         {/* Main Content Viewport */}
