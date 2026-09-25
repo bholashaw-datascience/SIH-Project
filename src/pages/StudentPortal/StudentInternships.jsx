@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
+import StudentDashboardNavbar from '../../components/StudentDashboardNavbar'
 import './StudentInternships.css'
 
 // Supported Institutional Academic Departments
@@ -798,7 +799,13 @@ export const getDepartmentClass = (dept) => {
   return 'si-dept-default'
 }
 
-export default function StudentInternships({ student = {}, onBack, onNavigateHome }) {
+export default function StudentInternships({
+  student = {},
+  onBack,
+  onNavigateHome,
+  onEditProfile,
+  onLogout,
+}) {
   // Navigation & View mode
   const [activeTab, setActiveTab] = useState('all') // 'all' | 'remote' | 'on-site' | 'hybrid' | 'status'
   const [sortOption, setSortOption] = useState('latest') // 'latest' | 'stipend_high' | 'deadline_soon'
@@ -1241,47 +1248,15 @@ ${company}
         </div>
       )}
 
-      {/* TOP NAVBAR */}
-      <header className="si-top-navbar" aria-label="Portal Header">
-        <div className="si-nav-left">
-          <div className="si-nav-brand">
-            <span
-              className="si-nav-brand-bold"
-              onClick={onNavigateHome}
-              style={{ cursor: onNavigateHome ? 'pointer' : 'default' }}
-              title={onNavigateHome ? 'Return to Portal Home' : ''}
-            >
-              IAS Collaboration Portal
-            </span>
-            <span className="si-nav-slash">/</span>
-            <span
-              onClick={onBack}
-              style={{ cursor: onBack ? 'pointer' : 'default' }}
-              title={onBack ? 'Return to Student Dashboard' : ''}
-            >
-              Student Portal
-            </span>
-            <span className="si-nav-slash">/</span>
-            <span className="si-nav-active-tag">Internships</span>
-          </div>
-        </div>
-
-        <div className="si-nav-right">
-          <div className="si-nav-user-chip">
-            {s.profilePic ? (
-              <img src={s.profilePic} alt={studentName} className="si-nav-avatar" />
-            ) : (
-              <div className="si-nav-avatar">
-                {studentName.charAt(0).toUpperCase()}
-              </div>
-            )}
-            <div className="si-nav-user-meta">
-              <span className="si-nav-user-name">{studentName}</span>
-              <span className="si-nav-user-sub">{studentBranch}</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* STANDARDIZED NAVBAR */}
+      <StudentDashboardNavbar
+        student={student}
+        onBack={onBack}
+        onNavigateHome={onNavigateHome}
+        onEditProfile={onEditProfile}
+        onLogout={onLogout}
+        subtitle="Internships"
+      />
 
       {/* MAIN CONTAINER */}
       <main className="si-main-content">

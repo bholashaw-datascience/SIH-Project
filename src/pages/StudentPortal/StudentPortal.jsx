@@ -1742,24 +1742,32 @@ function StudentPortal({
                   initialTab={achievementsTab}
                   onBack={() => goToDemoView('auto')}
                   onNavigateHome={onNavigateHome}
+                  onEditProfile={() => goToDemoStep(2)}
+                  onLogout={onNavigateHome}
                 />
               ) : activeView === 'public_post' ? (
                 <PublicPost
                   student={currentLive}
                   onBack={() => goToDemoView('auto')}
                   onNavigateHome={onNavigateHome}
+                  onEditProfile={() => goToDemoStep(2)}
+                  onLogout={onNavigateHome}
                 />
               ) : activeView === 'internships' ? (
                 <StudentInternships
                   student={currentLive}
                   onBack={() => goToDemoView('auto')}
                   onNavigateHome={onNavigateHome}
+                  onEditProfile={() => goToDemoStep(2)}
+                  onLogout={onNavigateHome}
                 />
               ) : activeView === 'placements' ? (
                 <StudentPlacements
                   student={currentLive}
                   onBack={() => goToDemoView('auto')}
                   onNavigateHome={onNavigateHome}
+                  onEditProfile={() => goToDemoStep(2)}
+                  onLogout={onNavigateHome}
                 />
               ) : activeView === 'skill_assessments' ? (
                 <StudentSkillAssessments
@@ -1774,6 +1782,7 @@ function StudentPortal({
                   onOpenPlacements={() => goToDemoView('placements')}
                   onOpenPublicPost={() => goToDemoView('public_post')}
                   onEditProfile={() => goToDemoStep(2)}
+                  onLogout={onNavigateHome}
                   onNavigateHome={onNavigateHome}
                 />
               ) : (
@@ -2015,24 +2024,32 @@ function StudentPortal({
                   initialTab={achievementsTab}
                   onBack={() => goToNormalView('auto')}
                   onNavigateHome={onNavigateHome}
+                  onEditProfile={() => goToNormalView('edit_form')}
+                  onLogout={onNavigateHome}
                 />
               ) : activeView === 'public_post' ? (
                 <PublicPost
                   student={currentLive}
                   onBack={() => goToNormalView('auto')}
                   onNavigateHome={onNavigateHome}
+                  onEditProfile={() => goToNormalView('edit_form')}
+                  onLogout={onNavigateHome}
                 />
               ) : activeView === 'internships' ? (
                 <StudentInternships
                   student={currentLive}
                   onBack={() => goToNormalView('auto')}
                   onNavigateHome={onNavigateHome}
+                  onEditProfile={() => goToNormalView('edit_form')}
+                  onLogout={onNavigateHome}
                 />
               ) : activeView === 'placements' ? (
                 <StudentPlacements
                   student={currentLive}
                   onBack={() => goToNormalView('auto')}
                   onNavigateHome={onNavigateHome}
+                  onEditProfile={() => goToNormalView('edit_form')}
+                  onLogout={onNavigateHome}
                 />
               ) : activeView === 'skill_assessments' ? (
                 <StudentSkillAssessments
@@ -2047,6 +2064,7 @@ function StudentPortal({
                   onOpenPlacements={() => goToNormalView('placements')}
                   onOpenPublicPost={() => goToNormalView('public_post')}
                   onEditProfile={() => goToNormalView('edit_form')}
+                  onLogout={onNavigateHome}
                   onNavigateHome={onNavigateHome}
                 />
               ) : activeView === 'edit_form' ? (

@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
+import StudentDashboardNavbar from '../../components/StudentDashboardNavbar'
 import './StudentPlacements.css'
 
 // Supported Institutional Academic Departments
@@ -558,7 +559,13 @@ const INITIAL_PLACEMENTS = [
   }
 ]
 
-export default function StudentPlacements({ student = {}, onBack, onNavigateHome }) {
+export default function StudentPlacements({
+  student = {},
+  onBack,
+  onNavigateHome,
+  onEditProfile,
+  onLogout,
+}) {
   // Navigation & View mode
   const [activeTab, setActiveTab] = useState('all') // 'all' | 'core' | 'software' | 'consulting' | 'day0' | 'status'
   const [sortOption, setSortOption] = useState('highest_package')
@@ -882,47 +889,15 @@ ${company}
 
   return (
     <div className="sp-page-wrapper">
-      {/* TOP NAVIGATION NAVBAR */}
-      <header className="sp-top-navbar">
-        <div className="sp-nav-left">
-          <div className="sp-nav-brand">
-            <span
-              className="sp-nav-brand-bold"
-              onClick={onNavigateHome}
-              style={{ cursor: onNavigateHome ? 'pointer' : 'default' }}
-              title={onNavigateHome ? 'Return to Portal Home' : ''}
-            >
-              IAS Collaboration Portal
-            </span>
-            <span className="sp-nav-slash">/</span>
-            <span
-              onClick={onBack}
-              style={{ cursor: onBack ? 'pointer' : 'default' }}
-              title={onBack ? 'Return to Student Dashboard' : ''}
-            >
-              Student Portal
-            </span>
-            <span className="sp-nav-slash">/</span>
-            <span className="sp-nav-active-tag">Campus Placements</span>
-          </div>
-        </div>
-
-        <div className="sp-nav-right">
-          <div className="sp-nav-user-chip">
-            {s.profilePic ? (
-              <img src={s.profilePic} alt={studentName} className="sp-nav-avatar" />
-            ) : (
-              <div className="sp-nav-avatar">
-                {studentName.charAt(0).toUpperCase()}
-              </div>
-            )}
-            <div className="sp-nav-user-meta">
-              <span className="sp-nav-user-name">{studentName}</span>
-              <span className="sp-nav-user-sub">{studentBranch}</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* STANDARDIZED NAVBAR */}
+      <StudentDashboardNavbar
+        student={student}
+        onBack={onBack}
+        onNavigateHome={onNavigateHome}
+        onEditProfile={onEditProfile}
+        onLogout={onLogout}
+        subtitle="Campus Placements"
+      />
 
       {/* MAIN CONTAINER */}
       <main className="sp-main-content">

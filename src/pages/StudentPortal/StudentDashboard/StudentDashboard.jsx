@@ -7,6 +7,7 @@ import PublicPostModal from './PublicPostModal'
 import InternshipsPlacementsModal from './InternshipsPlacementsModal'
 import SkillAssessmentsModal from './SkillAssessmentsModal'
 import ChangePasswordModal from './ChangePasswordModal'
+import StudentDashboardNavbar from '../../../components/StudentDashboardNavbar'
 
 const EMPTY_OBJ = {}
 
@@ -1264,154 +1265,21 @@ export default function StudentDashboard({
         }
       `}</style>
 
-      {/* TOPBAR HEADER (Requirement 1) */}
-      <header className="sd-topbar">
-        <div className="sd-topbar-left">
-          {/* Mobile Menu Toggle Button */}
-          <button
-            type="button"
-            className="sd-mobile-menu-toggle"
-            onClick={() => setIsMobileSidebarOpen((prev) => !prev)}
-            aria-label="Toggle navigation menu"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          </button>
-
-          {/* Institutional Brand Identity */}
-          <div className="sd-brand-identity" onClick={onNavigateHome} title="Return to Portal Home">
-            <div className="sd-brand-emblem">IAS</div>
-            <div className="sd-brand-titles">
-              <span className="sd-brand-main">IAS Collaboration Portal</span>
-              <span className="sd-brand-sub">Student Overview Dashboard</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="sd-topbar-right">
-          {/* Search Input Filter */}
-          <div className="sd-search-box">
-            <svg className="sd-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input
-              type="text"
-              className="sd-search-input"
-              placeholder="Search portal..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label="Search portal"
-            />
-          </div>
-
-          {/* Notifications Trigger Button */}
-          <button
-            type="button"
-            className="sd-icon-btn"
-            onClick={() => setIsNotifOpen(true)}
-            aria-label="View notifications"
-            title="Institutional Notifications & Alerts"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-            </svg>
-            {unreadNotifsCount > 0 && (
-              <span className="sd-badge-counter">{unreadNotifsCount}</span>
-            )}
-          </button>
-
-          {/* Profile User Dropdown Pill */}
-          <div className="sd-user-dropdown-wrap" ref={profileMenuRef}>
-            <button
-              type="button"
-              className={`sd-user-pill-btn ${isProfileMenuOpen ? 'is-active' : ''}`}
-              onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-              aria-expanded={isProfileMenuOpen}
-              aria-haspopup="true"
-              aria-label="User account menu"
-            >
-              <div className="sd-pill-avatar" onClick={(e) => { e.stopPropagation(); setIsPhotoLightboxOpen(true); }} title="View Photo">
-                {s.profilePic ? (
-                  <img src={s.profilePic} alt={s.name || 'Student'} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                ) : (
-                  <span>{(s.name || 'S').charAt(0).toUpperCase()}</span>
-                )}
-              </div>
-              <span>{s.name || 'Student'}</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </button>
-
-            {isProfileMenuOpen && (
-              <div className="sd-dropdown-menu" role="menu">
-                <div className="sd-menu-head">
-                  <div className="sd-menu-user-name">{s.name || 'Student Account'}</div>
-                  <div className="sd-menu-user-sub">{s.email || 'student@ias.edu'}</div>
-                </div>
-
-                <button
-                  type="button"
-                  className="sd-menu-action"
-                  role="menuitem"
-                  onClick={() => {
-                    setIsProfileMenuOpen(false)
-                    if (onEditProfile) onEditProfile()
-                  }}
-                >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
-                  <span>My Profile</span>
-                </button>
-
-                <button
-                  type="button"
-                  className="sd-menu-action"
-                  role="menuitem"
-                  onClick={() => {
-                    setIsProfileMenuOpen(false)
-                    setIsChangePasswordOpen(true)
-                  }}
-                >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                  </svg>
-                  <span>Change Password</span>
-                </button>
-
-                <button
-                  type="button"
-                  className="sd-menu-action danger"
-                  role="menuitem"
-                  onClick={() => {
-                    setIsProfileMenuOpen(false)
-                    if (onLogout) {
-                      onLogout()
-                    } else if (onNavigateHome) {
-                      onNavigateHome()
-                    }
-                  }}
-                >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                    <polyline points="16 17 21 12 16 7" />
-                    <line x1="21" y1="12" x2="9" y2="12" />
-                  </svg>
-                  <span>Logout</span>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
+      {/* TOPBAR HEADER */}
+      <StudentDashboardNavbar
+        student={s}
+        unreadCount={unreadNotifsCount}
+        onOpenNotifications={() => setIsNotifOpen(true)}
+        onChangePassword={() => setIsChangePasswordOpen(true)}
+        onOpenPhotoLightbox={() => setIsPhotoLightboxOpen(true)}
+        onToggleSidebar={() => setIsMobileSidebarOpen((prev) => !prev)}
+        onNavigateHome={onNavigateHome}
+        onEditProfile={onEditProfile}
+        onLogout={onLogout}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        subtitle="Student Overview Dashboard"
+      />
 
       {/* BODY: LEFT SIDEBAR + MAIN VIEWPORT */}
       <div className="sd-body-container">

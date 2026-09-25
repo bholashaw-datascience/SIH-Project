@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
+import StudentDashboardNavbar from '../../components/StudentDashboardNavbar'
 import './StudentSkillAssessments.css'
 
 // Supported Institutional Academic Departments (Reused from Portal Convention)
@@ -569,7 +570,8 @@ export default function StudentSkillAssessments({
   onOpenInternships: _onOpenInternships,
   onOpenPlacements: _onOpenPlacements,
   onOpenPublicPost: _onOpenPublicPost,
-  onEditProfile: _onEditProfile,
+  onEditProfile,
+  onLogout,
 }) {
   // Student Profile Data matching StudentPlacements
   const s = student || {}
@@ -1194,46 +1196,15 @@ export default function StudentSkillAssessments({
       {/* ====================================================================
           TOP NAVIGATION NAVBAR (Matches StudentPlacements & StudentInternships)
           ==================================================================== */}
-      <header className="sa-top-navbar">
-        <div className="sa-nav-left">
-          <div className="sa-nav-brand">
-            <span
-              className="sa-nav-brand-bold"
-              onClick={onNavigateHome}
-              style={{ cursor: onNavigateHome ? 'pointer' : 'default' }}
-              title={onNavigateHome ? 'Return to Portal Home' : ''}
-            >
-              IAS Collaboration Portal
-            </span>
-            <span className="sa-nav-slash">/</span>
-            <span
-              onClick={handleBack}
-              style={{ cursor: 'pointer' }}
-              title="Return to Student Dashboard"
-            >
-              Student Portal
-            </span>
-            <span className="sa-nav-slash">/</span>
-            <span className="sa-nav-active-tag">Skill Assessments</span>
-          </div>
-        </div>
-
-        <div className="sa-nav-right">
-          <div className="sa-nav-user-chip">
-            {s.profilePic ? (
-              <img src={s.profilePic} alt={studentName} className="sa-nav-avatar" />
-            ) : (
-              <div className="sa-nav-avatar">
-                {studentName.charAt(0).toUpperCase()}
-              </div>
-            )}
-            <div className="sa-nav-user-meta">
-              <span className="sa-nav-user-name">{studentName}</span>
-              <span className="sa-nav-user-sub">{studentBranch}</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* STANDARDIZED NAVBAR */}
+      <StudentDashboardNavbar
+        student={student}
+        onBack={onBack || handleBack}
+        onNavigateHome={onNavigateHome}
+        onEditProfile={onEditProfile}
+        onLogout={onLogout}
+        subtitle="Skill Assessments"
+      />
 
       {/* ====================================================================
           MAIN CONTENT CONTAINER (Matches StudentPlacements Structure)

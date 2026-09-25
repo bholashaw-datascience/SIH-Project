@@ -1,11 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
 import ImageCropModal from '../../components/Auth/ImageCropModal'
+import StudentDashboardNavbar from '../../components/StudentDashboardNavbar'
 import './PublicPost.css'
 
 export default function PublicPost({
   student = {},
   onBack,
   onNavigateHome,
+  onEditProfile,
+  onLogout,
 }) {
   // Student metadata with reliable fallbacks
   const s = {
@@ -445,46 +448,15 @@ export default function PublicPost({
         onChange={handleExecuteReplace}
       />
 
-      {/* TOP NAVBAR */}
-      <header className="pp-top-navbar" aria-label="Portal Header">
-        <div className="pp-nav-left">
-          <div className="pp-nav-brand">
-            <span className="pp-nav-brand-bold">IAS Collaboration Portal</span>
-            <span className="pp-nav-slash">/</span>
-            <span>Student Portal</span>
-            <span className="pp-nav-slash">/</span>
-            <span className="pp-nav-active-tag">Create Public Post</span>
-          </div>
-        </div>
-
-        <div className="pp-nav-right">
-          <div className="pp-nav-user-chip">
-            {s.profilePic ? (
-              <img src={s.profilePic} alt={s.name} className="pp-nav-avatar" />
-            ) : (
-              <div className="pp-nav-avatar">
-                {s.name.charAt(0).toUpperCase()}
-              </div>
-            )}
-            <div className="pp-nav-user-meta">
-              <span className="pp-nav-user-name">{s.name}</span>
-              <span className="pp-nav-user-sub">{s.branch}</span>
-            </div>
-          </div>
-
-          {onNavigateHome && (
-            <button
-              type="button"
-              className="pp-nav-back-btn"
-              onClick={onNavigateHome}
-              title="Return to Portal Home"
-              style={{ background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.15)' }}
-            >
-              Exit
-            </button>
-          )}
-        </div>
-      </header>
+      {/* STANDARDIZED NAVBAR */}
+      <StudentDashboardNavbar
+        student={student}
+        onBack={onBack}
+        onNavigateHome={onNavigateHome}
+        onEditProfile={onEditProfile}
+        onLogout={onLogout}
+        subtitle="Public Posts"
+      />
 
       {/* MAIN BODY CONTAINER */}
       <main className="pp-main-content">

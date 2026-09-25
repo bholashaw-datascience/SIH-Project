@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import StudentDashboardNavbar from '../../components/StudentDashboardNavbar'
 
 const SKILL_CATEGORIES = [
   'Engineering & Technology',
@@ -36,6 +37,8 @@ export default function StudentAchievementsExperience({
   initialTab = 'skills',
   onBack,
   onNavigateHome,
+  onEditProfile,
+  onLogout,
 }) {
   const [activeTab, setActiveTab] = useState(initialTab || 'skills')
   const [prevInitialTab, setPrevInitialTab] = useState(initialTab)
@@ -961,8 +964,6 @@ export default function StudentAchievementsExperience({
     if (l.includes('intermediate')) return { count: 2, text: 'Intermediate (Applied Practical & Projects)' }
     return { count: 1, text: 'Beginner (Foundational Knowledge)' }
   }
-
-  const s = student || {}
 
   return (
     <div className="sae-page-wrap">
@@ -2609,46 +2610,15 @@ export default function StudentAchievementsExperience({
         }
       `}</style>
 
-      {/* TOP NAVBAR */}
-      <header className="sae-header">
-        <div className="sae-header-left">
-          <div className="sae-brand-title">
-            <span
-              onClick={onNavigateHome}
-              style={{ cursor: onNavigateHome ? 'pointer' : 'default' }}
-              title={onNavigateHome ? 'Return to Portal Home' : ''}
-            >
-              IAS Collaboration Portal
-            </span>
-            <span className="sae-breadcrumb-slash">/</span>
-            <span
-              onClick={onBack}
-              style={{ cursor: onBack ? 'pointer' : 'default', color: '#ffffff', fontWeight: 500 }}
-              title={onBack ? 'Return to Student Dashboard' : ''}
-            >
-              Student Portal
-            </span>
-            <span className="sae-breadcrumb-slash">/</span>
-            <span className="sae-breadcrumb-active">Achievements & Experience</span>
-          </div>
-        </div>
-
-        <div className="sae-header-right">
-          <div className="sae-user-chip">
-            <div className="sae-user-avatar">
-              {s.profilePic ? (
-                <img src={s.profilePic} alt={s.name || 'Student'} />
-              ) : (
-                <span>{(s.name || 'S').charAt(0).toUpperCase()}</span>
-              )}
-            </div>
-            <div className="sae-user-meta">
-              <div className="sae-user-name">{s.name || 'Student Member'}</div>
-              <div className="sae-user-role">{s.branch || s.course || 'Student Profile'}</div>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* STANDARDIZED NAVBAR */}
+      <StudentDashboardNavbar
+        student={student}
+        onBack={onBack}
+        onNavigateHome={onNavigateHome}
+        onEditProfile={onEditProfile}
+        onLogout={onLogout}
+        subtitle="Projects & Experience"
+      />
 
       {/* MAIN BODY */}
       <main className="sae-main-container">
