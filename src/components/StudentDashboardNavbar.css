@@ -31,30 +31,7 @@
   gap: 14px;
 }
 
-/* Back to Dashboard navigation button on subpages */
-.sd-topbar-back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #f1cf7c;
-  border-radius: 6px;
-  height: 32px;
-  padding: 0 10px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-family: inherit;
-  flex-shrink: 0;
-}
 
-.sd-topbar-back-btn:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: #b3881e;
-  color: #ffffff;
-}
 
 /* Mobile sidebar toggle button on dashboard */
 .sd-mobile-menu-toggle {
@@ -343,12 +320,7 @@
   .sd-brand-sub {
     display: none;
   }
-  .sd-topbar-back-btn span {
-    display: none;
-  }
-  .sd-topbar-back-btn {
-    padding: 0 8px;
-  }
+
   .sd-user-pill-btn > span {
     display: none;
   }

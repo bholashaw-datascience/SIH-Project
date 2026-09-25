@@ -123,22 +123,8 @@ export default function StudentDashboardNavbar({
     <>
       <header className="sd-topbar">
         <div className="sd-topbar-left">
-          {/* Back to Dashboard Button on Subpages */}
-          {onBack ? (
-            <button
-              type="button"
-              className="sd-topbar-back-btn"
-              onClick={onBack}
-              title="Return to Student Dashboard"
-              aria-label="Return to Student Dashboard"
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12" />
-                <polyline points="12 19 5 12 12 5" />
-              </svg>
-              <span>Dashboard</span>
-            </button>
-          ) : onToggleSidebar ? (
+          {/* Mobile sidebar toggle button (when on dashboard) */}
+          {onToggleSidebar ? (
             <button
               type="button"
               className="sd-mobile-menu-toggle"
