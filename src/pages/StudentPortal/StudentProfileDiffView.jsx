@@ -493,13 +493,6 @@ export default function StudentProfileDiffView({
       {/* Top Navbar */}
       <header className="diff-top-nav-bar">
         <h1 className="diff-nav-title">IAS Collaboration Portal • Profile Changes</h1>
-        <button
-          type="button"
-          className="diff-btn-back"
-          onClick={onBackToDashboard}
-        >
-          ← Return to Dashboard
-        </button>
       </header>
 
       {/* Banner */}

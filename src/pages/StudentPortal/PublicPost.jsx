@@ -448,19 +448,6 @@ export default function PublicPost({
       {/* TOP NAVBAR */}
       <header className="pp-top-navbar" aria-label="Portal Header">
         <div className="pp-nav-left">
-          <button
-            type="button"
-            className="pp-nav-back-btn"
-            onClick={onBack}
-            title="Return to Student Dashboard"
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
-            Back to Dashboard
-          </button>
-
           <div className="pp-nav-brand">
             <span className="pp-nav-brand-bold">IAS Collaboration Portal</span>
             <span className="pp-nav-slash">/</span>

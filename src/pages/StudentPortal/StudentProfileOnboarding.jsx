@@ -1902,7 +1902,7 @@ export default function StudentProfileOnboarding({
 
         <div className="onb-nav-actions">
           {draftToast && <div className="onb-toast">✓ {draftToast}</div>}
-          {onBackHome && (
+          {onBackHome && !isEditMode && (
             <button
               type="button"
               className="onb-return-btn"

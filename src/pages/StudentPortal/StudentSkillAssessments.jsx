@@ -1196,19 +1196,6 @@ export default function StudentSkillAssessments({
           ==================================================================== */}
       <header className="sa-top-navbar">
         <div className="sa-nav-left">
-          <button
-            type="button"
-            className="sa-nav-back-btn"
-            onClick={handleBack}
-            title="Return to Student Dashboard"
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
-            Back to Dashboard
-          </button>
-
           <div className="sa-nav-brand">
             <span
               className="sa-nav-brand-bold"

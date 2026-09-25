@@ -2612,19 +2612,6 @@ export default function StudentAchievementsExperience({
       {/* TOP NAVBAR */}
       <header className="sae-header">
         <div className="sae-header-left">
-          <button
-            type="button"
-            className="sae-back-btn"
-            onClick={onBack}
-            title="Return to Student Dashboard"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
-            ← Back to Dashboard
-          </button>
-
           <div className="sae-brand-title">
             <span
               onClick={onNavigateHome}
