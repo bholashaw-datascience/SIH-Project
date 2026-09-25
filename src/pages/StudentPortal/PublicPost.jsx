@@ -1,7 +1,392 @@
 import { useState, useRef, useEffect } from 'react'
 import ImageCropModal from '../../components/Auth/ImageCropModal'
-import StudentDashboardNavbar from '../../components/StudentDashboardNavbar'
 import './PublicPost.css'
+
+function StudentPageNavbar({
+  student = {},
+  subtitle = 'Portal',
+  onNavigateHome,
+  onBack,
+  onEditProfile,
+  onLogout,
+}) {
+  const studentName = student?.name || 'Student'
+  const studentEmail = student?.email || 'student@ias.edu'
+  const studentPic = student?.profilePic || ''
+  const studentInitial = (studentName || 'S').charAt(0).toUpperCase()
+
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
+  const profileMenuRef = useRef(null)
+  const [localSearch, setLocalSearch] = useState('')
+
+  useEffect(() => {
+    if (!isProfileMenuOpen) return
+    const handleClickOutside = (e) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
+        setIsProfileMenuOpen(false)
+      }
+    }
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setIsProfileMenuOpen(false)
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside)
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isProfileMenuOpen])
+
+  return (
+    <header className="sd-topbar">
+      <style>{`
+        .sd-topbar {
+          background-color: #0d1b2a;
+          color: #ffffff;
+          border-bottom: 2px solid #b3881e;
+          height: 52px;
+          min-height: 52px;
+          max-height: 52px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 20px;
+          position: sticky;
+          top: 0;
+          z-index: 1050;
+          box-shadow: 0 2px 10px rgba(10, 20, 30, 0.2);
+          box-sizing: border-box;
+          width: 100%;
+          flex-shrink: 0;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        .sd-topbar-left {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+        .sd-brand-identity {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          cursor: pointer;
+          text-decoration: none;
+          user-select: none;
+        }
+        .sd-brand-emblem {
+          width: 34px;
+          height: 34px;
+          border-radius: 6px;
+          background: linear-gradient(135deg, #b3881e 0%, #8c681b 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 800;
+          font-size: 0.88rem;
+          color: #ffffff;
+          letter-spacing: 0.04em;
+          border: 1px solid rgba(255, 255, 255, 0.25);
+          flex-shrink: 0;
+        }
+        .sd-brand-titles {
+          display: flex;
+          flex-direction: column;
+        }
+        .sd-brand-main {
+          font-size: 0.96rem;
+          font-weight: 700;
+          letter-spacing: 0.02em;
+          color: #ffffff;
+          line-height: 1.2;
+          white-space: nowrap;
+        }
+        .sd-brand-sub {
+          font-size: 0.68rem;
+          color: #94a3b8;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          font-weight: 600;
+          white-space: nowrap;
+        }
+        .sd-topbar-right {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+        .sd-search-box {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+        .sd-search-icon {
+          position: absolute;
+          left: 10px;
+          color: #94a3b8;
+          pointer-events: none;
+        }
+        .sd-search-input {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          border-radius: 6px;
+          padding: 6px 12px 6px 32px;
+          color: #ffffff;
+          font-size: 0.82rem;
+          width: 200px;
+          transition: all 0.2s ease;
+          outline: none;
+        }
+        .sd-search-input:focus {
+          border-color: #b3881e;
+          background: rgba(255, 255, 255, 0.14);
+          box-shadow: 0 0 0 2px rgba(179, 136, 30, 0.25);
+        }
+        .sd-icon-btn {
+          position: relative;
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          border-radius: 6px;
+          color: #ffffff;
+          width: 34px;
+          height: 34px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .sd-icon-btn:hover {
+          background: rgba(255, 255, 255, 0.15);
+          border-color: rgba(255, 255, 255, 0.3);
+        }
+        .sd-user-dropdown-wrap {
+          position: relative;
+        }
+        .sd-user-pill-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          border-radius: 20px;
+          padding: 3px 10px 3px 4px;
+          color: #ffffff;
+          font-size: 0.82rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .sd-user-pill-btn:hover,
+        .sd-user-pill-btn.is-active {
+          background: rgba(255, 255, 255, 0.15);
+          border-color: #b3881e;
+        }
+        .sd-pill-avatar {
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          background: #b3881e;
+          color: #ffffff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.76rem;
+          font-weight: 700;
+          overflow: hidden;
+        }
+        .sd-dropdown-menu {
+          position: absolute;
+          right: 0;
+          top: calc(100% + 8px);
+          width: 220px;
+          background: #ffffff;
+          border-radius: 8px;
+          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+          border: 1px solid #e2e8f0;
+          z-index: 1100;
+          overflow: hidden;
+          animation: sdMenuFade 0.15s ease-out forwards;
+        }
+        @keyframes sdMenuFade {
+          from { opacity: 0; transform: translateY(-4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .sd-menu-head {
+          padding: 12px 14px;
+          background: #f8fafc;
+          border-bottom: 1px solid #e2e8f0;
+        }
+        .sd-menu-user-name {
+          font-weight: 700;
+          font-size: 0.86rem;
+          color: #0f172a;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .sd-menu-user-sub {
+          font-size: 0.74rem;
+          color: #64748b;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .sd-menu-action {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 14px;
+          background: none;
+          border: none;
+          font-size: 0.84rem;
+          font-weight: 500;
+          color: #334155;
+          cursor: pointer;
+          text-align: left;
+          transition: background 0.15s;
+        }
+        .sd-menu-action:hover {
+          background: #f1f5f9;
+          color: #0f172a;
+        }
+        .sd-menu-action.danger {
+          color: #dc2626;
+          border-top: 1px solid #f1f5f9;
+        }
+        .sd-menu-action.danger:hover {
+          background: #fef2f2;
+        }
+        @media (max-width: 860px) {
+          .sd-search-box { display: none; }
+        }
+        @media (max-width: 580px) {
+          .sd-topbar { padding: 0 12px; }
+          .sd-brand-sub { display: none; }
+          .sd-user-pill-btn > span { display: none; }
+          .sd-user-pill-btn { padding: 3px 6px 3px 4px; }
+        }
+      `}</style>
+      <div className="sd-topbar-left">
+        <div
+          className="sd-brand-identity"
+          onClick={() => {
+            if (onNavigateHome) onNavigateHome()
+            else if (onBack) onBack()
+          }}
+          title={onNavigateHome ? 'Return to Portal Home' : 'Return to Student Dashboard'}
+        >
+          <div className="sd-brand-emblem">IAS</div>
+          <div className="sd-brand-titles">
+            <span className="sd-brand-main">IAS Collaboration Portal</span>
+            <span className="sd-brand-sub">{subtitle}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="sd-topbar-right">
+        <div className="sd-search-box">
+          <svg className="sd-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            type="text"
+            className="sd-search-input"
+            placeholder="Search portal..."
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
+            aria-label="Search portal"
+          />
+        </div>
+
+        <button
+          type="button"
+          className="sd-icon-btn"
+          aria-label="View notifications"
+          title="Institutional Notifications & Alerts"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+        </button>
+
+        <div className="sd-user-dropdown-wrap" ref={profileMenuRef}>
+          <button
+            type="button"
+            className={`sd-user-pill-btn ${isProfileMenuOpen ? 'is-active' : ''}`}
+            onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+            aria-expanded={isProfileMenuOpen}
+            aria-haspopup="true"
+            aria-label="User account menu"
+          >
+            <div className="sd-pill-avatar" title="User avatar">
+              {studentPic ? (
+                <img
+                  src={studentPic}
+                  alt={studentName}
+                  style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+                />
+              ) : (
+                <span>{studentInitial}</span>
+              )}
+            </div>
+            <span>{studentName}</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+
+          {isProfileMenuOpen && (
+            <div className="sd-dropdown-menu" role="menu">
+              <div className="sd-menu-head">
+                <div className="sd-menu-user-name">{studentName}</div>
+                <div className="sd-menu-user-sub">{studentEmail}</div>
+              </div>
+
+              <button
+                type="button"
+                className="sd-menu-action"
+                role="menuitem"
+                onClick={() => {
+                  setIsProfileMenuOpen(false)
+                  if (onEditProfile) onEditProfile()
+                  else if (onBack) onBack()
+                }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span>My Profile</span>
+              </button>
+
+              <button
+                type="button"
+                className="sd-menu-action danger"
+                role="menuitem"
+                onClick={() => {
+                  setIsProfileMenuOpen(false)
+                  if (onLogout) onLogout()
+                  else if (onNavigateHome) onNavigateHome()
+                }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                <span>Logout</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+  )
+}
 
 export default function PublicPost({
   student = {},
@@ -449,7 +834,7 @@ export default function PublicPost({
       />
 
       {/* STANDARDIZED NAVBAR */}
-      <StudentDashboardNavbar
+      <StudentPageNavbar
         student={student}
         onBack={onBack}
         onNavigateHome={onNavigateHome}
