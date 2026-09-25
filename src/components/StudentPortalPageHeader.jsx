@@ -8,7 +8,9 @@ export default function StudentPortalPageHeader({
   return (
     <section className={`sp-page-header ${className}`} style={style}>
       <style>{`
+        section.sp-page-header,
         .sp-page-header {
+          display: block;
           background: linear-gradient(135deg, #112233 0%, #193855 100%);
           color: #ffffff;
           padding: clamp(10px, 1.5vh, 16px) clamp(24px, 3vw, 40px);
@@ -21,7 +23,7 @@ export default function StudentPortalPageHeader({
         }
 
         .sp-page-header-inner {
-          max-width: 860px;
+          max-width: 1100px;
           margin: 0 auto;
         }
 
@@ -52,7 +54,7 @@ export default function StudentPortalPageHeader({
           font-size: 13px;
           color: #cbd5e1;
           line-height: 1.4;
-          max-width: 760px;
+          max-width: 1050px;
           margin: 0 auto;
         }
       `}</style>

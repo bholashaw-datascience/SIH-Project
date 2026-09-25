@@ -310,6 +310,74 @@ function StudentPortal({
           box-shadow: 0 4px 16px rgba(15, 29, 47, 0.12);
         }
 
+        .onb-top-nav-bar {
+          background-color: #112233;
+          color: #ffffff;
+          padding: clamp(8px, 1.2vh, 12px) 36px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 2px 8px rgba(15, 29, 47, 0.12);
+          width: 100%;
+          box-sizing: border-box;
+          flex-shrink: 0;
+        }
+
+        .onb-brand-row {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .onb-brand-tag {
+          background: rgba(179, 136, 30, 0.22);
+          border: 1px solid #b3881e;
+          color: #f1cf7c;
+          font-size: 10.5px;
+          font-weight: 700;
+          letter-spacing: 0.06em;
+          padding: 3px 8px;
+          border-radius: 4px;
+          text-transform: uppercase;
+        }
+
+        .onb-nav-title {
+          font-size: 17px;
+          font-weight: 700;
+          color: #ffffff;
+          margin: 0;
+          letter-spacing: normal;
+        }
+
+        .onb-nav-actions {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .onb-return-btn {
+          background: transparent;
+          border: 1px solid rgba(255, 255, 255, 0.25);
+          color: #ffffff;
+          font-size: 12px;
+          font-weight: 600;
+          padding: 7px 14px;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-family: inherit;
+        }
+
+        .onb-return-btn:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+          border-color: #b3881e;
+          color: #f1cf7c;
+        }
+
         .sp-brand-block {
           display: flex;
           align-items: center;
@@ -1268,11 +1336,11 @@ function StudentPortal({
         }
       `}</style>
 
-      {/* Top Gold Accent Bar */}
-      {(!showDashboard && !showAchievementsExperience && (!isDemoActive || demoStep === 1 || demoStep === 4)) && <div className="sp-gold-accent-bar" />}
+      {/* Top Gold Accent Bar (Non-demo mode only) */}
+      {(!isDemoActive && !showDashboard && !showAchievementsExperience) && <div className="sp-gold-accent-bar" />}
 
-      {/* Top Navigation Navbar */}
-      {(!showDashboard && !showAchievementsExperience && (!isDemoActive || demoStep === 1 || demoStep === 4)) && (
+      {/* Top Navigation Navbar for Non-Demo flow */}
+      {(!isDemoActive && !showDashboard && !showAchievementsExperience) && (
         <header className="sp-top-navbar">
           <div className="sp-brand-block">
             <h1 className="sp-brand-title">IAS Collaboration Portal</h1>
@@ -1296,6 +1364,27 @@ function StudentPortal({
             <button
               type="button"
               className="sp-exit-btn"
+              onClick={onNavigateHome}
+              aria-label="Return to Main Portal"
+            >
+              <span>← Back to Home</span>
+            </button>
+          </div>
+        </header>
+      )}
+
+      {/* Top Navigation Navbar for Demo Preview Steps 1 & 4 (Matching Step 3 Reference Design) */}
+      {(isDemoActive && (demoStep === 1 || demoStep === 4)) && (
+        <header className="onb-top-nav-bar">
+          <div className="onb-brand-row">
+            <span className="onb-brand-tag">Student Pathway</span>
+            <h1 className="onb-nav-title">IAS Collaboration Portal</h1>
+          </div>
+
+          <div className="onb-nav-actions">
+            <button
+              type="button"
+              className="onb-return-btn"
               onClick={onNavigateHome}
               aria-label="Return to Main Portal"
             >

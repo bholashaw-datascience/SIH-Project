@@ -339,12 +339,15 @@ export default function StudentProfileOnboarding({
         .onb-top-nav-bar {
           background-color: #112233;
           color: #ffffff;
-          padding: 16px 36px;
+          padding: clamp(8px, 1.2vh, 12px) 36px;
           display: flex;
           align-items: center;
           justify-content: space-between;
           border-bottom: 1px solid rgba(255, 255, 255, 0.1);
           box-shadow: 0 2px 8px rgba(15, 29, 47, 0.12);
+          flex-shrink: 0;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         .onb-brand-row {
@@ -1641,19 +1644,6 @@ export default function StudentProfileOnboarding({
           padding-bottom: 0 !important;
         }
 
-        .onb-profile-only-mode .onb-top-nav-bar {
-          padding: 8px 32px;
-          flex-shrink: 0;
-        }
-
-        .onb-profile-only-mode .onb-nav-title {
-          font-size: 15px;
-        }
-
-        .onb-profile-only-mode .onb-return-btn {
-          padding: 5px 12px;
-          font-size: 11.5px;
-        }
 
 
 
