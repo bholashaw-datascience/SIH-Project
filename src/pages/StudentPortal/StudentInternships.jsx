@@ -802,17 +802,36 @@ function StudentPageNavbar({
 
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
   const profileMenuRef = useRef(null)
+  const [isNotifOpen, setIsNotifOpen] = useState(false)
+  const notifMenuRef = useRef(null)
   const [localSearch, setLocalSearch] = useState('')
 
+  const [notifications] = useState(() => {
+    try {
+      const saved = localStorage.getItem('udaan_student_notifications')
+      if (saved) return JSON.parse(saved)
+    } catch {}
+    return [
+      { id: 'n1', type: 'info', title: 'Portal Verified Session', message: 'Institutional collaboration tools are active.', timestamp: 'Active now' },
+      { id: 'n2', type: 'success', title: 'Profile Document Verification', message: 'Your submitted academic credentials have been verified.', timestamp: '1d ago' }
+    ]
+  })
+
   useEffect(() => {
-    if (!isProfileMenuOpen) return
+    if (!isProfileMenuOpen && !isNotifOpen) return
     const handleClickOutside = (e) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
         setIsProfileMenuOpen(false)
       }
+      if (notifMenuRef.current && !notifMenuRef.current.contains(e.target)) {
+        setIsNotifOpen(false)
+      }
     }
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') setIsProfileMenuOpen(false)
+      if (e.key === 'Escape') {
+        setIsProfileMenuOpen(false)
+        setIsNotifOpen(false)
+      }
     }
     document.addEventListener('mousedown', handleClickOutside)
     document.addEventListener('touchstart', handleClickOutside)
@@ -822,7 +841,7 @@ function StudentPageNavbar({
       document.removeEventListener('touchstart', handleClickOutside)
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isProfileMenuOpen])
+  }, [isProfileMenuOpen, isNotifOpen])
 
   return (
     <header className="sd-topbar">
@@ -1104,17 +1123,39 @@ function StudentPageNavbar({
           />
         </div>
 
-        <button
-          type="button"
-          className="sd-icon-btn"
-          aria-label="View notifications"
-          title="Institutional Notifications & Alerts"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-          </svg>
-        </button>
+        <div className="sd-user-dropdown-wrap" ref={notifMenuRef}>
+          <button
+            type="button"
+            className={`sd-icon-btn ${isNotifOpen ? 'is-active' : ''}`}
+            aria-label="View notifications"
+            title="Institutional Notifications & Alerts"
+            onClick={() => setIsNotifOpen((prev) => !prev)}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+          </button>
+          {isNotifOpen && (
+            <div className="sd-dropdown-menu" style={{ width: '280px', padding: '0' }}>
+              <div className="sd-menu-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 700, fontSize: '0.85rem', color: '#0f172a' }}>Notifications</span>
+                <span style={{ fontSize: '0.72rem', background: '#b3881e', color: '#fff', padding: '1px 6px', borderRadius: '10px', fontWeight: 700 }}>
+                  {notifications.length}
+                </span>
+              </div>
+              <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
+                {notifications.map((n) => (
+                  <div key={n.id} style={{ padding: '10px 14px', borderBottom: '1px solid #f1f5f9' }}>
+                    <div style={{ fontWeight: 600, fontSize: '0.8rem', color: '#1e293b' }}>{n.title}</div>
+                    <div style={{ fontSize: '0.74rem', color: '#64748b', marginTop: '2px', lineHeight: 1.3 }}>{n.message}</div>
+                    <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginTop: '4px' }}>{n.timestamp}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="sd-user-dropdown-wrap" ref={profileMenuRef}>
           <button

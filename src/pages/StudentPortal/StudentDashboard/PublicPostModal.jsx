@@ -1410,7 +1410,14 @@ export default function PublicPostModal({
                     Upload multiple images (JPG, PNG, WEBP) and videos (MP4, WebM, MOV) in the same post.
                     All media will be framed cleanly according to your chosen aspect ratio.
                   </p>
-                  <button type="button" className="sp-post-btn-browse">
+                  <button
+                    type="button"
+                    className="sp-post-btn-browse"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      initialDropInputRef.current?.click()
+                    }}
+                  >
                     Browse Files
                   </button>
                 </div>
