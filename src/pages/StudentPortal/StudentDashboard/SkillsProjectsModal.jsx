@@ -2,6 +2,10 @@ import { useState } from 'react'
 
 const EMPTY_ARRAY = []
 
+// -----------------------------------------------------------------------------
+// Skills, Projects & Internship Experience Modal
+// -----------------------------------------------------------------------------
+
 export default function SkillsProjectsModal({
   isOpen,
   onClose,
@@ -88,6 +92,9 @@ export default function SkillsProjectsModal({
     setShowAddForm(false)
   }
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="sp-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="sp-modal-title">
       <style>{`

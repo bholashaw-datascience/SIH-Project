@@ -976,6 +976,9 @@ export default function StudentSkillAssessments({
   onEditProfile,
   onLogout,
 }) {
+  // ---------------------------------------------------------------------------
+  // State Management & Filter Options
+  // ---------------------------------------------------------------------------
   // Student Profile Data matching StudentPlacements
   const s = student || {}
   const studentName = s.name || 'Student Member'
@@ -1586,6 +1589,9 @@ export default function StudentSkillAssessments({
     )
   }
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="sa-page-wrapper">
       {/* Toast Notification */}

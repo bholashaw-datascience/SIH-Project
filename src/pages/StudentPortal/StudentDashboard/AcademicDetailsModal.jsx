@@ -1,9 +1,16 @@
+// -----------------------------------------------------------------------------
+// Academic Details & Institutional Transcript Modal
+// -----------------------------------------------------------------------------
+
 export default function AcademicDetailsModal({ isOpen, onClose, student }) {
   if (!isOpen) return null
 
   const s = student || {}
   const semHistory = s.semesterHistory && Array.isArray(s.semesterHistory) ? s.semesterHistory : []
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="acad-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="acad-modal-title">
       <style>{`

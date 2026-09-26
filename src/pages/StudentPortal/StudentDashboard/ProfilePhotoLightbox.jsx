@@ -1,6 +1,13 @@
+// -----------------------------------------------------------------------------
+// Profile Photo Lightbox Modal
+// -----------------------------------------------------------------------------
+
 export default function ProfilePhotoLightbox({ isOpen, imageSrc, studentName, onClose }) {
   if (!isOpen) return null
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="lightbox-overlay">
       <style>{`

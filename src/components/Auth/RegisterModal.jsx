@@ -398,6 +398,9 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
     }, 1800)
   }
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <>
       <div className="modal-backdrop">

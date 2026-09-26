@@ -538,8 +538,9 @@ function StudentPortal({
   // Determine current active display profile
   const currentLive = verifiedProfile.formData || student
 
-
-
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className={`sp-canvas ${isDemoActive && demoStep === 4 ? 'sp-canvas-step4' : ''} ${isDemoActive && demoStep === 3 ? 'sp-canvas-step3' : ''}`}>
       <style>{`

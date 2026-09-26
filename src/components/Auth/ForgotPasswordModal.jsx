@@ -288,6 +288,9 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
     setStep(4)
   }
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="modal-backdrop">
       <div className="modal-card">

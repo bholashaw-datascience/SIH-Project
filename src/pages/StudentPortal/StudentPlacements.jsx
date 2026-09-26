@@ -977,6 +977,9 @@ export default function StudentPlacements({
   onEditProfile,
   onLogout,
 }) {
+  // ---------------------------------------------------------------------------
+  // State Management & Filter Options
+  // ---------------------------------------------------------------------------
   // Navigation & View mode
   const [activeTab, setActiveTab] = useState('all') // 'all' | 'core' | 'software' | 'consulting' | 'day0' | 'status'
   const [sortOption, setSortOption] = useState('highest_package')
@@ -1298,6 +1301,9 @@ ${company}
     setActiveTab('all')
   }
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="sp-page-wrapper">
       {/* STANDARDIZED NAVBAR */}

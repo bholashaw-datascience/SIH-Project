@@ -1,5 +1,9 @@
 import { useState } from 'react'
 
+// -----------------------------------------------------------------------------
+// Skill Assessments & Certification Catalog Modal
+// -----------------------------------------------------------------------------
+
 export default function SkillAssessmentsModal({ isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState('all') // 'all' | 'completed' | 'available'
 
@@ -36,6 +40,9 @@ export default function SkillAssessmentsModal({ isOpen, onClose }) {
     return true
   })
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="sa-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="sa-modal-title">
       <style>{`

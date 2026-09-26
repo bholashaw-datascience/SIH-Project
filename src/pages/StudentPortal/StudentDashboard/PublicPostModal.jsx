@@ -6,6 +6,10 @@ const EMPTY_POSTS = []
 const createMediaId = () =>
   `m_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
 
+// -----------------------------------------------------------------------------
+// Public Post Composer & Submission Modal
+// -----------------------------------------------------------------------------
+
 export default function PublicPostModal({
   isOpen,
   onClose,
@@ -330,6 +334,9 @@ export default function PublicPostModal({
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div
       className="sp-post-overlay"

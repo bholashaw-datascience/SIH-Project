@@ -1217,6 +1217,9 @@ export default function StudentInternships({
   onEditProfile,
   onLogout,
 }) {
+  // ---------------------------------------------------------------------------
+  // State Management & Filter Options
+  // ---------------------------------------------------------------------------
   // Navigation & View mode
   const [activeTab, setActiveTab] = useState('all') // 'all' | 'remote' | 'on-site' | 'hybrid' | 'status'
   const [sortOption, setSortOption] = useState('latest') // 'latest' | 'stipend_high' | 'deadline_soon'
@@ -1646,6 +1649,9 @@ ${company}
     }, 600)
   }
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="si-page-wrapper">
       {/* Toast Alert */}

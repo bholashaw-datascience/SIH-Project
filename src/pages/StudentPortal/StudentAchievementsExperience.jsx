@@ -443,6 +443,9 @@ export default function StudentAchievementsExperience({
   onEditProfile,
   onLogout,
 }) {
+  // ---------------------------------------------------------------------------
+  // State Management (Skills, Projects, Experience)
+  // ---------------------------------------------------------------------------
   const [activeTab, setActiveTab] = useState(initialTab || 'skills')
   const [prevInitialTab, setPrevInitialTab] = useState(initialTab)
 
@@ -1368,6 +1371,9 @@ export default function StudentAchievementsExperience({
     return { count: 1, text: 'Beginner (Foundational Knowledge)' }
   }
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="sae-page-wrap">
       <style>{`

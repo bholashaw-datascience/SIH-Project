@@ -1,5 +1,9 @@
 import { useState } from 'react'
 
+// -----------------------------------------------------------------------------
+// Internships & Placements Opportunity Modal
+// -----------------------------------------------------------------------------
+
 export default function InternshipsPlacementsModal({ isOpen, onClose, student }) {
   const [filter, setFilter] = useState('all') // 'all' | 'placements' | 'internships' | 'applied'
   const [appliedIds, setAppliedIds] = useState([])
@@ -77,6 +81,9 @@ export default function InternshipsPlacementsModal({ isOpen, onClose, student })
     return true
   })
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="ip-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="ip-modal-title">
       <style>{`

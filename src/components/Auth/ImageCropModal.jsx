@@ -155,6 +155,9 @@ function ImageCropModal({
     onApply(croppedDataUrl, fileName)
   }
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="crop-modal-overlay">
       <div className="crop-modal-card">

@@ -1,5 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 
+// -----------------------------------------------------------------------------
+// Change Password & Credential Management Modal
+// -----------------------------------------------------------------------------
+
 export default function ChangePasswordModal({ isOpen, onClose, student, onPasswordChanged }) {
   const s = student || {}
 
@@ -264,6 +268,9 @@ export default function ChangePasswordModal({ isOpen, onClose, student, onPasswo
     setStep('success')
   }
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="cp-modal-overlay" role="dialog" aria-modal="true">
       <style>{`

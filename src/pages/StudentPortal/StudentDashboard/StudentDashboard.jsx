@@ -53,7 +53,9 @@ export default function StudentDashboard({
     profilePic: student?.profilePic || verifiedProfile?.formData?.profilePic || '',
   }
 
-  // Modals state
+  // ---------------------------------------------------------------------------
+  // Dashboard State & Modal Visibility
+  // ---------------------------------------------------------------------------
   const [isPhotoLightboxOpen, setIsPhotoLightboxOpen] = useState(false)
   const [isNotifOpen, setIsNotifOpen] = useState(false)
   const [isAcadOpen, setIsAcadOpen] = useState(false)
@@ -420,6 +422,9 @@ export default function StudentDashboard({
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="sd-app-layout">
       <style>{`

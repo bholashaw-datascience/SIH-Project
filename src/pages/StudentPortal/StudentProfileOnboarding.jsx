@@ -326,7 +326,7 @@ export default function StudentProfileOnboarding({
   }
 
   // ---------------------------------------------------------------------------
-  // Form & Document Validation
+  // Form Validation & Required Document Checks
   // ---------------------------------------------------------------------------
   const errors = {}
   if (!formData.name?.trim()) errors.name = 'Full name is required'
@@ -407,6 +407,9 @@ export default function StudentProfileOnboarding({
     })
   }
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className={`onb-page-wrapper ${activeSection === 'documents' ? 'onb-docs-only-mode' : ''} ${activeSection === 'profile' ? 'onb-profile-only-mode' : ''}`}>
       <style>{`

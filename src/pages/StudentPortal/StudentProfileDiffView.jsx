@@ -48,6 +48,9 @@ export default function StudentProfileDiffView({
 
   const isPhotoChanged = verifiedData?.profilePic !== pendingData?.profilePic && pendingData?.profilePic
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="diff-page-wrapper">
       <style>{`

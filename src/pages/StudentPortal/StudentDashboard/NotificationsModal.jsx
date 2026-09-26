@@ -1,5 +1,9 @@
 import { useState } from 'react'
 
+// -----------------------------------------------------------------------------
+// Notifications & System Alerts Modal
+// -----------------------------------------------------------------------------
+
 export default function NotificationsModal({
   isOpen,
   onClose,
@@ -17,6 +21,9 @@ export default function NotificationsModal({
     return true
   })
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="notif-modal-overlay">
       <style>{`

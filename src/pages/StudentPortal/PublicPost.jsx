@@ -398,6 +398,9 @@ export default function PublicPost({
   onEditProfile,
   onLogout,
 }) {
+  // ---------------------------------------------------------------------------
+  // State Management & Post Creation Form
+  // ---------------------------------------------------------------------------
   // Student metadata with reliable fallbacks
   const s = {
     name: student?.name || 'Verified Student Member',
@@ -809,6 +812,9 @@ export default function PublicPost({
         }
     : undefined
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="pp-page-wrapper">
       {/* Hidden File Inputs */}

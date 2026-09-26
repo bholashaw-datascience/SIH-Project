@@ -85,6 +85,9 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
     }
   }, [activeModal, studentMode])
 
+  // ---------------------------------------------------------------------------
+  // Role Definitions & Gateway Configuration
+  // ---------------------------------------------------------------------------
   const roles = [
     {
       id: 'academic',
@@ -175,6 +178,9 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
     setAdminMode('login')
   }
 
+  // ---------------------------------------------------------------------------
+  // View Rendering
+  // ---------------------------------------------------------------------------
   return (
     <div className="portal-canvas">
       <style>{`
@@ -2355,6 +2361,9 @@ function Home({ onOpenStudentPortal, onOpenStudentDemo }) {
         </footer>
       </main>
 
+      {/* ===================================================================== */}
+      {/* Authentication Modals (Student, Academic, Industry, Admin)            */}
+      {/* ===================================================================== */}
       {/* Student Login, Registration & Forgot Password Modals */}
       <LoginModal
         isOpen={activeModal === 'students' && studentMode === 'login'}
