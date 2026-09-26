@@ -1,8 +1,12 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import './StudentInternships.css'
 
+// -----------------------------------------------------------------------------
+// Department Constants & Date/Time Formatting Utilities
+// -----------------------------------------------------------------------------
+
 // Supported Institutional Academic Departments
-export const DEPARTMENTS = [
+const DEPARTMENTS = [
   'All Departments',
   'Computer Science / IT',
   'Mechanical',
@@ -17,7 +21,7 @@ export const DEPARTMENTS = [
 
 // Date & Time formatting helper for internship postings
 // Example output: "Posted 18 Sep 2026, 6:30 PM"
-export function formatPostedDateTime(dateInput, postedDaysAgo = 0) {
+function formatPostedDateTime(dateInput, postedDaysAgo = 0) {
   let date
   if (!dateInput) {
     // Deterministic realistic time anchored to simulated today: 18 Sep 2026
@@ -46,7 +50,7 @@ export function formatPostedDateTime(dateInput, postedDaysAgo = 0) {
 // - If > 2 days away: normal date e.g. "Closes 20 Oct 2026"
 // - If <= 2 days away: compact live countdown e.g. "Closes in 1d 8h" or "Closes in 6h 25m"
 // - If today: remaining hours/minutes e.g. "Closes in 4h 29m"
-export function formatClosingDeadline(deadlineStr, displayDeadline, now = new Date()) {
+function formatClosingDeadline(deadlineStr, displayDeadline, now = new Date()) {
   if (!deadlineStr) return displayDeadline ? `Closes ${displayDeadline.replace(/^Closes:?\s*/i, '')}` : ''
 
   let deadlineDate
@@ -93,7 +97,7 @@ export function formatClosingDeadline(deadlineStr, displayDeadline, now = new Da
   return `Closes ${day} ${months[deadlineDate.getMonth()]} ${deadlineDate.getFullYear()}`
 }
 
-export function isUrgentDeadline(deadlineStr, now = new Date()) {
+function isUrgentDeadline(deadlineStr, now = new Date()) {
   if (!deadlineStr) return false
   const deadlineDate = deadlineStr.includes('T') ? new Date(deadlineStr) : new Date(`${deadlineStr}T23:59:59`)
   if (isNaN(deadlineDate.getTime())) return false
@@ -1187,7 +1191,7 @@ function StudentPageNavbar({
   )
 }
 
-export const getDepartmentClass = (dept) => {
+const getDepartmentClass = (dept) => {
   if (!dept) return 'si-dept-default'
   const d = dept.toLowerCase()
   if (d.includes('mech')) return 'si-dept-mech'
@@ -1200,6 +1204,10 @@ export const getDepartmentClass = (dept) => {
   if (d.includes('comp') || d.includes('it')) return 'si-dept-cs'
   if (d.includes('aero') || d.includes('space')) return 'si-dept-aero'
   return 'si-dept-default'
+}
+
+const createOfferReferenceId = (prefix, id) => {
+  return `${prefix}-${id ? id.toUpperCase() : '2026'}-${Date.now().toString().slice(-4)}`
 }
 
 export default function StudentInternships({
@@ -1408,7 +1416,7 @@ export default function StudentInternships({
 ================================================================================
 
 Date: ${offer.issueDate || new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-Reference ID: ${offer.letterId || `IAS-OFF-${app.internshipId ? app.internshipId.toUpperCase() : '2026'}-${Date.now().toString().slice(-4)}`}
+Reference ID: ${offer.letterId || createOfferReferenceId('IAS-OFF', app.internshipId)}
 
 To:
 Candidate: ${studentName}

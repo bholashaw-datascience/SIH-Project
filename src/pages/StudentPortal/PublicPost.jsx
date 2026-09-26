@@ -388,6 +388,9 @@ function StudentPageNavbar({
   )
 }
 
+const createPostId = (prefix = 'post') =>
+  `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
+
 export default function PublicPost({
   student = {},
   onBack,
@@ -702,7 +705,7 @@ export default function PublicPost({
     }
 
     const newPost = {
-      id: editingPostId || `post_${Date.now()}`,
+      id: editingPostId || createPostId('post'),
       title: caption.trim() || description.trim().slice(0, 50) + (description.trim().length > 50 ? '...' : ''),
       caption: caption.trim() || description.trim(),
       content: description.trim(),
@@ -737,7 +740,7 @@ export default function PublicPost({
     try {
       const savedNotifs = JSON.parse(localStorage.getItem('udaan_student_notifications') || '[]')
       const notif = {
-        id: `n_${Date.now()}`,
+        id: createPostId('n'),
         type: 'info',
         title: 'Public Post Submitted for Verification',
         message: `Your post "${newPost.title}" has been submitted for moderation review by Portal Admin.`,

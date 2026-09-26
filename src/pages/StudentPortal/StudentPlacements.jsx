@@ -1,8 +1,12 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import './StudentPlacements.css'
 
+// -----------------------------------------------------------------------------
+// Department Constants & Date/Time Formatting Utilities
+// -----------------------------------------------------------------------------
+
 // Supported Institutional Academic Departments
-export const DEPARTMENTS = [
+const DEPARTMENTS = [
   'All Departments',
   'Computer Science / IT',
   'Mechanical',
@@ -16,7 +20,7 @@ export const DEPARTMENTS = [
 ]
 
 // Date & Time formatting helper for placement postings
-export function formatPostedDateTime(dateInput, postedDaysAgo = 0) {
+function formatPostedDateTime(dateInput, postedDaysAgo = 0) {
   let date
   if (!dateInput) {
     const base = new Date('2026-09-18T18:30:00+05:30')
@@ -41,7 +45,7 @@ export function formatPostedDateTime(dateInput, postedDaysAgo = 0) {
 }
 
 // Application closing deadline formatting helper
-export function formatClosingDeadline(deadlineStr, displayDeadline, now = new Date()) {
+function formatClosingDeadline(deadlineStr, displayDeadline, now = new Date()) {
   if (!deadlineStr) return displayDeadline ? `Closes ${displayDeadline.replace(/^Closes:?\s*/i, '')}` : ''
 
   let deadlineDate
@@ -83,7 +87,7 @@ export function formatClosingDeadline(deadlineStr, displayDeadline, now = new Da
   return `Closes ${day} ${months[deadlineDate.getMonth()]} ${deadlineDate.getFullYear()}`
 }
 
-export function isUrgentDeadline(deadlineStr, now = new Date()) {
+function isUrgentDeadline(deadlineStr, now = new Date()) {
   if (!deadlineStr) return false
   const deadlineDate = deadlineStr.includes('T') ? new Date(deadlineStr) : new Date(`${deadlineStr}T23:59:59`)
   if (isNaN(deadlineDate.getTime())) return false
@@ -962,6 +966,10 @@ function StudentPageNavbar({
   )
 }
 
+const createPlacementReferenceId = (placementId) => {
+  return `IAS-PLC-${(placementId || '2026').toUpperCase()}-${Date.now().toString().slice(-4)}`
+}
+
 export default function StudentPlacements({
   student = {},
   onBack,
@@ -1116,7 +1124,7 @@ IAS COLLABORATION PLATFORM - TRAINING & PLACEMENT CELL
 ================================================================================
 
 Date: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-Reference ID: IAS-PLC-${(offer.placementId || '2026').toUpperCase()}-${Date.now().toString().slice(-4)}
+Reference ID: ${createPlacementReferenceId(offer.placementId)}
 
 To:
 Candidate: ${studentName}

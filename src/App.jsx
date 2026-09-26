@@ -3,6 +3,9 @@ import Home from './pages/Home/Home'
 import StudentPortal from './pages/StudentPortal/StudentPortal'
 
 function App() {
+  // ---------------------------------------------------------------------------
+  // Application State & Navigation Routing
+  // ---------------------------------------------------------------------------
   const [isDemoMode, setIsDemoMode] = useState(() => {
     const params = new URLSearchParams(window.location.search)
     return params.get('demo') === 'true' || window.location.hash.includes('demo')
@@ -17,13 +20,18 @@ function App() {
     return 'home'
   })
 
-  // Synchronize with browser history and hash navigation
+  const [demoKey, setDemoKey] = useState(0)
+
+  // ---------------------------------------------------------------------------
+  // Browser History & Hash Synchronization
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     const handleLocationChange = () => {
       const hash = window.location.hash
       const params = new URLSearchParams(window.location.search)
       const isDemo = params.get('demo') === 'true' || hash.includes('demo')
       setIsDemoMode(isDemo)
+
       const isStudentPortal =
         params.get('portal') === 'student' || hash.startsWith('#student-portal')
       if (isStudentPortal) {
@@ -32,6 +40,7 @@ function App() {
         setCurrentPage('home')
       }
     }
+
     window.addEventListener('popstate', handleLocationChange)
     window.addEventListener('hashchange', handleLocationChange)
     return () => {
@@ -40,10 +49,12 @@ function App() {
     }
   }, [])
 
-  const [demoKey, setDemoKey] = useState(0)
-
+  // ---------------------------------------------------------------------------
+  // Navigation Handler
+  // ---------------------------------------------------------------------------
   const navigateTo = (page, { demo = false, hash = null } = {}) => {
     setIsDemoMode(demo)
+
     if (demo) {
       setDemoKey((k) => k + 1)
       const targetHash = hash || '#student-portal-demo/step-1'
@@ -74,10 +85,14 @@ function App() {
         window.location.hash = targetHash
       }
     }
+
     setCurrentPage(page)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  // ---------------------------------------------------------------------------
+  // Page Render
+  // ---------------------------------------------------------------------------
   if (currentPage === 'student-portal') {
     return (
       <StudentPortal

@@ -7,6 +7,11 @@ import PublicPost from './PublicPost'
 import StudentInternships from './StudentInternships'
 import StudentPlacements from './StudentPlacements'
 import StudentSkillAssessments from './StudentSkillAssessments'
+
+// =============================================================================
+// Shared Sub-components: Page Header & Portal Footer
+// =============================================================================
+
 function StudentPortalPageHeader({
   eyebrow = '',
   title = '',
@@ -138,6 +143,10 @@ function PortalFooter({ className = '', style = {} }) {
     </footer>
   )
 }
+
+// =============================================================================
+// Main Student Portal Component
+// =============================================================================
 
 function StudentPortal({
   onNavigateHome,

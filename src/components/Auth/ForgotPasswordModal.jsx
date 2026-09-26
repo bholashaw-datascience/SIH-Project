@@ -55,6 +55,9 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
     ? 'Enter institutional username'
     : 'Enter your student username'
 
+  // ---------------------------------------------------------------------------
+  // Component State
+  // ---------------------------------------------------------------------------
   // Step state: 1: 'identify', 2: 'otp', 3: 'password', 4: 'success'
   const [step, setStep] = useState(1)
 
@@ -78,32 +81,42 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
   // Feedback states
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
-  const [touched, setTouched] = useState({ username: false, otp: false, password: false, confirmPassword: false })
+  const [touched, setTouched] = useState({
+    username: false,
+    otp: false,
+    password: false,
+    confirmPassword: false,
+  })
 
-  // Reset state when opening/closing modal
-  const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
-  if (isOpen !== prevIsOpen) {
-    setPrevIsOpen(isOpen)
-    if (!isOpen) {
-      setStep(1)
-      setUsername('')
-      setFoundAccount(null)
-      setOtpSent(false)
-      setGeneratedOtp('')
-      setOtpExpiry(0)
-      setEnteredOtp('')
-      setNewPassword('')
-      setConfirmPassword('')
-      setShowNewPassword(false)
-      setShowConfirmPassword(false)
-      setErrorMessage('')
-      setSuccessMessage('')
-      setCooldownSeconds(0)
-      setTouched({ username: false, otp: false, password: false, confirmPassword: false })
-    }
+  const resetState = () => {
+    setStep(1)
+    setUsername('')
+    setFoundAccount(null)
+    setOtpSent(false)
+    setGeneratedOtp('')
+    setOtpExpiry(0)
+    setEnteredOtp('')
+    setNewPassword('')
+    setConfirmPassword('')
+    setShowNewPassword(false)
+    setShowConfirmPassword(false)
+    setErrorMessage('')
+    setSuccessMessage('')
+    setCooldownSeconds(0)
+    setTouched({ username: false, otp: false, password: false, confirmPassword: false })
   }
 
-  // Cooldown countdown
+  const handleClose = () => {
+    resetState()
+    onClose?.()
+  }
+
+  const handleSwitchLogin = () => {
+    resetState()
+    onSwitchToLogin?.()
+  }
+
+  // OTP resend cooldown timer
   useEffect(() => {
     let timer = null
     if (cooldownSeconds > 0) {
@@ -116,7 +129,9 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
 
   if (!isOpen) return null
 
-  // Password validation rules (reusing the registration password-strength criteria)
+  // ---------------------------------------------------------------------------
+  // Password Validation Rules
+  // ---------------------------------------------------------------------------
   const passwordHasMinLen = newPassword.length >= 8
   const passwordHasUpper = /[A-Z]/.test(newPassword)
   const passwordHasLower = /[a-z]/.test(newPassword)
@@ -132,7 +147,9 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
   const isConfirmPasswordValid =
     confirmPassword.length > 0 && confirmPassword === newPassword
 
-  // STEP 1 HANDLER: Account Lookup
+  // ---------------------------------------------------------------------------
+  // Step 1 Handler: Account Lookup
+  // ---------------------------------------------------------------------------
   const handleIdentifySubmit = (e) => {
     e.preventDefault()
     setTouched((prev) => ({ ...prev, username: true }))
@@ -176,7 +193,9 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
     setStep(2)
   }
 
-  // Action: Send OTP explicitly
+  // ---------------------------------------------------------------------------
+  // Step 2 Handlers: OTP Generation & Verification
+  // ---------------------------------------------------------------------------
   const handleSendOtp = () => {
     const newOtp = Math.floor(100000 + Math.random() * 900000).toString()
     setGeneratedOtp(newOtp)
@@ -189,7 +208,6 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
     setTimeout(() => setSuccessMessage(''), 3000)
   }
 
-  // STEP 2 HANDLER: Verify OTP
   const handleOtpSubmit = (e) => {
     e.preventDefault()
     setTouched((prev) => ({ ...prev, otp: true }))
@@ -221,7 +239,6 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
     setStep(3)
   }
 
-  // Resend OTP Action
   const handleResendOtp = () => {
     if (cooldownSeconds > 0) return
     const newOtp = Math.floor(100000 + Math.random() * 900000).toString()
@@ -234,7 +251,9 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
     setTimeout(() => setSuccessMessage(''), 3500)
   }
 
-  // STEP 3 HANDLER: Reset Password
+  // ---------------------------------------------------------------------------
+  // Step 3 Handler: Reset Password
+  // ---------------------------------------------------------------------------
   const handleResetPasswordSubmit = (e) => {
     e.preventDefault()
     setTouched((prev) => ({ ...prev, password: true, confirmPassword: true }))
@@ -296,7 +315,7 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
             type="button"
             className="modal-close-btn"
             aria-label="Close modal"
-            onClick={onClose}
+            onClick={handleClose}
           >
             ✕
           </button>
@@ -371,7 +390,7 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
                 <button
                   type="button"
                   className="modal-switch-link"
-                  onClick={onSwitchToLogin}
+                  onClick={handleSwitchLogin}
                 >
                   Log in
                 </button>
@@ -433,7 +452,7 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
                     <button
                       type="button"
                       className="modal-switch-link"
-                      onClick={onSwitchToLogin}
+                      onClick={handleSwitchLogin}
                     >
                       Back to Login
                     </button>
@@ -508,7 +527,7 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
                     <button
                       type="button"
                       className="modal-switch-link"
-                      onClick={onSwitchToLogin}
+                      onClick={handleSwitchLogin}
                     >
                       Back to Login
                     </button>
@@ -645,7 +664,7 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
                 <button
                   type="button"
                   className="modal-switch-link"
-                  onClick={onSwitchToLogin}
+                  onClick={handleSwitchLogin}
                 >
                   Cancel and return to Login
                 </button>
@@ -669,7 +688,7 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
               <button
                 type="button"
                 className="form-submit-btn"
-                onClick={onSwitchToLogin}
+                onClick={handleSwitchLogin}
               >
                 Back to Login
               </button>

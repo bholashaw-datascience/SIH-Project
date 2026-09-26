@@ -87,7 +87,9 @@ export default function StudentProfileOnboarding({
   activeSection = 'all',
   onProceedToDocuments = null,
 }) {
-  // Form State
+  // ---------------------------------------------------------------------------
+  // Profile Form & Document State
+  // ---------------------------------------------------------------------------
   const [formData, setFormData] = useState(() => ({
     profilePic: initialData?.profilePic || null,
     name: initialData?.name || '',
@@ -125,6 +127,9 @@ export default function StudentProfileOnboarding({
   // Hidden File Inputs for Document Cards
   const fileInputRefs = useRef({})
 
+  // ---------------------------------------------------------------------------
+  // Form Field Change Handlers
+  // ---------------------------------------------------------------------------
   const handleFieldChange = (field, val) => {
     setFormData((prev) => {
       const next = { ...prev, [field]: val }
@@ -143,7 +148,9 @@ export default function StudentProfileOnboarding({
     }
   }
 
-  // Profile Picture File Selection -> Opens ImageCropModal
+  // ---------------------------------------------------------------------------
+  // Profile Photo Selection & Cropping Handlers
+  // ---------------------------------------------------------------------------
   const handlePhotoSelect = (e) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -183,7 +190,9 @@ export default function StudentProfileOnboarding({
     setFormData((prev) => ({ ...prev, profilePic: null }))
   }
 
-  // Document Upload & Preview Handling
+  // ---------------------------------------------------------------------------
+  // Document Upload & Preview Handlers
+  // ---------------------------------------------------------------------------
   const triggerDocUpload = (docId) => {
     if (fileInputRefs.current[docId]) {
       fileInputRefs.current[docId].click()
@@ -316,7 +325,9 @@ export default function StudentProfileOnboarding({
     return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
   }
 
-  // Validation Logic
+  // ---------------------------------------------------------------------------
+  // Form & Document Validation
+  // ---------------------------------------------------------------------------
   const errors = {}
   if (!formData.name?.trim()) errors.name = 'Full name is required'
   if (!formData.email?.trim()) {
@@ -358,7 +369,9 @@ export default function StudentProfileOnboarding({
 
   const isValid = Object.keys(errors).length === 0 && missingRequiredDocs.length === 0
 
-  // Save Draft Action
+  // ---------------------------------------------------------------------------
+  // Action Handlers: Save Draft & Verification Submission
+  // ---------------------------------------------------------------------------
   const handleSaveDraftClick = () => {
     onSaveDraft({
       formData,
@@ -369,7 +382,6 @@ export default function StudentProfileOnboarding({
     setTimeout(() => setDraftToast(null), 3500)
   }
 
-  // Submit for Verification Action
   const handleSubmitClick = (e) => {
     e.preventDefault()
 

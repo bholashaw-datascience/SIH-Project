@@ -2,10 +2,16 @@ import { useState } from 'react'
 import ImageCropModal from './ImageCropModal'
 
 function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
+  // ---------------------------------------------------------------------------
+  // Role Configuration
+  // ---------------------------------------------------------------------------
   const isAdmin = role === 'admin'
   const isAcademic = role === 'academic'
   const isIndustry = role === 'industries' || role === 'industry'
 
+  // ---------------------------------------------------------------------------
+  // Form & Input States
+  // ---------------------------------------------------------------------------
   const [showRegPassword, setShowRegPassword] = useState(false)
   const [showRegConfirmPassword, setShowRegConfirmPassword] = useState(false)
   const [isPasswordFocused, setIsPasswordFocused] = useState(false)
@@ -53,44 +59,53 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
     return []
   })
 
-  const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
-  if (isOpen !== prevIsOpen) {
-    setPrevIsOpen(isOpen)
-    if (!isOpen) {
-      setRegForm({
-        name: '',
-        address: '',
-        email: '',
-        phone: '',
-        username: '',
-        password: '',
-        confirmPassword: '',
-      })
-      setRegTouched({
-        name: false,
-        address: false,
-        email: false,
-        phone: false,
-        username: false,
-        password: false,
-        confirmPassword: false,
-      })
-      setShowRegPassword(false)
-      setShowRegConfirmPassword(false)
-      setIsPasswordFocused(false)
-      setProfilePic(null)
-      setProfilePicName('')
-      setProfilePicError('')
-      setIsCropping(false)
-      setCropImageSrc(null)
-      setCropFileName('')
-      setRegSubmitAttempted(false)
-      setRegSuccessMessage('')
-    }
+  const resetForm = () => {
+    setRegForm({
+      name: '',
+      address: '',
+      email: '',
+      phone: '',
+      username: '',
+      password: '',
+      confirmPassword: '',
+    })
+    setRegTouched({
+      name: false,
+      address: false,
+      email: false,
+      phone: false,
+      username: false,
+      password: false,
+      confirmPassword: false,
+    })
+    setShowRegPassword(false)
+    setShowRegConfirmPassword(false)
+    setIsPasswordFocused(false)
+    setProfilePic(null)
+    setProfilePicName('')
+    setProfilePicError('')
+    setIsCropping(false)
+    setCropImageSrc(null)
+    setCropFileName('')
+    setRegSubmitAttempted(false)
+    setRegSuccessMessage('')
+  }
+
+  const handleClose = () => {
+    resetForm()
+    onClose?.()
+  }
+
+  const handleSwitchLogin = () => {
+    resetForm()
+    onSwitchToLogin?.()
   }
 
   if (!isOpen) return null
 
+  // ---------------------------------------------------------------------------
+  // Validation Rules
+  // ---------------------------------------------------------------------------
   // 1. Name validation (Student Name vs Institute Name vs Industry Name vs Admin Name)
   const isNameValid = regForm.name.trim().length >= (isAcademic || isIndustry ? 1 : 2)
   const nameError =
@@ -241,6 +256,9 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
     isConfirmPasswordValid &&
     !profilePicError
 
+  // ---------------------------------------------------------------------------
+  // Profile Photo & Cropping Handlers
+  // ---------------------------------------------------------------------------
   const handleProfilePicChange = (e) => {
     setProfilePicError('')
     const file = e.target.files?.[0]
@@ -293,6 +311,9 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
     setCropFileName('')
   }
 
+  // ---------------------------------------------------------------------------
+  // Form Submission Handler
+  // ---------------------------------------------------------------------------
   const handleRegisterSubmit = (e) => {
     e.preventDefault()
     setRegSubmitAttempted(true)
@@ -403,7 +424,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
               type="button"
               className="modal-close-btn"
               aria-label="Close modal"
-              onClick={onClose}
+              onClick={handleClose}
             >
               ✕
             </button>
@@ -842,7 +863,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
                   <button
                     type="button"
                     className="modal-switch-link"
-                    onClick={onSwitchToLogin}
+                    onClick={handleSwitchLogin}
                   >
                     Log in to your account
                   </button>

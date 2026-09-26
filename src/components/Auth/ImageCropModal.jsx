@@ -13,6 +13,9 @@ function ImageCropModal({
   aspectRatio = '1:1',
   shape = 'circle',
 }) {
+  // ---------------------------------------------------------------------------
+  // Crop Geometry & State
+  // ---------------------------------------------------------------------------
   const [cropZoom, setCropZoom] = useState(1)
   const [cropPan, setCropPan] = useState({ x: 0, y: 0 })
   const [cropNaturalSize, setCropNaturalSize] = useState({ width: 0, height: 0 })
@@ -41,15 +44,6 @@ function ImageCropModal({
     frameHeight = 220
     exportWidth = 360
     exportHeight = 360
-  }
-
-  const [prevOpenSrc, setPrevOpenSrc] = useState({ isOpen, imageSrc, aspectRatio })
-  if (isOpen !== prevOpenSrc.isOpen || imageSrc !== prevOpenSrc.imageSrc || aspectRatio !== prevOpenSrc.aspectRatio) {
-    setPrevOpenSrc({ isOpen, imageSrc, aspectRatio })
-    if (isOpen) {
-      setCropZoom(1)
-      setCropPan({ x: 0, y: 0 })
-    }
   }
 
   if (!isOpen || !imageSrc) return null
@@ -196,6 +190,7 @@ function ImageCropModal({
             onWheel={handleWheel}
           >
             <img
+              key={`${imageSrc}-${aspectRatio}`}
               ref={cropImgRef}
               src={imageSrc}
               alt="Crop target"

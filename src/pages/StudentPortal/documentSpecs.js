@@ -1,3 +1,6 @@
+// -----------------------------------------------------------------------------
+// Required Verification Document Specifications
+// -----------------------------------------------------------------------------
 export const DOCUMENT_SPECS = [
   {
     id: 'admissionSlip',

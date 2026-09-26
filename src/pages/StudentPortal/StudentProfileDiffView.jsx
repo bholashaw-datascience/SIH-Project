@@ -13,7 +13,9 @@ export default function StudentProfileDiffView({
 }) {
   const isRejected = pendingStatus === 'rejected'
 
-  // Comparison fields definitions
+  // ---------------------------------------------------------------------------
+  // Comparison Field Definitions
+  // ---------------------------------------------------------------------------
   const fields = [
     { key: 'name', label: 'Full Name' },
     { key: 'email', label: 'Email Address' },
@@ -35,6 +37,9 @@ export default function StudentProfileDiffView({
     { key: 'cgpa', label: 'CGPA' },
   ]
 
+  // ---------------------------------------------------------------------------
+  // Field & Photo Change Helpers
+  // ---------------------------------------------------------------------------
   const isFieldChanged = (key) => {
     const oldVal = (verifiedData?.[key] || '').toString().trim()
     const newVal = (pendingData?.[key] || '').toString().trim()
@@ -493,6 +498,15 @@ export default function StudentProfileDiffView({
       {/* Top Navbar */}
       <header className="diff-top-nav-bar">
         <h1 className="diff-nav-title">IAS Collaboration Portal • Profile Changes</h1>
+        {onBackToDashboard && (
+          <button
+            type="button"
+            className="diff-btn-back"
+            onClick={onBackToDashboard}
+          >
+            ← Back to Dashboard
+          </button>
+        )}
       </header>
 
       {/* Banner */}

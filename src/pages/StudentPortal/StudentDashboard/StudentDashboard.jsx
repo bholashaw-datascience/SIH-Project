@@ -10,6 +10,9 @@ import ChangePasswordModal from './ChangePasswordModal'
 
 const EMPTY_OBJ = {}
 
+const generateRecordId = (prefix) =>
+  `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
+
 export default function StudentDashboard({
   student = EMPTY_OBJ,
   verifiedProfile = EMPTY_OBJ,
@@ -258,7 +261,7 @@ export default function StudentDashboard({
     setInternships((prev) => [item, ...prev])
 
     const notif = {
-      id: `n_${Date.now()}`,
+      id: generateRecordId('n'),
       type: 'info',
       title: `Internship Experience Submitted: ${item.company}`,
       message: 'Certificate and tenure details submitted to Portal Admin for review.',
@@ -270,7 +273,7 @@ export default function StudentDashboard({
 
   const handleCreatePost = (postData, isDraft) => {
     const newPost = {
-      id: `post_${Date.now()}`,
+      id: generateRecordId('post'),
       title: postData.title || (postData.caption ? postData.caption.slice(0, 45) + '...' : 'Public Post'),
       caption: postData.caption || postData.content || '',
       content: postData.caption || postData.content || '',
@@ -296,7 +299,7 @@ export default function StudentDashboard({
 
     if (!isDraft) {
       const notif = {
-        id: `n_${Date.now()}`,
+        id: generateRecordId('n'),
         type: 'info',
         title: `Public Post Submitted for Verification`,
         message: 'Your post is under moderation review by IAS Collaboration Portal Admin.',

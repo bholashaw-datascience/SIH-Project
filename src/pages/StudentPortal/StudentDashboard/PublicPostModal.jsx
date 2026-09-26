@@ -3,6 +3,9 @@ import ImageCropModal from '../../../components/Auth/ImageCropModal'
 
 const EMPTY_POSTS = []
 
+const createMediaId = () =>
+  `m_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
+
 export default function PublicPostModal({
   isOpen,
   onClose,
@@ -296,7 +299,7 @@ export default function PublicPostModal({
     } else if (post.attachmentUrl || post.attachment) {
       setMediaList([
         {
-          id: `m_${Date.now()}`,
+          id: createMediaId(),
           name: post.attachment || 'Attached Media',
           size: post.attachmentSize || '',
           type: post.attachmentType || 'image',
