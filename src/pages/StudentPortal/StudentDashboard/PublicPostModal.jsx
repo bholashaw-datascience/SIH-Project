@@ -128,8 +128,10 @@ export default function PublicPostModal({
 
     Array.from(fileList).forEach((file) => {
       const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase()
-      const isImage = file.type.startsWith('image/') || allowedImgExts.includes(ext)
-      const isVideo = file.type.startsWith('video/') || allowedVidExts.includes(ext)
+      const validImgMimes = ['image/jpeg', 'image/png', 'image/webp']
+      const validVidMimes = ['video/mp4', 'video/webm', 'video/quicktime', 'video/ogg']
+      const isImage = allowedImgExts.includes(ext) && (validImgMimes.includes(file.type) || !file.type) && file.type !== 'image/svg+xml'
+      const isVideo = allowedVidExts.includes(ext) && (validVidMimes.includes(file.type) || file.type.startsWith('video/') || !file.type)
 
       if (!isImage && !isVideo) {
         encounteredError = `"${file.name}" is not supported. Please upload photos (JPG, PNG, WEBP) or videos (MP4, WebM, MOV).`
@@ -185,8 +187,10 @@ export default function PublicPostModal({
     const allowedImgExts = ['.jpg', '.jpeg', '.png', '.webp']
     const allowedVidExts = ['.mp4', '.webm', '.mov', '.ogg']
     const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase()
-    const isImage = file.type.startsWith('image/') || allowedImgExts.includes(ext)
-    const isVideo = file.type.startsWith('video/') || allowedVidExts.includes(ext)
+    const validImgMimes = ['image/jpeg', 'image/png', 'image/webp']
+    const validVidMimes = ['video/mp4', 'video/webm', 'video/quicktime', 'video/ogg']
+    const isImage = allowedImgExts.includes(ext) && (validImgMimes.includes(file.type) || !file.type) && file.type !== 'image/svg+xml'
+    const isVideo = allowedVidExts.includes(ext) && (validVidMimes.includes(file.type) || file.type.startsWith('video/') || !file.type)
 
     if (!isImage && !isVideo) {
       setFileError('Invalid file format. Please choose a valid photo (JPG, PNG) or video (MP4, WebM).')

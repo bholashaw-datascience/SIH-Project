@@ -2,6 +2,15 @@ import { useState } from 'react'
 
 const EMPTY_ARRAY = []
 
+const sanitizeExternalUrl = (rawUrl) => {
+  if (!rawUrl || typeof rawUrl !== 'string') return null
+  const trimmed = rawUrl.trim()
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed
+  }
+  return null
+}
+
 // -----------------------------------------------------------------------------
 // Skills, Projects & Internship Experience Modal
 // -----------------------------------------------------------------------------
@@ -59,10 +68,12 @@ export default function SkillsProjectsModal({
   const handleCreateProject = (e) => {
     e.preventDefault()
     if (!projTitle.trim()) return
+    const cleanUrl = projUrl.trim()
+    const formattedUrl = cleanUrl && !/^https?:\/\//i.test(cleanUrl) ? `https://${cleanUrl}` : cleanUrl
     onAddProject?.({
       title: projTitle.trim(),
       techStack: projTech.split(',').map((t) => t.trim()).filter(Boolean),
-      url: projUrl.trim(),
+      url: formattedUrl,
       description: projDesc.trim(),
       documentFile: projDocName || 'Project_Documentation.pdf',
     })
@@ -875,14 +886,23 @@ export default function SkillsProjectsModal({
                             {p.techStack && (
                               <span><strong>Stack:</strong> {Array.isArray(p.techStack) ? p.techStack.join(', ') : p.techStack}</span>
                             )}
-                            {p.url && (
-                              <>
-                                <span>•</span>
-                                <a href={p.url} target="_blank" rel="noreferrer" style={{ color: '#0369a1', textDecoration: 'underline' }}>
-                                  View Source / Demo
-                                </a>
-                              </>
-                            )}
+                            {(() => {
+                              const safeUrl = sanitizeExternalUrl(p.url)
+                              if (!safeUrl) return null
+                              return (
+                                <>
+                                  <span>•</span>
+                                  <a
+                                    href={safeUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ color: '#0369a1', textDecoration: 'underline' }}
+                                  >
+                                    View Source / Demo
+                                  </a>
+                                </>
+                              )
+                            })()}
                             {p.documentFile && (
                               <>
                                 <span>•</span>

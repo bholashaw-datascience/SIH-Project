@@ -220,6 +220,7 @@ function LoginModal({
                     : 'Enter your username'
                 }
                 value={username}
+                maxLength={50}
                 onChange={(e) => {
                   setUsername(e.target.value)
                   if (!touched.username) setTouched({ ...touched, username: true })
@@ -244,6 +245,7 @@ function LoginModal({
                   className={`form-input ${touched.password && !password.trim() ? 'is-invalid' : ''}`}
                   placeholder="Enter your password"
                   value={password}
+                  maxLength={128}
                   onChange={(e) => {
                     setPassword(e.target.value)
                     if (!touched.password) setTouched({ ...touched, password: true })

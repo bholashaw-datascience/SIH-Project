@@ -31,6 +31,15 @@ const DURATION_OPTIONS = [
   'Other',
 ]
 
+function sanitizeExternalUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== 'string') return ''
+  const trimmed = rawUrl.trim()
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed
+  }
+  return ''
+}
+
 function StudentPageNavbar({
   student = {},
   subtitle = 'Portal',
@@ -577,9 +586,10 @@ export default function StudentAchievementsExperience({
       setFormError('Certificate file exceeds 5 MB limit. Please select a smaller file.')
       return
     }
-    const allowed = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
+    const allowedMimes = ['application/pdf', 'image/jpeg', 'image/png']
+    const allowedExts = ['pdf', 'jpg', 'jpeg', 'png']
     const ext = (file.name.split('.').pop() || '').toLowerCase()
-    if (!allowed.includes(file.type) && !['pdf', 'jpg', 'jpeg', 'png'].includes(ext)) {
+    if ((file.type && !allowedMimes.includes(file.type)) || !allowedExts.includes(ext) || file.type === 'image/svg+xml') {
       setFormError('Please upload a valid PDF, JPG, or PNG certificate file.')
       return
     }
@@ -855,7 +865,7 @@ export default function StudentAchievementsExperience({
         return
       }
       const ext = (file.name.split('.').pop() || '').toLowerCase()
-      if (!allowed.includes(file.type) && !['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
+      if ((file.type && !allowed.includes(file.type)) || !['jpg', 'jpeg', 'png', 'webp'].includes(ext) || file.type === 'image/svg+xml') {
         setProjectFormError(`File "${file.name}" is not a valid image. Please upload PNG, JPG, JPEG, or WEBP.`)
         return
       }
@@ -889,7 +899,7 @@ export default function StudentAchievementsExperience({
     }
     const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
     const ext = (newFile.name.split('.').pop() || '').toLowerCase()
-    if (!allowed.includes(newFile.type) && !['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
+    if ((newFile.type && !allowed.includes(newFile.type)) || !['jpg', 'jpeg', 'png', 'webp'].includes(ext) || newFile.type === 'image/svg+xml') {
       setProjectFormError(`File "${newFile.name}" is not a valid image. Allowed formats: PNG, JPG, JPEG, WEBP.`)
       return
     }
@@ -3755,9 +3765,9 @@ export default function StudentAchievementsExperience({
                                 )}
                               </div>
 
-                              {item.credentialUrl && (
+                              {sanitizeExternalUrl(item.credentialUrl) && (
                                 <a
-                                  href={item.credentialUrl}
+                                  href={sanitizeExternalUrl(item.credentialUrl)}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="sae-cred-verify-link"
@@ -4523,9 +4533,9 @@ export default function StudentAchievementsExperience({
                           </div>
 
                           {/* Project Link if available */}
-                          {(item.url || item.link) && (
+                          {sanitizeExternalUrl(item.url || item.link) && (
                             <a
-                              href={item.url || item.link}
+                              href={sanitizeExternalUrl(item.url || item.link)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="sae-cred-verify-link"
@@ -5111,9 +5121,9 @@ export default function StudentAchievementsExperience({
                           </div>
 
                           {/* Certificate Link */}
-                          {item.certificateLink && (
+                          {sanitizeExternalUrl(item.certificateLink) && (
                             <a
-                              href={item.certificateLink}
+                              href={sanitizeExternalUrl(item.certificateLink)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="sae-project-link-btn"

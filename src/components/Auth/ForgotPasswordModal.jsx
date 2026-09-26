@@ -277,7 +277,8 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
           acc.username.toLowerCase() === foundAccount.username.toLowerCase() &&
           (acc.role === normalizedRole || (normalizedRole === 'industry' && acc.role === 'industries'))
         ) {
-          return Object.assign({}, acc, { password: newPassword })
+          // Never persist plaintext passwords in browser storage; track reset event timestamp
+          return Object.assign({}, acc, { passwordLastReset: new Date().toISOString() })
         }
         return acc
       })
@@ -371,6 +372,7 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
                   className={`form-input ${touched.username && !username.trim() ? 'is-invalid' : ''}`}
                   placeholder={usernamePlaceholder}
                   value={username}
+                  maxLength={50}
                   onChange={(e) => {
                     setUsername(e.target.value)
                     if (errorMessage) setErrorMessage('')
@@ -552,6 +554,7 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
                     className={`form-input ${touched.password && !isPasswordValid ? 'is-invalid' : newPassword && isPasswordValid ? 'is-valid' : ''}`}
                     placeholder="Create a strong new password"
                     value={newPassword}
+                    maxLength={128}
                     onChange={(e) => {
                       setNewPassword(e.target.value)
                       if (errorMessage) setErrorMessage('')
@@ -621,6 +624,7 @@ function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin, role = 'student
                     className={`form-input ${confirmPassword && !isConfirmPasswordValid ? 'is-invalid' : confirmPassword && isConfirmPasswordValid ? 'is-valid' : ''}`}
                     placeholder="Re-enter your new password"
                     value={confirmPassword}
+                    maxLength={128}
                     onChange={(e) => {
                       setConfirmPassword(e.target.value)
                       if (errorMessage) setErrorMessage('')

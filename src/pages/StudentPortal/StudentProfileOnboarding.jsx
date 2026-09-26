@@ -155,8 +155,11 @@ export default function StudentProfileOnboarding({
     const file = e.target.files?.[0]
     if (!file) return
 
-    if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file (JPG, PNG, WEBP).')
+    const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase()
+    const validImageExts = ['.jpg', '.jpeg', '.png', '.webp']
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/webp']
+    if (!validImageTypes.includes(file.type) || !validImageExts.includes(ext)) {
+      alert('Please upload a valid raster image file (JPG, PNG, WEBP). SVG and script formats are not permitted.')
       return
     }
 
@@ -205,11 +208,11 @@ export default function StudentProfileOnboarding({
 
     const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase()
     const validExts = ['.pdf', '.png', '.jpg', '.jpeg']
-    const isPdf = file.type === 'application/pdf' || ext === '.pdf'
-    const isImage = file.type.startsWith('image/') || ['.png', '.jpg', '.jpeg'].includes(ext)
+    const isAllowedExt = validExts.includes(ext)
+    const isAllowedMime = file.type === 'application/pdf' || ['image/jpeg', 'image/png'].includes(file.type) || file.type === ''
 
-    if (!validExts.includes(ext) && !isPdf && !isImage) {
-      alert(`Invalid file format "${file.name}". Please upload a PDF, JPG, JPEG, or PNG document.`)
+    if (!isAllowedExt || !isAllowedMime) {
+      alert(`Invalid file format "${file.name}". Please upload a genuine PDF, JPG, JPEG, or PNG document.`)
       e.target.value = ''
       return
     }
@@ -231,7 +234,7 @@ export default function StudentProfileOnboarding({
         docId,
         fileName: file.name,
         fileSize: sizeFormatted,
-        fileType: file.type || (isPdf ? 'application/pdf' : 'image/jpeg'),
+        fileType: file.type || (ext === '.pdf' ? 'application/pdf' : 'image/jpeg'),
         uploadedAt: new Date().toLocaleDateString('en-IN', {
           day: '2-digit',
           month: 'short',
@@ -2122,6 +2125,7 @@ export default function StudentProfileOnboarding({
                     className={`onb-input ${submitAttempted && errors.name ? 'has-error' : ''}`}
                     placeholder="Enter full legal name as per Aadhaar / 10th"
                     value={formData.name}
+                    maxLength={100}
                     onChange={(e) => handleFieldChange('name', e.target.value)}
                   />
                   {submitAttempted && errors.name && <span className="onb-field-error">{errors.name}</span>}
@@ -2136,6 +2140,7 @@ export default function StudentProfileOnboarding({
                     className={`onb-input ${submitAttempted && errors.email ? 'has-error' : ''}`}
                     placeholder="student@institution.edu"
                     value={formData.email}
+                    maxLength={150}
                     onChange={(e) => handleFieldChange('email', e.target.value)}
                   />
                   {submitAttempted && errors.email && <span className="onb-field-error">{errors.email}</span>}
@@ -2150,6 +2155,7 @@ export default function StudentProfileOnboarding({
                     className={`onb-input ${submitAttempted && errors.phone ? 'has-error' : ''}`}
                     placeholder="+91 98765 43210"
                     value={formData.phone}
+                    maxLength={15}
                     onChange={(e) => handleFieldChange('phone', e.target.value)}
                   />
                   {submitAttempted && errors.phone && <span className="onb-field-error">{errors.phone}</span>}
@@ -2270,6 +2276,7 @@ export default function StudentProfileOnboarding({
                     className={`onb-input ${submitAttempted && errors.institution ? 'has-error' : ''}`}
                     placeholder="e.g. National Institute of Technology"
                     value={formData.institution}
+                    maxLength={150}
                     onChange={(e) => handleFieldChange('institution', e.target.value)}
                   />
                   {submitAttempted && errors.institution && (
@@ -2286,6 +2293,7 @@ export default function StudentProfileOnboarding({
                     className={`onb-input ${submitAttempted && errors.course ? 'has-error' : ''}`}
                     placeholder="e.g. B.Tech Computer Science & Engineering"
                     value={formData.course}
+                    maxLength={100}
                     onChange={(e) => handleFieldChange('course', e.target.value)}
                   />
                   {submitAttempted && errors.course && (
@@ -2346,6 +2354,7 @@ export default function StudentProfileOnboarding({
                     className={`onb-input ${submitAttempted && errors.collegeRoll ? 'has-error' : ''}`}
                     placeholder="e.g. CSE-23-042"
                     value={formData.collegeRoll}
+                    maxLength={50}
                     onChange={(e) => handleFieldChange('collegeRoll', e.target.value)}
                   />
                   {submitAttempted && errors.collegeRoll && (
@@ -2362,6 +2371,7 @@ export default function StudentProfileOnboarding({
                     className={`onb-input ${submitAttempted && errors.universityRoll ? 'has-error' : ''}`}
                     placeholder="e.g. 10800123042 or STU-2026-CS8841"
                     value={formData.universityRoll}
+                    maxLength={50}
                     onChange={(e) => handleFieldChange('universityRoll', e.target.value)}
                   />
                   {submitAttempted && errors.universityRoll && (
@@ -2765,7 +2775,7 @@ export default function StudentProfileOnboarding({
                           <a
                             href={previewDoc.dataUrl}
                             target="_blank"
-                            rel="noreferrer"
+                            rel="noopener noreferrer"
                             download={previewDoc.fileName}
                             className="onb-doc-btn-preview"
                           >
@@ -2802,7 +2812,7 @@ export default function StudentProfileOnboarding({
                   <a
                     href={previewDoc.dataUrl}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     download={previewDoc.fileName}
                     className="onb-preview-download-link"
                   >

@@ -268,7 +268,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
     const fileExt = file.name.split('.').pop()?.toLowerCase()
     const validExtensions = ['jpg', 'jpeg', 'png', 'webp']
 
-    if (!validMimeTypes.includes(file.type) && !validExtensions.includes(fileExt)) {
+    if (!validMimeTypes.includes(file.type) || !validExtensions.includes(fileExt)) {
       setProfilePicError('Invalid format. Supported formats: JPG, PNG, or WebP only.')
       e.target.value = ''
       return
@@ -475,6 +475,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
                           : 'Enter your full name'
                       }
                       value={regForm.name}
+                      maxLength={100}
                       onChange={(e) => {
                         setRegForm({ ...regForm, name: e.target.value })
                         if (!regTouched.name) setRegTouched({ ...regTouched, name: true })
@@ -494,6 +495,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
                         className={`form-input ${addressError ? 'is-invalid' : (regForm.address && isAddressValid ? 'is-valid' : '')}`}
                         placeholder={isIndustry ? 'Corporate office, city, state' : 'Campus address, city, state'}
                         value={regForm.address}
+                        maxLength={250}
                         onChange={(e) => {
                           setRegForm({ ...regForm, address: e.target.value })
                           if (!regTouched.address) setRegTouched({ ...regTouched, address: true })
@@ -515,6 +517,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
                             : 'Choose unique username'
                         }
                         value={regForm.username}
+                        maxLength={30}
                         onChange={(e) => {
                           setRegForm({ ...regForm, username: e.target.value })
                           if (!regTouched.username) setRegTouched({ ...regTouched, username: true })
@@ -548,6 +551,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
                           : 'name@university.edu'
                       }
                       value={regForm.email}
+                      maxLength={150}
                       onChange={(e) => {
                         setRegForm({ ...regForm, email: e.target.value })
                         if (!regTouched.email) setRegTouched({ ...regTouched, email: true })
@@ -569,6 +573,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
                       className={`form-input ${phoneError ? 'is-invalid' : (regForm.phone && isPhoneValid ? 'is-valid' : '')}`}
                       placeholder="10-digit mobile number"
                       value={regForm.phone}
+                      maxLength={15}
                       onChange={(e) => {
                         setRegForm({ ...regForm, phone: e.target.value })
                         if (!regTouched.phone) setRegTouched({ ...regTouched, phone: true })
@@ -595,6 +600,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
                             : 'Institutional username (e.g. iit_delhi_admin)'
                         }
                         value={regForm.username}
+                        maxLength={30}
                         onChange={(e) => {
                           setRegForm({ ...regForm, username: e.target.value })
                           if (!regTouched.username) setRegTouched({ ...regTouched, username: true })
@@ -734,6 +740,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
                       className={`form-input ${(regTouched.password || regSubmitAttempted) && !isPasswordValid ? 'is-invalid' : (regForm.password && isPasswordValid ? 'is-valid' : '')}`}
                       placeholder="Create strong password"
                       value={regForm.password}
+                      maxLength={128}
                       onChange={(e) => {
                         setRegForm({ ...regForm, password: e.target.value })
                         if (!regTouched.password) setRegTouched({ ...regTouched, password: true })
@@ -783,6 +790,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin, role = 'student' }) {
                       className={`form-input ${confirmPasswordFeedback?.type === 'error' ? 'is-invalid' : (confirmPasswordFeedback?.type === 'success' ? 'is-valid' : '')}`}
                       placeholder="Confirm your password"
                       value={regForm.confirmPassword}
+                      maxLength={128}
                       onChange={(e) => {
                         setRegForm({ ...regForm, confirmPassword: e.target.value })
                         if (!regTouched.confirmPassword) setRegTouched({ ...regTouched, confirmPassword: true })
